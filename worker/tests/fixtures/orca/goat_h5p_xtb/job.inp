@@ -1,0 +1,12 @@
+! GOAT-EXPLORE XTB
+%maxcore 600
+%goat
+  MaxEn 30
+end
+* xyz 1 1
+H 0 0 0
+H 0.9 0 0
+H 0.45 0.78 0
+H 0.45 0.3 1.4
+H 0.45 0.3 2.2
+*

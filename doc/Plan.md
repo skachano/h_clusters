@@ -89,8 +89,9 @@ trusting them, which is a core HTC habit.
 | L0′ | GFN2-xTB (standalone `xtb`, or ORCA `! GOAT-EXPLORE XTB`) | Candidate *geometry* generator only; its energies are not used for ranking (see Phase 0 findings) | ms–s |
 | L0 | r²SCAN-3c (ORCA) | Pre-optimization and screening of all candidates | s |
 | L1 | DFT: ωB97M-V/def2-TZVPPD (alt. ωB97X-D4, r²SCAN-3c) | Geometry optimization + frequencies for every candidate | s–min |
+| L1M | (U)MP2/aug-cc-pVTZ | Second geometry optimization + frequencies, free of DFT self-interaction and delocalization error (added in Phase 3: DFT has no C₂v H₅⁺ minimum) | min |
 | L1′ | B3LYP/def2-TZVPPD (no dispersion) | Didactic: shows self-interaction and dispersion failures | s–min |
-| L2 | (U)CCSD(T)/aug-cc-pVTZ single points on L1 geometries | Reference energetics | s–min |
+| L2 | (U)CCSD(T)/aug-cc-pVTZ single points on L1 *and* L1M geometries | Reference energetics; the lower of the two picks the structure | s–min |
 | L3 | (U)CCSD(T)/aug-cc-pVTZ optimization (numerical gradients) + frequencies, for the final low-lying structures only | Check that the L1 geometries/minima hold | min–h |
 | L4 (opt.) | CCSD(T)/aug-cc-pVQZ or CBS extrapolation | Basis-set convergence study | min–h |
 
@@ -119,7 +120,8 @@ complementary sources of candidates:
 2. **Random structures**: K random geometries per state (start with K = 20)
    with a minimum-distance constraint (e.g. 0.6 Å) inside a sphere that
    scales with m^(1/3).
-3. **ORCA GOAT** global optimizer (new in ORCA 6) at GFN2-xTB level:
+3. **ORCA GOAT** global optimizer (new in ORCA 6) at GFN2-xTB level. This
+   source is *optional*: in Phase 3 it contributed no surviving candidate.
    `! GOAT-EXPLORE XTB`. Use the *explore* variant: plain `GOAT` treats each
    H atom as its own fragment and keeps the bonding pattern fixed, so it
    cannot turn a chain into a ring. ORCA finds xtb through the `XTBEXE`
@@ -129,16 +131,24 @@ complementary sources of candidates:
    (estimated ~5 h for H₃⁺), so the DFT-level search is our own parallel
    template + random search.
 
-All candidates are pre-optimized at L0 (r²SCAN-3c). They are then **deduplicated** by
-energy (ΔE < 0.1 kcal/mol) plus a geometric fingerprint (sorted
-interatomic-distance vector or RMSD after alignment, permutation-invariant).
-The unique structures within an energy window (e.g. 15 kcal/mol, at most
-8 per state) are promoted to L1.
+All candidates are pre-optimized at L0 (r²SCAN-3c). A `select` stage then
+acts as a per-state barrier: it waits until every job that can feed it has
+finished, and then:
+1. **Deduplicates.** Two structures are duplicates if ΔE < 0.1 kcal/mol
+   *and* the RMS difference of their sorted interatomic-distance vectors is
+   < 0.05 Å. That fingerprint is invariant to translation, rotation and atom
+   permutation.
+2. **Promotes.** The unique, intact structures within 15 kcal/mol (at most
+   8 per state) go on to L1 and L1M.
+3. **Records every decision** in the `Candidate` table: duplicate-of, rank,
+   dissociated, composition, and source (seed generator or GOAT).
 
-Some starting points will **fall apart** during optimization (fragments fly
-away). Detect this with a connectivity graph (H–H cutoff ≈ 1.3 Å for
-covalent contacts, ≈ 3.5 Å for van der Waals contacts). Record it as a
-result ("dissociates"), not as a failure.
+Some starting points **fall apart** during optimization. If no contact
+between the pieces is shorter than 2.5 Å (`dissociation_cutoff`), the
+structure has dissociated. That is recorded as a result, never retried, and
+never promoted. A converged optimization ends `done`, an unconverged one
+`dissociated`. Bonded units (contacts < 1.15 Å) give a composition label such
+as `H3·H2`.
 
 ### 2.2 Derived quantities
 
@@ -217,7 +227,7 @@ h_clusters/
 │       ├── geometry.py        # Geometry + XYZ I/O
 │       ├── levels.py          # method ladder L0…L2
 │       ├── results.py         # engine-independent Result
-│       ├── structures.py      # templates, random generator, dedup/fingerprints
+│       ├── structures.py      # seed generators, fingerprints, fragments/composition
 │       ├── engines/
 │       │   └── orca.py        # input rendering, hashing, run (xtb runs via ORCA GOAT)
 │       ├── parse.py           # property.json (orca_2json) + text-only items → Result
@@ -493,14 +503,55 @@ Each phase has a concrete **done when** criterion.
   - H₄⁻ (quartet): its L0 optimization never converges while the fragments
     drift apart
 
-### Phase 3: Structure search (2–3 days)
+### Phase 3: Structure search (2–3 days) — ✅ done 2026-10-09
 - Templates, a random generator, GOAT, L0 pre-optimization, dedup by
   fingerprint, fragmentation detection, and promotion.
 - **Done when** the search finds the D₃h triangle for H₃⁺ and the
   H₃⁺·H₂ (C₂v) structure for H₅⁺ starting from random geometries.
+- What was built:
+  - Seed generators: `chain`, `ring`, `sphere`, `h2_units`, `h3_core`, the
+    `templates` bundle, and `random` (seeded, uniform in a ball,
+    connected).
+  - A `select` stage with the `Candidate` table.
+  - Seeds can be routed to any stage (`into:`), and a stage can have several
+    inputs (`from: [..]`).
+  - GOAT is a task that fans its ensemble out into child jobs.
+  - Campaigns are **extensible**: stages added to a finished campaign get
+    their jobs on the next `run`, and only that new work runs.
+  - `python -m hclust structures <campaign> --stage <name>` lists the
+    structures per state.
+- Acceptance campaign: `campaigns/phase3_check.yaml`, 20 random seeds per
+  state.
+
+**Findings:**
+- **H₃⁺:** all 20 random starts reach the triangle (L0 0.870 Å, L1 0.875 Å,
+  MP2 0.871 Å).
+- **H₅⁺: DFT has no C₂v minimum.**
+  - At r²SCAN-3c and ωB97M-V, all 20 random starts (and the `h3_core`
+    template, which starts as C₂v H₃⁺·H₂) end in the proton-shared
+    [H₂–H–H₂]⁺ structure: D₂d, 4 × 1.13 Å, a minimum with all frequencies
+    real. A planar variant lies 0.29 kcal/mol higher at L0.
+  - MP2/aug-cc-pVTZ has the C₂v H₃⁺·H₂ minimum (H₂ 0.761 Å, H₃⁺ unit
+    0.811/0.969/0.969 Å), while D₂d is a saddle point (546i cm⁻¹). The
+    runner displaced both promoted structures along their imaginary modes
+    into C₂v.
+  - CCSD(T)/aVTZ: C₂v is 0.13 kcal/mol below D₂d at MP2 geometries, and
+    0.16 kcal/mol below the ωB97M-V geometry. This matches the literature.
+  - This is DFT delocalization error favouring a delocalized, shared proton.
+    Hence the new **L1M (MP2) geometry level** next to L1.
+  - Physics caveat: 0.13 kcal/mol is far below H₅⁺'s zero-point energy, so
+    the real molecule is fluxional.
+- **GOAT (xTB):** 220 s for H₅⁺. Its single ensemble member (xtb's linear
+  chain) was the one optimization that never converged, so it added no
+  candidate. GOAT is therefore off by default for Phase 4 (cost grows with
+  m; value so far is zero).
+- **Optimizer behaviour:** 16 of the 21 H₅⁺ pre-optimizations needed a
+  restart. Optimizations started from random geometries often exceed
+  ORCA's default cycle limit, and the restart rule recovers them.
 
 ### Phase 4: Full baseline campaign (1 day, plus compute time)
-- Run L0 → L1 (+freq) → L2 for all 29 species × baseline multiplicities.
+- Run L0 → select → L1 and L1M (+freq) → L2 for all 29 species × baseline
+  multiplicities.
 - Rough budget: ~57 states × ~30 candidates × L0, then ~57 × 8 × L1, then L2
   on the minima. That is a few thousand jobs, hours of wall time on 16
   workers.

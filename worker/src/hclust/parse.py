@@ -14,6 +14,7 @@ NORMAL_TERMINATION = "ORCA TERMINATED NORMALLY"
 OPT_CONVERGED = "THE OPTIMIZATION HAS CONVERGED"
 SCF_NOT_CONVERGED = "SCF NOT CONVERGED"
 
+_VERSION = re.compile(r"Program Version (\S+)")
 _S2 = re.compile(r"Expectation value of <S\*\*2>\s*:\s*(-?\d+\.\d+)")
 _POINT_GROUP = re.compile(r"Point Group:\s*(\S+),\s*Symmetry Number:\s*(\d+)")
 _ORBITAL_ROW = re.compile(r"^\s*\d+\s+(\d+\.\d+)\s+(-?\d+\.\d+)\s+-?\d+\.\d+\s*$")
@@ -21,7 +22,9 @@ _ORBITAL_ROW = re.compile(r"^\s*\d+\s+(\d+\.\d+)\s+(-?\d+\.\d+)\s+-?\d+\.\d+\s*$
 _ERRORS = (re.compile(r"\bError \(.*"), re.compile(r"^Error\b.*"))
 
 
-def parse_orca(workdir: Path, basename: str = "job", is_opt: bool = False) -> Result:
+def parse_orca(
+    workdir: Path, basename: str = "job", is_opt: bool = False, is_goat: bool = False
+) -> Result:
     workdir = Path(workdir)
     out_path = workdir / f"{basename}.out"
     out = out_path.read_text(errors="replace") if out_path.exists() else ""
@@ -38,11 +41,14 @@ def parse_orca(workdir: Path, basename: str = "job", is_opt: bool = False) -> Re
         energy=last["Single_Point_Data"]["FinalEnergy"],
         geometry=_geometry(last),
         mulliken_charges=_charges(last),
-        orca_version=props["Calculation_Status"]["version"],
+        orca_version=_VERSION.search(out)[1],
         wall_time_s=props.get("Calculation_Timings", {}).get("SUM"),
         workdir=workdir,
     )
-    if is_opt:
+    if is_goat:
+        result.ensemble, result.ensemble_energies = _ensemble(workdir / f"{basename}.finalensemble.xyz")
+        result.geometry, result.energy = result.ensemble[0], result.ensemble_energies[0]
+    elif is_opt:
         result.opt_converged = OPT_CONVERGED in out
         if not result.opt_converged:
             result.status, result.error_kind = "failed", "opt"
@@ -67,6 +73,20 @@ def _geometry(entry: dict) -> Geometry:
     if coords["Units"] == "a.u.":
         xyz *= BOHR_TO_ANGSTROM
     return Geometry(tuple(r[0] for r in rows), xyz)
+
+
+def _ensemble(path: Path) -> tuple[list[Geometry], list[float]]:
+    """Multi-frame XYZ written by GOAT; each comment line starts with the energy (Eh)."""
+    lines = path.read_text().splitlines()
+    geometries, energies, i = [], [], 0
+    while i < len(lines) and lines[i].strip():
+        n = int(lines[i])
+        frame = Geometry.from_xyz("\n".join(lines[i : i + n + 2]))
+        energies.append(float(frame.comment.split()[0]))
+        geometries.append(Geometry(frame.symbols, frame.coords))
+        i += n + 2
+    order = sorted(range(len(energies)), key=energies.__getitem__)
+    return [geometries[k] for k in order], [energies[k] for k in order]
 
 
 def _charges(entry: dict) -> list[float] | None:

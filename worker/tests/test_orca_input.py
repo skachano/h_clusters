@@ -69,3 +69,15 @@ def test_retry_keywords_are_appended_and_change_the_hash():
     slow = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], extra_keywords=("SlowConv",))
     assert slow.keywords() == "wB97M-V def2-TZVPPD TightSCF SlowConv"
     assert slow.hash != plain.hash
+
+
+def test_goat_input():
+    h3 = Geometry.hydrogens([[0, 0, 0], [0.9, 0, 0], [1.8, 0, 0]])
+    job = OrcaJob(State(3, 1, 1), h3, LEVELS["XTB"], Task.GOAT)
+    text = job.render()
+    assert "! GOAT-EXPLORE XTB\n" in text
+    assert "%goat\n  MaxEn 30\nend\n" in text
+    # H2 has a single shape: GOAT degrades to an xTB optimization, with no UKS/UHF keyword.
+    h2 = OrcaJob(State(2, 1, 2), H2, LEVELS["XTB"], Task.GOAT)
+    assert h2.effective_task is Task.OPT
+    assert h2.keywords() == "XTB TightOpt TightSCF"

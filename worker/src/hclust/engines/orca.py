@@ -21,6 +21,10 @@ ORCA_DIR = Path(os.environ.get("ORCA_DIR", "/opt/orca"))
 BASENAME = "job"
 # Kept after a run; everything else (scratch, .gbw, densities) is deleted to save space.
 KEEP_SUFFIXES = (".inp", ".out", ".property.json", ".property.txt", ".xyz", ".hess", ".engrad", ".opt")
+# GOAT's per-worker outputs and per-iteration ensembles are deleted too.
+DISCARD_MARKERS = (".goat.", ".globaliter.")
+# xTB ranks H clusters wrongly, so keep a wide energy window of GOAT structures.
+GOAT_BLOCK = "%goat\n  MaxEn 30\nend\n"
 
 
 class Task(StrEnum):
@@ -28,6 +32,7 @@ class Task(StrEnum):
     OPT = "opt"
     FREQ = "freq"
     OPTFREQ = "optfreq"
+    GOAT = "goat"  # global structure search (GOAT-EXPLORE), returns an ensemble
 
     @property
     def optimizes(self) -> bool:
@@ -56,16 +61,22 @@ class OrcaJob:
 
     @property
     def effective_task(self) -> Task:
-        """A single atom can be neither optimized nor vibrated."""
-        return Task.SP if len(self.geometry) == 1 else self.task
+        """A single atom can be neither optimized nor vibrated; H2 has one shape (no GOAT)."""
+        if len(self.geometry) == 1:
+            return Task.SP
+        if self.task is Task.GOAT and len(self.geometry) < 3:
+            return Task.OPT
+        return self.task
 
     def keywords(self) -> str:
         level, state = self.level, self.state
         fallback = level.correlated and state.n_electrons < 2
-        words = ["HF" if fallback else level.method, level.basis]
-        if state.mult > 1:
-            words.append("UKS" if level.kind == "dft" and not fallback else "UHF")
         task = self.effective_task
+        if task is Task.GOAT:
+            return " ".join(["GOAT-EXPLORE", level.method, *self.extra_keywords])
+        words = ["HF" if fallback else level.method, level.basis]
+        if state.mult > 1 and level.kind != "xtb":
+            words.append("UKS" if level.kind == "dft" and not fallback else "UHF")
         if task.optimizes:
             words.append("TightOpt")
             if not level.analytic_gradient and not fallback:
@@ -81,6 +92,7 @@ class OrcaJob:
             f"# hclust {self.state.label} {self.level.name} {self.effective_task}\n"
             f"! {self.keywords()}\n"
             f"%maxcore {self.maxcore_mb}\n"
+            f"{GOAT_BLOCK if self.effective_task is Task.GOAT else ''}"
             f"* xyz {self.state.charge} {self.state.mult}\n"
             f"{self.geometry.atom_block()}\n"
             "*\n"
@@ -146,9 +158,10 @@ def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 360
     workdir = (jobs_root or default_jobs_root()) / job.hash
     out = workdir / f"{BASENAME}.out"
     is_opt = job.effective_task.optimizes
+    is_goat = job.effective_task is Task.GOAT
 
     if out.exists() and NORMAL_TERMINATION in out.read_text(errors="replace"):
-        result = parse_orca(workdir, BASENAME, is_opt)
+        result = parse_orca(workdir, BASENAME, is_opt, is_goat)
         result.cached = True
         return result
 
@@ -186,10 +199,11 @@ def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 360
         cwd=workdir, capture_output=True, timeout=120,
     )
     _cleanup(workdir)
-    return parse_orca(workdir, BASENAME, is_opt)
+    return parse_orca(workdir, BASENAME, is_opt, is_goat)
 
 
 def _cleanup(workdir: Path) -> None:
     for path in workdir.iterdir():
-        if path.is_file() and not path.name.endswith(KEEP_SUFFIXES):
+        discard = any(marker in path.name for marker in DISCARD_MARKERS)
+        if path.is_file() and (discard or not path.name.endswith(KEEP_SUFFIXES)):
             path.unlink()

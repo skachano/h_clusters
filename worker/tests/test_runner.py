@@ -86,7 +86,7 @@ def test_dag_runs_to_completion(session):
     fake = FakeOrca()
     counts = run(session, make_spec(), fake)
     # H (single atom) and H2: three stages each.
-    assert counts == {"pending": 0, "running": 0, "done": 6, "failed": 0}
+    assert counts == {"pending": 0, "running": 0, "done": 6, "failed": 0, "dissociated": 0}
     by_stage = {(j.state_id, j.stage): j for j in jobs(session)}
     for (state_id, stage), job in by_stage.items():
         if stage == "pre":
@@ -192,3 +192,149 @@ def test_jobs_left_running_by_a_crash_are_recovered(session):
     session.commit()
     counts = run(session, spec, FakeOrca())
     assert counts["running"] == 0 and counts["done"] == 3
+
+
+# --------------------------------------------------------------------------- Phase 3: search
+
+from hclust.db import Candidate  # noqa: E402
+from hclust.units import HARTREE_TO_KCAL  # noqa: E402
+
+TRIANGLE = Geometry.hydrogens([[0, 0, 0], [0.87, 0, 0], [0.435, 0.753, 0]])
+LINE = Geometry.hydrogens([[0, 0, 0], [0.9, 0, 0], [1.8, 0, 0]])
+BENT = Geometry.hydrogens([[0, 0, 0], [0.9, 0, 0], [1.5, 0.7, 0]])
+APART = Geometry.hydrogens([[0, 0, 0], [0.74, 0, 0], [5.0, 0, 0]])  # H2 + H, 4.3 A apart
+
+
+def search_spec(select=None, n_random=6, goat=False, max_outputs=None) -> CampaignSpec:
+    seeds = [{"generator": "random", "params": {"count": n_random}, "into": "pre"}]
+    stages = [
+        {"name": "pre", "level": "L0", "task": "opt"},
+        {"name": "promote", "select": select or {}, "from": "pre"},
+        {"name": "opt", "level": "L1", "task": "optfreq", "from": "promote"},
+    ]
+    if goat:
+        seeds.append({"generator": "chain", "into": "goat"})
+        stages.insert(0, {"name": "goat", "level": "XTB", "task": "goat", "max_outputs": max_outputs})
+        stages[1]["from"] = "goat"
+    return CampaignSpec.model_validate({
+        "name": "search", "species": {"states": [[3, 1, 1]]}, "seeds": seeds, "stages": stages,
+    })
+
+
+def landscape(outcomes):
+    """L0 optimizations land, in turn, on the (geometry, energy) pairs in `outcomes`."""
+    counter = iter(range(10**6))
+
+    def script(job, n):
+        if job.level.name == "L0":
+            geometry, energy = outcomes[next(counter) % len(outcomes)]
+            return Result(status="ok", energy=energy, geometry=geometry, opt_converged=True)
+        return ok(job)
+
+    return script
+
+
+def candidates(session):
+    return session.exec(select(Candidate).order_by(Candidate.energy)).all()
+
+
+def test_select_waits_for_all_sources_then_dedups_and_promotes(session):
+    kcal = 1 / HARTREE_TO_KCAL
+    fake = FakeOrca(landscape([
+        (TRIANGLE, -1.30),
+        (LINE, -1.30 + 6 * kcal),
+        (APART, -1.40),  # lowest, but fallen apart
+    ]))
+    run(session, search_spec(n_random=6), fake)
+
+    levels = [c.level.name for c in fake.calls]
+    assert levels == ["L0"] * 6 + ["L1"] * 2  # the barrier: no L1 before every L0 finished
+    cands = candidates(session)
+    assert len(cands) == 6
+    assert [c.dissociated for c in cands] == [True, True, False, False, False, False]
+    unique = [c for c in cands if not c.dissociated and c.duplicate_of is None]
+    assert [c.rank for c in unique] == [0, 1]
+    assert [c.composition for c in unique] == ["H3", "H3"]
+    assert all(c.selected for c in unique)
+    assert all(c.source == "seed:random" for c in cands)
+    # L1 starts from the selected L0 structures.
+    l1_inputs = {j.input_structure_id for j in jobs(session) if j.stage == "opt"}
+    assert l1_inputs == {c.structure_id for c in unique}
+
+
+def test_energy_window_and_max_per_state(session):
+    kcal = 1 / HARTREE_TO_KCAL
+    outcomes = [(TRIANGLE, -1.3), (LINE, -1.3 + 6 * kcal), (BENT, -1.3 + 20 * kcal)]
+    run(session, search_spec({"energy_window_kcal": 15}, n_random=3), FakeOrca(landscape(outcomes)))
+    assert [c.selected for c in candidates(session)] == [True, True, False]
+
+
+def test_max_per_state(session):
+    outcomes = [(TRIANGLE, -1.3), (LINE, -1.29), (BENT, -1.28)]
+    run(session, search_spec({"max_per_state": 1}, n_random=3), FakeOrca(landscape(outcomes)))
+    assert [c.selected for c in candidates(session)] == [True, False, False]
+    assert sum(j.stage == "opt" for j in jobs(session)) == 1
+
+
+def test_selection_runs_once_and_survives_restart(session):
+    spec = search_spec(n_random=3)
+    run(session, spec, FakeOrca(landscape([(TRIANGLE, -1.3)])))
+    n = len(candidates(session))
+    second = FakeOrca()
+    run(session, spec, second)
+    assert len(candidates(session)) == n and second.calls == []
+
+
+def test_goat_ensemble_fans_out_into_pre_jobs(session):
+    ensemble = [TRIANGLE, LINE, BENT]
+
+    def script(job, n):
+        if job.effective_task is Task.GOAT:
+            return Result(status="ok", energy=-1.0, geometry=ensemble[0],
+                          ensemble=ensemble, ensemble_energies=[-1.0, -0.9, -0.8])
+        return landscape([(TRIANGLE, -1.3)])(job, n)
+
+    run(session, search_spec(n_random=2, goat=True, max_outputs=2), FakeOrca(script))
+    pre = [j for j in jobs(session) if j.stage == "pre"]
+    origins = sorted(session.get(Structure, j.input_structure_id).origin for j in pre)
+    assert origins == ["goat", "goat", "seed:random", "seed:random"]
+    assert sorted(c.source for c in candidates(session)) == origins
+
+
+def test_optimization_that_falls_apart_is_dissociated_not_retried(session):
+    def script(job, n):
+        return Result(status="failed", error_kind="opt", error="not converged", geometry=APART)
+
+    counts = run(session, search_spec(n_random=2), FakeOrca(script))
+    assert counts["dissociated"] == 2 and counts["failed"] == 0
+    assert all(j.attempts == 1 for j in jobs(session))
+    assert candidates(session) == []  # nothing intact to select
+
+
+def test_dissociated_saddle_point_is_not_displaced(session):
+    def script(job, n):
+        if job.effective_task.has_freq:
+            r = ok(job, freqs=[-50.0, 100.0, 200.0])
+            r.geometry = APART
+            return r
+        return landscape([(TRIANGLE, -1.3)])(job, n)
+
+    run(session, search_spec(n_random=1), FakeOrca(script))
+    opt = next(j for j in jobs(session) if j.stage == "opt")
+    assert opt.status == "done" and opt.attempts == 1
+
+
+def test_stage_added_to_a_finished_campaign_runs_only_new_work(session):
+    spec = search_spec(n_random=3)
+    run(session, spec, FakeOrca(landscape([(TRIANGLE, -1.3)])))
+    before = len(jobs(session))
+
+    extended = CampaignSpec.model_validate(spec.model_dump(by_alias=True) | {"stages": [
+        *spec.model_dump(by_alias=True)["stages"],
+        {"name": "opt2", "level": "L1M", "task": "optfreq", "from": "promote"},
+        {"name": "ref2", "level": "L2", "task": "sp", "from": "opt2", "when": "minimum"},
+    ]})
+    fake = FakeOrca()
+    run(session, extended, fake)
+    assert [c.level.name for c in fake.calls] == ["L1M", "L2"]
+    assert len(jobs(session)) == before + 2

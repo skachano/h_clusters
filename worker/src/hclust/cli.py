@@ -10,7 +10,10 @@ import typer
 from sqlmodel import Session, select
 
 from hclust.campaign import CampaignSpec
-from hclust.db import Campaign, Job, JobStatus, StateRow, get_engine
+from hclust.db import Campaign, Candidate, Job, JobResult, JobStatus, StateRow, Structure, get_engine
+from hclust.geometry import Geometry
+from hclust.structures import composition
+from hclust.units import HARTREE_TO_KCAL
 from hclust.runner import Runner, plan as plan_campaign
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
@@ -20,6 +23,7 @@ SYMBOLS = {
     JobStatus.FAILED: "✗",
     JobStatus.RUNNING: "▶",
     JobStatus.PENDING: "·",
+    JobStatus.DISSOCIATED: "÷",
 }
 
 CampaignFile = Annotated[Path, typer.Argument(exists=True, dir_okay=False, help="campaign YAML")]
@@ -55,11 +59,69 @@ def run(
 
 @app.command()
 def status(name: Annotated[str, typer.Argument(help="campaign name or YAML file")]) -> None:
-    """Show a states × stages table of job statuses."""
+    """Show a states × stages table of job statuses (select stages: promoted/seen)."""
     if name.endswith((".yaml", ".yml")):
         name = CampaignSpec.load(Path(name)).name
     with Session(get_engine()) as session:
         _print_status(session, name)
+
+
+@app.command()
+def structures(
+    name: Annotated[str, typer.Argument(help="campaign name")],
+    stage: Annotated[str, typer.Option(help="stage whose results to list")] = "opt",
+) -> None:
+    """List each state's structures from one stage, lowest energy first."""
+    with Session(get_engine()) as session:
+        campaign = _campaign(session, name)
+        jobs = session.exec(
+            select(Job).where(Job.campaign_id == campaign.id, Job.stage == stage)
+        ).all()
+        children = defaultdict(list)
+        for job in session.exec(select(Job).where(Job.campaign_id == campaign.id)).all():
+            if job.parent_id is not None:
+                children[job.parent_id].append(job)
+        sources = {
+            c.job_id: c.source
+            for c in session.exec(select(Candidate).where(Candidate.campaign_id == campaign.id))
+        }
+        by_state = defaultdict(list)
+        for job in jobs:
+            if (result := session.get(JobResult, job.id)) is not None:
+                by_state[job.state_id].append((job, result))
+
+        for state_id, rows in sorted(by_state.items(), key=lambda kv: session.get(StateRow, kv[0]).to_state()):
+            typer.echo(f"\n{session.get(StateRow, state_id).to_state().label}  ({len(rows)} structures)")
+            typer.echo(f"  {'job':>5} {'ΔE kcal':>8} {'imag':>4} {'units':<12} {'shortest H-H (Å)':<22} {'source':<15} children")
+            e_min = min(r.energy for _, r in rows)
+            for job, result in sorted(rows, key=lambda jr: jr[1].energy):
+                geometry = Geometry.from_xyz(session.get(Structure, result.final_structure_id).xyz)
+                shortest = " ".join(f"{d:.3f}" for d in geometry.distances()[:3])
+                kids = " ".join(
+                    f"{k.stage}={r.energy:.6f}" for k in children[job.id]
+                    if (r := session.get(JobResult, k.id)) is not None
+                )
+                typer.echo(
+                    f"  {job.id:>5} {(result.energy - e_min) * HARTREE_TO_KCAL:8.2f} "
+                    f"{'' if result.n_imag is None else result.n_imag:>4} {composition(geometry):<12} "
+                    f"{shortest:<22} {_source(session, job, sources):<15} {kids}"
+                )
+
+
+def _source(session: Session, job: Job, sources: dict[int, str]) -> str:
+    """Where the search for this structure started (from the nearest selection record)."""
+    while job is not None:
+        if job.id in sources:
+            return sources[job.id]
+        job = session.get(Job, job.parent_id) if job.parent_id else None
+    return "?"
+
+
+def _campaign(session: Session, name: str) -> Campaign:
+    campaign = session.exec(select(Campaign).where(Campaign.name == name)).first()
+    if campaign is None:
+        raise typer.BadParameter(f"no campaign named {name!r}")
+    return campaign
 
 
 def _raise_keyboard_interrupt(signum, frame) -> None:
@@ -67,21 +129,27 @@ def _raise_keyboard_interrupt(signum, frame) -> None:
 
 
 def _print_status(session: Session, name: str) -> None:
-    campaign = session.exec(select(Campaign).where(Campaign.name == name)).first()
-    if campaign is None:
-        raise typer.BadParameter(f"no campaign named {name!r}")
+    campaign = _campaign(session, name)
     stages = [s["name"] for s in campaign.spec["stages"]]
+    selects = {s["name"] for s in campaign.spec["stages"] if s.get("select")}
     jobs = session.exec(select(Job).where(Job.campaign_id == campaign.id)).all()
+    candidates = session.exec(select(Candidate).where(Candidate.campaign_id == campaign.id)).all()
     states = {row.id: row.to_state() for row in session.exec(select(StateRow)).all()}
 
     cells: dict[int, dict[str, Counter]] = defaultdict(lambda: defaultdict(Counter))
     for job in jobs:
         cells[job.state_id][job.stage][job.status] += 1
+    for c in candidates:
+        cells[c.state_id][c.stage]["seen"] += 1
+        cells[c.state_id][c.stage]["selected"] += c.selected
 
-    width = 9
+    width = 10
     typer.echo(f"{'state':<11}" + "".join(f"{s:>{width}}" for s in stages))
     for state_id in sorted(cells, key=lambda i: states[i]):
-        row = "".join(f"{_cell(cells[state_id][s]):>{width}}" for s in stages)
+        row = "".join(
+            f"{_select_cell(cells[state_id][s]) if s in selects else _cell(cells[state_id][s]):>{width}}"
+            for s in stages
+        )
         typer.echo(f"{states[state_id].label:<11}{row}")
 
     totals = Counter(job.status for job in jobs)
@@ -91,6 +159,10 @@ def _print_status(session: Session, name: str) -> None:
         + ", ".join(f"{totals[s]} {s}" for s in JobStatus)
         + f"; {retried} needed retries"
     )
+
+
+def _select_cell(counter: Counter) -> str:
+    return f"{counter['selected']}/{counter['seen']}" if counter["seen"] else "-"
 
 
 def _cell(counter: Counter) -> str:

@@ -66,3 +66,12 @@ def test_unconverged_optimization_keeps_last_geometry(orca_fixture):
     r = parse_orca(orca_fixture("opt_fail_r2scan"), is_opt=True)
     assert not r.ok and r.error_kind == "opt" and r.opt_converged is False
     assert len(r.geometry) == 3  # the restart point
+
+
+def test_goat_ensemble(orca_fixture):
+    r = parse_orca(orca_fixture("goat_h5p_xtb"), is_goat=True)
+    assert r.ok
+    assert len(r.ensemble) == len(r.ensemble_energies) == 1
+    assert r.energy == pytest.approx(-1.9493849110)
+    # GFN2-xTB's "global minimum" for H5+ is a chain, not the H3+.H2 complex.
+    assert r.geometry.distances()[-1] == pytest.approx(3.963, abs=1e-3)

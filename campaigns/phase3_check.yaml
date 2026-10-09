@@ -1,0 +1,22 @@
+# Phase 3 acceptance check: from random geometries, the search must find the D3h
+# triangle for H3+ and the H3+.H2 complex for H5+. GOAT runs alongside as a
+# second source, so that its contribution can be measured.
+# DFT (L0, L1) has no C2v H5+ minimum (delocalization error: the proton is shared
+# symmetrically, D2d), so MP2 geometries (L1M) run alongside wB97M-V (L1).
+name: phase3-check
+species:
+  states: [[3, 1, 1], [5, 1, 1]]
+seeds:
+  - { generator: random, params: { count: 20, seed: 1 }, into: pre }
+  - { generator: sphere, into: goat }
+stages:
+  - { name: goat, level: XTB, task: goat, max_outputs: 10 }
+  - { name: pre, level: L0, task: opt, from: goat }
+  - { name: promote, select: { energy_window_kcal: 15, max_per_state: 8 }, from: pre }
+  - { name: opt, level: L1, task: optfreq, from: promote }
+  - { name: ref, level: L2, task: sp, from: opt, when: minimum }
+  - { name: opt_mp2, level: L1M, task: optfreq, from: promote }
+  - { name: ref_mp2, level: L2, task: sp, from: opt_mp2, when: minimum }
+resources:
+  workers: 16
+  timeout_min: 60

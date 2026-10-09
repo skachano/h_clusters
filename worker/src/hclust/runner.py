@@ -15,12 +15,15 @@ import numpy as np
 from sqlmodel import Session, select
 
 from hclust.campaign import CampaignSpec, StageSpec
-from hclust.db import Attempt, Campaign, Job, JobResult, JobStatus, StateRow, Structure, _now
+from hclust.db import (
+    TERMINAL, Attempt, Campaign, Candidate, Job, JobResult, JobStatus, StateRow, Structure, _now,
+)
 from hclust.engines.orca import OrcaJob, Task, allow_runs, kill_all, run_orca
 from hclust.geometry import Geometry
 from hclust.levels import LEVELS
 from hclust.results import Result
-from hclust.structures import GENERATORS
+from hclust.structures import GENERATORS, composition, is_dissociated, same_structure
+from hclust.units import HARTREE_TO_KCAL
 
 MAX_ATTEMPTS = 3
 # Keywords added on the 1st and 2nd retry after an SCF convergence failure.
@@ -47,12 +50,15 @@ def plan(session: Session, spec: CampaignSpec) -> Campaign:
     session.add(campaign)
     session.flush()
 
+    generated: dict[tuple[int, int], list[Geometry]] = {}  # (seed index, m) -> geometries
     for state in spec.species.states():
         row = _state_row(session, state)
-        for seed in spec.seeds:
-            for geometry in GENERATORS[seed.generator](state.m, **seed.params):
+        for i, seed in enumerate(spec.seeds):
+            if (i, state.m) not in generated:
+                generated[i, state.m] = GENERATORS[seed.generator](state.m, **seed.params)
+            for geometry in generated[i, state.m]:
                 structure = _structure(session, row.id, f"seed:{seed.generator}", geometry)
-                _job(session, campaign, row.id, spec.root, structure.id, parent_id=None)
+                _job(session, campaign, row.id, spec.seed_stage(seed), structure.id, parent_id=None)
     session.commit()
     return campaign
 
@@ -126,6 +132,7 @@ class Runner:
     def run(self) -> dict[str, int]:
         """Run until no job is pending or running; return job counts by status."""
         self._recover()
+        self._expand()
         allow_runs()
         in_flight: dict[Future, int] = {}
         with ThreadPoolExecutor(self.workers) as pool:
@@ -149,8 +156,13 @@ class Runner:
         return self.counts()
 
     def counts(self) -> dict[str, int]:
-        jobs = self.session.exec(select(Job).where(Job.campaign_id == self.campaign.id)).all()
+        jobs = self._jobs()
         return {s.value: sum(j.status == s for j in jobs) for s in JobStatus}
+
+    def _jobs(self, *conditions) -> list[Job]:
+        return self.session.exec(
+            select(Job).where(Job.campaign_id == self.campaign.id, *conditions)
+        ).all()
 
     def _recover(self) -> None:
         """Jobs left 'running' by a killed orchestrator go back to the queue."""
@@ -210,16 +222,26 @@ class Runner:
         elif result.ok:
             job.status = JobStatus.DONE
             self._store_result(job, result)
+        elif result.error_kind == "opt" and self._dissociated(result.geometry):
+            job.status = JobStatus.DISSOCIATED
         else:
             job.status = JobStatus.FAILED
         job.updated_at = _now()
         self.session.add(job)
         self.session.commit()
         self._log_outcome(job, result, elapsed, action)
+        if job.status in TERMINAL:
+            self._maybe_select(job.state_id)
+
+    def _dissociated(self, geometry: Geometry | None) -> bool:
+        return geometry is not None and is_dissociated(geometry, self.spec.dissociation_cutoff)
 
     def _next_action(self, job: Job, result: Result) -> str | None:
-        """Retry playbook (doc/Plan.md, 3.5). None means the job reached a final state."""
-        if job.attempts >= MAX_ATTEMPTS:
+        """Retry playbook (doc/Plan.md, 3.5). None means the job reached a final state.
+
+        Fragments drifting apart are a result, not a failure: they are never retried.
+        """
+        if job.attempts >= MAX_ATTEMPTS or self._dissociated(result.geometry):
             return None
         if result.ok:
             return "displace" if result.n_imag else None
@@ -240,12 +262,16 @@ class Runner:
         job.start_structure_id = structure.id
 
     def _store_result(self, job: Job, result: Result) -> None:
-        if Task(job.task).optimizes:
-            final_id = _structure(self.session, job.state_id, job.stage, result.geometry, job.id).id
+        stage = self.spec.stage(job.stage)
+        if result.ensemble is not None:
+            ensemble = result.ensemble[: stage.max_outputs]
+            outputs = [_structure(self.session, job.state_id, job.stage, g, job.id).id for g in ensemble]
+        elif Task(job.task).optimizes or Task(job.task) is Task.GOAT:
+            outputs = [_structure(self.session, job.state_id, job.stage, result.geometry, job.id).id]
         else:
-            final_id = job.start_structure_id
+            outputs = [job.start_structure_id]
         self.session.merge(JobResult(
-            job_id=job.id, energy=result.energy, final_structure_id=final_id,
+            job_id=job.id, energy=result.energy, final_structure_id=outputs[0],
             s2=result.s2, homo=result.homo, lumo=result.lumo,
             mulliken_charges=result.mulliken_charges,
             frequencies=None if result.frequencies is None else result.frequencies.tolist(),
@@ -254,10 +280,119 @@ class Runner:
             point_group=result.point_group, symmetry_number=result.symmetry_number,
             opt_converged=result.opt_converged, orca_version=result.orca_version,
         ))
+        self.session.flush()
+        self._spawn_children(job)
+
+    def _spawn_children(self, job: Job) -> None:
+        """Create the jobs of every ORCA stage that continues from this finished job (idempotent)."""
+        result = self.session.get(JobResult, job.id)
+        stage = self.spec.stage(job.stage)
+        if Task(job.task) is Task.GOAT:
+            outputs = [s.id for s in self.session.exec(
+                select(Structure)
+                .where(Structure.parent_job_id == job.id, Structure.origin == job.stage)
+                .order_by(Structure.id)
+            ).all()][: stage.max_outputs]
+        else:
+            outputs = [result.final_structure_id]
+        single_atom = self.session.get(StateRow, job.state_id).m == 1  # trivially a minimum
         for child in self.spec.children(job.stage):
-            if child.when == "minimum" and not _is_minimum(result):
+            if child.is_select or (child.when == "minimum" and not (single_atom or result.n_imag == 0)):
                 continue
-            _job(self.session, self.campaign, job.state_id, child, final_id, parent_id=job.id)
+            for structure_id in outputs:
+                _job(self.session, self.campaign, job.state_id, child, structure_id, parent_id=job.id)
+
+    def _expand(self) -> None:
+        """Create jobs for stages added to the campaign after their parents had finished."""
+        for job in self._jobs(Job.status == JobStatus.DONE):
+            self._spawn_children(job)
+        self.session.commit()
+        for state_id in {j.state_id for j in self._jobs()}:
+            self._maybe_select(state_id)
+
+    # ----------------------------------------------------------------------- selection
+
+    def _maybe_select(self, state_id: int) -> None:
+        """Run each select stage for this state once all jobs that can feed it have finished."""
+        for stage in self.spec.stages:
+            if not stage.is_select:
+                continue
+            if self._selected(stage.name, state_id):
+                self._spawn_from_selection(stage, state_id)
+                continue
+            upstream = self._jobs(
+                Job.state_id == state_id, Job.stage.in_(self.spec.upstream(stage.from_[0]))
+            )
+            if upstream and all(j.status in TERMINAL for j in upstream):
+                done = [j for j in upstream if j.stage == stage.from_[0] and j.status == JobStatus.DONE]
+                if done:
+                    self._select(stage, state_id, done)
+
+    def _spawn_from_selection(self, stage: StageSpec, state_id: int) -> None:
+        chosen = self.session.exec(
+            select(Candidate).where(
+                Candidate.campaign_id == self.campaign.id, Candidate.stage == stage.name,
+                Candidate.state_id == state_id, Candidate.selected == True,  # noqa: E712
+            )
+        ).all()
+        for candidate in chosen:
+            for child in self.spec.children(stage.name):
+                _job(self.session, self.campaign, state_id, child, candidate.structure_id,
+                     parent_id=candidate.job_id)
+        self.session.commit()
+
+    def _selected(self, stage: str, state_id: int) -> bool:
+        return self.session.exec(
+            select(Candidate).where(
+                Candidate.campaign_id == self.campaign.id, Candidate.stage == stage,
+                Candidate.state_id == state_id,
+            )
+        ).first() is not None
+
+    def _select(self, stage: StageSpec, state_id: int, jobs: list[Job]) -> None:
+        params = stage.select
+        candidates: list[tuple[Candidate, Geometry]] = []
+        for job in jobs:
+            result = self.session.get(JobResult, job.id)
+            geometry = Geometry.from_xyz(self.session.get(Structure, result.final_structure_id).xyz)
+            candidate = Candidate(
+                campaign_id=self.campaign.id, stage=stage.name, state_id=state_id, job_id=job.id,
+                structure_id=result.final_structure_id, energy=result.energy,
+                source=self.session.get(Structure, job.input_structure_id).origin,
+                composition=composition(geometry), dissociated=self._dissociated(geometry),
+            )
+            self.session.add(candidate)
+            candidates.append((candidate, geometry))
+        self.session.flush()
+
+        unique: list[tuple[Candidate, Geometry]] = []
+        for candidate, geometry in sorted(candidates, key=lambda c: c[0].energy):
+            if candidate.dissociated:
+                continue
+            twin = next((
+                u for u, g in unique
+                if abs(candidate.energy - u.energy) * HARTREE_TO_KCAL < params.dedup_energy_kcal
+                and same_structure(geometry, g, params.dedup_distance)
+            ), None)
+            if twin is None:
+                unique.append((candidate, geometry))
+            else:
+                candidate.duplicate_of = twin.id
+
+        for rank, (candidate, _) in enumerate(unique):
+            gap = (candidate.energy - unique[0][0].energy) * HARTREE_TO_KCAL
+            candidate.rank = rank
+            candidate.selected = rank < params.max_per_state and gap <= params.energy_window_kcal
+        self.session.commit()
+        self._spawn_from_selection(stage, state_id)
+
+        label = self.session.get(StateRow, state_id).to_state().label
+        n_dissociated = sum(c.dissociated for c, _ in candidates)
+        n_selected = sum(c.selected for c, _ in unique)
+        self.log(
+            f"select {label:<10} {stage.name}: {len(candidates)} structures, "
+            f"{n_dissociated} dissociated, {len(unique)} unique, {n_selected} promoted"
+        )
 
     def _log_outcome(self, job: Job, result: Result, elapsed: float, action: str | None) -> None:
         counts = self.counts()
@@ -280,13 +415,6 @@ def _timed(execute: Execute, job: OrcaJob, timeout_s: float) -> tuple[Result, fl
     start = time.monotonic()
     result = execute(job, timeout_s)
     return result, time.monotonic() - start
-
-
-def _is_minimum(result: Result) -> bool:
-    """A lone atom has no vibrations and is trivially a minimum."""
-    if result.geometry is not None and len(result.geometry) == 1:
-        return True
-    return bool(result.is_minimum)
 
 
 def displace_along_imaginary_mode(result: Result, sign: int = 1) -> Geometry:

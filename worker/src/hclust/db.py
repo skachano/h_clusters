@@ -21,6 +21,10 @@ class JobStatus(StrEnum):
     RUNNING = "running"
     DONE = "done"
     FAILED = "failed"
+    DISSOCIATED = "dissociated"  # the optimization drifted apart into fragments
+
+
+TERMINAL = (JobStatus.DONE, JobStatus.FAILED, JobStatus.DISSOCIATED)
 
 
 class StateRow(SQLModel, table=True):
@@ -113,6 +117,26 @@ class JobResult(SQLModel, table=True):
     symmetry_number: int | None = None
     opt_converged: bool | None = None
     orca_version: str | None = None
+
+
+class Candidate(SQLModel, table=True):
+    """One structure seen by a select stage: the record of dedup and promotion decisions."""
+
+    __table_args__ = (UniqueConstraint("campaign_id", "stage", "job_id"),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    campaign_id: int = Field(foreign_key="campaign.id", index=True)
+    stage: str  # the select stage
+    state_id: int = Field(foreign_key="state.id", index=True)
+    job_id: int = Field(foreign_key="job.id")  # source job
+    structure_id: int = Field(foreign_key="structure.id")
+    energy: float
+    source: str  # where the search started: "seed:random", "seed:templates", "goat", ...
+    composition: str  # bonded units, e.g. "H3·H2"
+    dissociated: bool
+    duplicate_of: int | None = Field(default=None, foreign_key="candidate.id")
+    rank: int | None = None  # among unique, intact structures; 0 = lowest energy
+    selected: bool = False
 
 
 def default_db_path() -> Path:

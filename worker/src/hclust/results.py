@@ -35,6 +35,9 @@ class Result:
     orca_version: str | None = None
     workdir: Path | None = None
     cached: bool = False  # returned from an earlier identical run without running ORCA
+    # GOAT: all distinct structures found, lowest energy first (geometry/energy = the first).
+    ensemble: list[Geometry] | None = None
+    ensemble_energies: list[float] | None = None
 
     @property
     def ok(self) -> bool:
