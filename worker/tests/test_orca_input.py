@@ -62,3 +62,10 @@ def test_hash_is_stable_and_sensitive():
     assert job.hash != OrcaJob(State(2, 0, 3), H2, LEVELS["L1"]).hash
     assert job.hash != OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], Task.OPT).hash
     assert job_hash(job.render(), "6.1.1") != job_hash(job.render(), "6.1.2")
+
+
+def test_retry_keywords_are_appended_and_change_the_hash():
+    plain = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"])
+    slow = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], extra_keywords=("SlowConv",))
+    assert slow.keywords() == "wB97M-V def2-TZVPPD TightSCF SlowConv"
+    assert slow.hash != plain.hash

@@ -3,7 +3,9 @@
 import hashlib
 import os
 import re
+import signal
 import subprocess
+import threading
 from dataclasses import dataclass
 from enum import StrEnum
 from functools import cache
@@ -43,6 +45,8 @@ class OrcaJob:
     level: Level
     task: Task = Task.SP
     maxcore_mb: int = 600
+    # Retry modifiers such as "SlowConv", appended to the keyword line.
+    extra_keywords: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.state.n_electrons == 0:
@@ -69,6 +73,7 @@ class OrcaJob:
         if task.has_freq:
             words.append("Freq" if level.analytic_hessian or fallback else "NumFreq")
         words.append("TightSCF")
+        words.extend(self.extra_keywords)
         return " ".join(w for w in words if w)
 
     def render(self) -> str:
@@ -105,6 +110,37 @@ def default_jobs_root() -> Path:
     return Path(os.environ.get("HCLUST_DATA", "data")) / "jobs"
 
 
+# ORCA processes currently running (from any thread), so that they can be killed on shutdown.
+_running: set[subprocess.Popen] = set()
+_running_lock = threading.Lock()
+_stopping = threading.Event()
+
+
+def kill_all() -> None:
+    """Kill every running ORCA together with its sub-programs (orca_scf, orca_mdci, ...).
+
+    Also refuses to start new runs until allow_runs() is called, so that a thread that is
+    just about to start ORCA cannot slip past the shutdown.
+    """
+    with _running_lock:
+        _stopping.set()
+        procs = list(_running)
+    for proc in procs:
+        _kill_group(proc)
+
+
+def allow_runs() -> None:
+    _stopping.clear()
+
+
+def _kill_group(proc: subprocess.Popen) -> None:
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    proc.wait()
+
+
 def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 3600) -> Result:
     """Run `job` unless an identical job already terminated normally; return its parsed result."""
     workdir = (jobs_root or default_jobs_root()) / job.hash
@@ -112,23 +148,38 @@ def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 360
     is_opt = job.effective_task.optimizes
 
     if out.exists() and NORMAL_TERMINATION in out.read_text(errors="replace"):
-        return parse_orca(workdir, BASENAME, is_opt)
+        result = parse_orca(workdir, BASENAME, is_opt)
+        result.cached = True
+        return result
 
     workdir.mkdir(parents=True, exist_ok=True)
     for stale in workdir.iterdir():
         stale.unlink()
     (workdir / f"{BASENAME}.inp").write_text(job.render())
 
-    try:
-        with out.open("w") as fh:
-            # ORCA must be started by its absolute path to find its sub-programs.
-            subprocess.run(
-                [ORCA_DIR / "orca", f"{BASENAME}.inp"],
-                cwd=workdir, stdout=fh, stderr=subprocess.STDOUT, timeout=timeout_s,
+    with out.open("w") as fh:
+        # ORCA must be started by its absolute path to find its sub-programs. Its own
+        # session makes the whole process tree killable at once.
+        proc = subprocess.Popen(
+            [ORCA_DIR / "orca", f"{BASENAME}.inp"],
+            cwd=workdir, stdout=fh, stderr=subprocess.STDOUT, start_new_session=True,
+        )
+        with _running_lock:
+            _running.add(proc)
+            if _stopping.is_set():
+                _kill_group(proc)
+        try:
+            proc.wait(timeout=timeout_s)
+        except subprocess.TimeoutExpired:
+            _kill_group(proc)
+            _cleanup(workdir)
+            return Result(
+                status="failed", error=f"timeout after {timeout_s:.0f} s",
+                error_kind="timeout", workdir=workdir,
             )
-    except subprocess.TimeoutExpired:
-        _cleanup(workdir)
-        return Result(status="failed", error=f"timeout after {timeout_s:.0f} s", workdir=workdir)
+        finally:
+            with _running_lock:
+                _running.discard(proc)
 
     subprocess.run(
         [ORCA_DIR / "orca_2json", BASENAME, "-property"],

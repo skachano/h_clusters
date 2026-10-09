@@ -11,11 +11,14 @@ from hclust.geometry import Geometry
 # Imaginary frequencies smaller than this are numerical noise (doc/Plan.md, 2.2).
 IMAG_FREQ_TOLERANCE_CM = 20.0
 
+ErrorKind = Literal["scf", "opt", "timeout", "other"]
+
 
 @dataclass
 class Result:
     status: Literal["ok", "failed"]
     error: str | None = None
+    error_kind: ErrorKind | None = None
     energy: float | None = None  # Eh, final single-point energy (highest level in the job)
     geometry: Geometry | None = None  # final geometry
     s2: float | None = None  # <S^2> of the UHF/UKS reference; None for restricted runs
@@ -31,6 +34,7 @@ class Result:
     wall_time_s: float | None = None
     orca_version: str | None = None
     workdir: Path | None = None
+    cached: bool = False  # returned from an earlier identical run without running ORCA
 
     @property
     def ok(self) -> bool:

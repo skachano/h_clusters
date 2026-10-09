@@ -208,7 +208,7 @@ visualisation can run while no calculations are running, and the reverse.
 h_clusters/
 ├── doc/Plan.md
 ├── compose.yaml
-├── .env.example               # ORCA_DIR=/opt/orca, N_WORKERS=16
+├── .env.example               # ORCA_DIR=/opt/orca
 ├── worker/
 │   ├── Dockerfile
 │   ├── pyproject.toml         # uv-managed
@@ -221,14 +221,15 @@ h_clusters/
 │       ├── engines/
 │       │   └── orca.py        # input rendering, hashing, run (xtb runs via ORCA GOAT)
 │       ├── parse.py           # property.json (orca_2json) + text-only items → Result
+│       ├── campaign.py        # campaign YAML schema (pydantic) + DAG validation
 │       ├── db.py              # SQLModel tables
-│       ├── runner.py          # job queue, process pool, retries, timeouts
+│       ├── runner.py          # planning, thread pool, retries, resume
 │       ├── workflow.py        # stage DAG: L0 → dedup → L1 → freq → L2 → L3
 │       ├── analysis/
 │       │   ├── symmetry.py    # point group (pymatgen PointGroupAnalyzer)
 │       │   ├── thermo.py      # RRHO / qRRHO at arbitrary T, p
 │       │   └── fragments.py   # channel enumeration, D_min, verdicts
-│       └── cli.py             # typer: `hclust plan|run|status|analyze|export`
+│       └── cli.py             # typer: `python -m hclust plan|run|status` (+ analyze|export later)
 ├── api/
 │   ├── Dockerfile
 │   └── src/hclust_api/        # reuses hclust package (installed as dep)
@@ -242,6 +243,9 @@ h_clusters/
 ```
 
 ### 3.3 Campaign definition (declarative)
+
+Phase 2 implements `species`, `seeds`, `stages` and `resources`; see
+`campaigns/demo.yaml`. The search and selection keys below arrive in Phase 3.
 
 ```yaml
 # campaigns/baseline.yaml
@@ -269,11 +273,15 @@ resources: { workers: 16, maxcore_mb: 600, timeout_min: 120 }
 
 - `State(id, m, charge, mult, n_electrons)`
 - `Structure(id, state_id, origin[template|random|goat|opt], parent_id, xyz, fingerprint)`
-- `Job(id, hash, state_id, structure_id, level, kind[sp|opt|freq|goat],
-  status[pending|running|done|failed|dissociated], attempts, wall_s,
-  workdir, orca_version, created/updated)`
-- `Result(job_id, energy_eh, s2, homo, lumo, charges_json, spins_json,
-  final_xyz, freqs_json, modes_json, zpe, point_group, converged)`
+- `Campaign(id, name, spec_json)`
+- `Job(id, campaign_id, state_id, stage, level, task, parent_id,
+  input_structure_id, start_structure_id, modifiers, status, attempts, hash,
+  error, error_kind, wall_s, created/updated)`. Each job is unique per
+  (campaign, stage, input structure), and a retry reuses the same row.
+- `Attempt(job_id, n, hash, modifiers, start_structure_id, status, error,
+  error_kind, action, cached, wall_s)`: one row per ORCA run.
+- `Result(job_id, energy, final_structure_id, s2, homo, lumo, charges,
+  frequencies, modes, thermo, n_imag, point_group, opt_converged)`
 - `Verdict(state_id, level, best_structure_id, d_min, d0_min, verdict, channel)`
 
 **Provenance and idempotence.** The job hash is
@@ -285,13 +293,20 @@ Keep the database as an index over them, never as the only copy.
 ### 3.5 Job runner (the HTC core, built by hand on purpose)
 
 - A single orchestrator process owns the DB, so there are no write races in
-  SQLite. A `ProcessPoolExecutor` / `asyncio` subprocess pool runs the jobs.
+  SQLite. A **thread** pool runs the jobs: each thread only waits on an
+  external ORCA process, so no worker processes are needed.
+- Each ORCA run gets its own process session. On a timeout or Ctrl-C the
+  whole tree (`orca` + `orca_scf`/`orca_mdci` …) is killed, and running jobs
+  go back to the queue.
 - A stage DAG: a job becomes runnable when its parent result exists (e.g. a
   freq job needs an opt job).
 - **Error handling playbook** (record each attempt):
-  - SCF not converged → retry with `SlowConv`, `SOSCF`, then `TRAH`.
+  - SCF not converged → retry with `SlowConv`, then `VerySlowConv`. ORCA 6
+    already falls back to TRAH by itself. At most 3 attempts per job.
   - Optimization not converged → restart from the last geometry, up to 2 times.
-  - Imaginary frequency → displace along the mode (±0.1 Å) and re-optimize.
+  - Imaginary frequency → displace along the mode (±0.1 Å, alternating sign)
+    and re-optimize. After 3 attempts, keep it as a saddle point (done,
+    `n_imag > 0`). Stages with `when: minimum` do not continue from it.
   - Fragmentation detected → mark as `dissociated`, store the fragments.
   - Timeout → mark as `failed` and let it surface in the dashboard.
 - `hclust status` gives a live table of states × levels.
@@ -444,11 +459,39 @@ Each phase has a concrete **done when** criterion.
   therefore be checked against L2. Other L1 values: r(H₂) = 0.740 Å,
   ω(H₂) = 4454 cm⁻¹ (exact 4401), r(H₃⁺) = 0.8754 Å.
 
-### Phase 2: Job DB + runner (2 days)
-- SQLModel schema, campaign YAML, stage DAG, process pool, retries, the
+### Phase 2: Job DB + runner (2 days) — ✅ done 2026-10-09
+- SQLModel schema, campaign YAML, stage DAG, worker pool, retries, the
   `status` CLI, and resumability.
 - **Done when** an interrupted campaign (Ctrl-C mid-run) resumes without
   redoing finished jobs.
+- Commands:
+  - `docker compose run --rm worker python -m hclust run /campaigns/demo.yaml`
+  - `… python -m hclust status demo`
+  - `campaigns/` is mounted read-only at `/campaigns`. The database is
+    `data/hclust.sqlite` (WAL mode).
+- Tests: the runner logic (DAG, SCF ladder, opt restart, saddle
+  displacement, interrupt/resume, crash recovery) is unit-tested with a
+  scripted fake ORCA.
+
+**Findings (demo campaign):**
+- Scope: m = 1–4, two spin states, chain seeds, L0 opt → L1 optfreq → L2 sp
+  on minima. That is 55 jobs, ~15 min wall time on 16 workers. One job
+  failed and 8 needed retries.
+- The resumability check passed. SIGINT mid-run left no ORCA processes and
+  returned the 1 running job to the queue. The rerun executed only that job
+  and its child, and a third run executed nothing.
+  - Lesson: in a container, signal the Python process, not its `sh -c`
+    wrapper.
+- Displacement along imaginary modes turned a linear H₃⁺ chain into the
+  equilateral triangle (0.875 Å).
+- Chains also show why Phase 3 needs **fragmentation detection**. Several
+  "minima" and saddle points are really separated fragments:
+  - H₂ (triplet) at 4.1 Å
+  - H₃ = H₂ + H at 3.9 Å
+  - H₄ singlet = 2 H₂ at 3.4 Å, a saddle point with 2 imaginary modes on a
+    flat van der Waals surface
+  - H₄⁻ (quartet): its L0 optimization never converges while the fragments
+    drift apart
 
 ### Phase 3: Structure search (2–3 days)
 - Templates, a random generator, GOAT, L0 pre-optimization, dedup by

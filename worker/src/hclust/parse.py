@@ -12,11 +12,13 @@ from hclust.units import BOHR_TO_ANGSTROM
 
 NORMAL_TERMINATION = "ORCA TERMINATED NORMALLY"
 OPT_CONVERGED = "THE OPTIMIZATION HAS CONVERGED"
+SCF_NOT_CONVERGED = "SCF NOT CONVERGED"
 
 _S2 = re.compile(r"Expectation value of <S\*\*2>\s*:\s*(-?\d+\.\d+)")
 _POINT_GROUP = re.compile(r"Point Group:\s*(\S+),\s*Symmetry Number:\s*(\d+)")
 _ORBITAL_ROW = re.compile(r"^\s*\d+\s+(\d+\.\d+)\s+(-?\d+\.\d+)\s+-?\d+\.\d+\s*$")
-_ERROR = re.compile(r"^Error\b|\bError \(|ERROR")
+# Most specific first: "Error (ORCA_MDCI): ...", then any line starting with "Error".
+_ERRORS = (re.compile(r"\bError \(.*"), re.compile(r"^Error\b.*"))
 
 
 def parse_orca(workdir: Path, basename: str = "job", is_opt: bool = False) -> Result:
@@ -25,7 +27,8 @@ def parse_orca(workdir: Path, basename: str = "job", is_opt: bool = False) -> Re
     out = out_path.read_text(errors="replace") if out_path.exists() else ""
 
     if NORMAL_TERMINATION not in out:
-        return Result(status="failed", error=_error_message(out), workdir=workdir)
+        kind = "scf" if SCF_NOT_CONVERGED in out else "other"
+        return Result(status="failed", error=_error_message(out), error_kind=kind, workdir=workdir)
 
     props = json.loads((workdir / f"{basename}.property.json").read_text())
     last = props["Geometries"][-1]
@@ -42,7 +45,8 @@ def parse_orca(workdir: Path, basename: str = "job", is_opt: bool = False) -> Re
     if is_opt:
         result.opt_converged = OPT_CONVERGED in out
         if not result.opt_converged:
-            result.status, result.error = "failed", "geometry optimization did not converge"
+            result.status, result.error_kind = "failed", "opt"
+            result.error = "geometry optimization did not converge"
 
     if s2 := _S2.findall(out):
         result.s2 = float(s2[-1])
@@ -106,7 +110,8 @@ def _error_message(out: str) -> str:
     if not out:
         return "no output"
     lines = [line.strip() for line in out.splitlines() if line.strip()]
-    for line in lines:
-        if _ERROR.search(line):
-            return line
+    for pattern in _ERRORS:
+        for line in lines:
+            if m := pattern.search(line):
+                return m[0]
     return lines[-1]

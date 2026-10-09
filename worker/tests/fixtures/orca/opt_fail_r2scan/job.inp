@@ -1,0 +1,8 @@
+! r2SCAN-3c TightOpt TightSCF
+%maxcore 600
+%geom MaxIter 2 end
+* xyz 1 1
+H 0 0 0
+H 0.9 0 0
+H 1.5 0.6 0
+*

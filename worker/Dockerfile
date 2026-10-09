@@ -28,6 +28,7 @@ ENV PATH=/opt/venv/bin:/opt/orca:/opt/xtb/bin:$PATH \
     XTBEXE=/opt/xtb/bin/xtb \
     OMP_NUM_THREADS=1 \
     OMP_STACKSIZE=1G \
+    PYTHONUNBUFFERED=1 \
     HCLUST_DATA=/data
 
 WORKDIR /app

@@ -54,3 +54,15 @@ def test_failed_job(orca_fixture):
 def test_missing_output(tmp_path):
     r = parse_orca(tmp_path)
     assert r.status == "failed" and r.error == "no output"
+
+
+def test_scf_failure_is_classified(orca_fixture):
+    r = parse_orca(orca_fixture("scf_fail_wb97mv"))
+    assert not r.ok and r.error_kind == "scf"
+    assert "SCF has not converged" in r.error
+
+
+def test_unconverged_optimization_keeps_last_geometry(orca_fixture):
+    r = parse_orca(orca_fixture("opt_fail_r2scan"), is_opt=True)
+    assert not r.ok and r.error_kind == "opt" and r.opt_converged is False
+    assert len(r.geometry) == 3  # the restart point

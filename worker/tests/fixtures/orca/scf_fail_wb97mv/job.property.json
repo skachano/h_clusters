@@ -1,0 +1,34 @@
+{
+    "Calculation_Status": {
+        "Status": "Running",
+        "progName": "LeanSCF",
+        "version": "6.1.1"
+    },
+    "Geometries": [
+        {
+            "Geometry": {
+                "Coordinates": {
+                    "Cartesians": [
+                        [
+                            "H",
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            "H",
+                            0.0,
+                            0.0,
+                            1.398397339102
+                        ]
+                    ],
+                    "Type": "Cartesians",
+                    "Units": "a.u."
+                },
+                "NAtoms": 2,
+                "NCorelessECP": 0,
+                "NGhostAtoms": 0
+            }
+        }
+    ]
+}

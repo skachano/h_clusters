@@ -1,0 +1,18 @@
+# Phase 2 demo: exercises the stage DAG, retries and resumability on small clusters.
+# Chain seeds only; the real structure search arrives in Phase 3.
+name: demo
+species:
+  m: [1, 4]
+  charges: [-1, 0, 1]
+  n_mult: 2
+seeds:
+  - generator: chain
+    params: { spacing: 0.9 }
+stages:
+  - { name: pre, level: L0, task: opt }
+  - { name: opt, level: L1, task: optfreq, from: pre }
+  - { name: ref, level: L2, task: sp, from: opt, when: minimum }
+resources:
+  workers: 16
+  maxcore_mb: 600
+  timeout_min: 60

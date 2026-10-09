@@ -6,10 +6,10 @@ services:
     profiles: [compute]
     environment:
       HOME: /tmp
-      N_WORKERS: ${N_WORKERS:-16}
     volumes:
       # ORCA's licence forbids redistribution: mount it, never bake it in.
       - ${ORCA_DIR:-/opt/orca}:/opt/orca:ro
       - ./data:/data
       - ./worker:/app
+      - ./campaigns:/campaigns:ro
     working_dir: /app
