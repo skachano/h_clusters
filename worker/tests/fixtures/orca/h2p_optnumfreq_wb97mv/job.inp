@@ -1,0 +1,6 @@
+! wB97M-V def2-TZVPPD TightOpt NumFreq TightSCF
+%maxcore 600
+* xyz 1 2
+H 0 0 0
+H 0 0 1.05
+*

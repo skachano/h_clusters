@@ -1,0 +1,64 @@
+import pytest
+
+from hclust.engines import orca
+from hclust.engines.orca import OrcaJob, Task, job_hash
+from hclust.geometry import Geometry
+from hclust.levels import LEVELS
+from hclust.species import State
+
+H2 = Geometry.hydrogens([[0, 0, 0], [0, 0, 0.74]])
+H = Geometry.hydrogens([[0, 0, 0]])
+
+
+@pytest.fixture(autouse=True)
+def fixed_version(monkeypatch):
+    monkeypatch.setattr(orca, "orca_version", lambda: "6.1.1")
+
+
+def test_render_closed_shell_dft_optfreq():
+    job = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], Task.OPTFREQ)
+    assert job.render() == (
+        "# hclust H2 (1) L1 optfreq\n"
+        "! wB97M-V def2-TZVPPD TightOpt NumFreq TightSCF\n"
+        "%maxcore 600\n"
+        "* xyz 0 1\n"
+        "H      0.0000000000     0.0000000000     0.0000000000\n"
+        "H      0.0000000000     0.0000000000     0.7400000000\n"
+        "*\n"
+    )
+
+
+def test_open_shell_uses_unrestricted_reference():
+    assert "UKS" in OrcaJob(State(2, 1, 2), H2, LEVELS["L0"]).keywords()
+    assert "UHF" in OrcaJob(State(2, -1, 2), H2, LEVELS["L2"]).keywords()
+
+
+def test_one_electron_falls_back_to_hf():
+    kw = OrcaJob(State(2, 1, 2), H2, LEVELS["L2"], Task.OPT).keywords()
+    assert kw == "HF aug-cc-pVTZ UHF TightOpt TightSCF"
+
+
+def test_ccsdt_optimization_uses_numerical_gradients():
+    kw = OrcaJob(State(2, 0, 1), H2, LEVELS["L2"], Task.OPTFREQ).keywords()
+    assert kw == "CCSD(T) aug-cc-pVTZ TightOpt NumGrad NumFreq TightSCF"
+
+
+def test_single_atom_is_single_point():
+    job = OrcaJob(State(1, 0, 2), H, LEVELS["L1"], Task.OPTFREQ)
+    assert job.effective_task is Task.SP
+    assert "Opt" not in job.keywords() and "Freq" not in job.keywords()
+
+
+def test_rejects_bare_proton_and_wrong_geometry():
+    with pytest.raises(ValueError, match="proton"):
+        OrcaJob(State(1, 1, 1), H, LEVELS["L1"])
+    with pytest.raises(ValueError, match="geometry"):
+        OrcaJob(State(3, 1, 1), H2, LEVELS["L1"])
+
+
+def test_hash_is_stable_and_sensitive():
+    job = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"])
+    assert job.hash == OrcaJob(State(2, 0, 1), H2, LEVELS["L1"]).hash
+    assert job.hash != OrcaJob(State(2, 0, 3), H2, LEVELS["L1"]).hash
+    assert job.hash != OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], Task.OPT).hash
+    assert job_hash(job.render(), "6.1.1") != job_hash(job.render(), "6.1.2")

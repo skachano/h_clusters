@@ -1,0 +1,7 @@
+! CCSD(T) aug-cc-pVTZ TightSCF
+%maxcore 600
+* xyz 1 1
+H 0 0 0
+H 0.873 0 0
+H 0.4365 0.756 0
+*

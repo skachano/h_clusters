@@ -1,0 +1,144 @@
+{
+    "Calculation_Status": {
+        "Status": "Running",
+        "progName": "ProgMDCI",
+        "version": "6.1.1"
+    },
+    "Geometries": [
+        {
+            "Energy": [
+                {
+                    "Method": "SCF",
+                    "Mult": [
+                        [
+                            2
+                        ]
+                    ],
+                    "totalEnergy": [
+                        [
+                            -0.49982117602314463
+                        ]
+                    ]
+                }
+            ],
+            "Geometry": {
+                "Coordinates": {
+                    "Cartesians": [
+                        [
+                            "H",
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                    ],
+                    "Type": "Cartesians",
+                    "Units": "a.u."
+                },
+                "NAtoms": 1,
+                "NCorelessECP": 0,
+                "NGhostAtoms": 0
+            },
+            "Loewdin_Population_Analysis": [
+                {
+                    "ATNO": [
+                        [
+                            1
+                        ]
+                    ],
+                    "AtomicCharges": [
+                        [
+                            0.0
+                        ]
+                    ],
+                    "Irrep": 0,
+                    "Level": "Relaxed density",
+                    "Method": "SCF",
+                    "Mult": 2,
+                    "NAtoms": 1,
+                    "State": -1
+                }
+            ],
+            "Mayer_Population_Analysis": [
+                {
+                    "ATNO": [
+                        [
+                            1
+                        ]
+                    ],
+                    "BVA": [
+                        [
+                            0.0
+                        ]
+                    ],
+                    "FA": [
+                        [
+                            0.9999999999999998
+                        ]
+                    ],
+                    "Irrep": 0,
+                    "Level": "Relaxed density",
+                    "Method": "SCF",
+                    "Mult": 2,
+                    "NA": [
+                        [
+                            1.0000000000000007
+                        ]
+                    ],
+                    "NAtoms": 1,
+                    "NBondOrdersPrint": 0,
+                    "QA": [
+                        [
+                            0.0
+                        ]
+                    ],
+                    "State": -1,
+                    "VA": [
+                        [
+                            0.9999999999999998
+                        ]
+                    ],
+                    "ZA": [
+                        [
+                            1.0
+                        ]
+                    ],
+                    "bondThresh": 0.1
+                }
+            ],
+            "Mulliken_Population_Analysis": [
+                {
+                    "ATNO": [
+                        [
+                            1
+                        ]
+                    ],
+                    "AtomicCharges": [
+                        [
+                            0.0
+                        ]
+                    ],
+                    "Irrep": 0,
+                    "Level": "Relaxed density",
+                    "Method": "SCF",
+                    "Mult": 2,
+                    "NAtoms": 1,
+                    "State": -1
+                }
+            ],
+            "SCF_Timings": {
+                "DENS": 0.0008390000000000029,
+                "DIIS": 0.0012159999999999983,
+                "ETOT": 0.0001959999999999948,
+                "FOCK": 0.003532000000000002,
+                "FOCKSTART": 0.00017400000000000054,
+                "FROZCORE": 3.900000000000084e-05,
+                "J": 0.0026699999999999988,
+                "POP": 0.0005940000000000008,
+                "PREP": 0.015271999999999999,
+                "SOSCF": 0.0008319999999999994,
+                "TOTAL": 0.010306999999999998,
+                "TRAFO": 0.0003970000000000015
+            }
+        }
+    ]
+}

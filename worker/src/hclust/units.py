@@ -1,0 +1,5 @@
+"""Physical constants and unit conversions (CODATA 2018)."""
+
+BOHR_TO_ANGSTROM = 0.529177210903
+HARTREE_TO_EV = 27.211386245988
+HARTREE_TO_KCAL = 627.509474

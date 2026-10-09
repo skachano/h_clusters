@@ -1,0 +1,144 @@
+"""ORCA engine: render inputs, run them in content-addressed job directories, parse results."""
+
+import hashlib
+import os
+import re
+import subprocess
+from dataclasses import dataclass
+from enum import StrEnum
+from functools import cache
+from pathlib import Path
+
+from hclust.geometry import Geometry
+from hclust.levels import Level
+from hclust.parse import NORMAL_TERMINATION, parse_orca
+from hclust.results import Result
+from hclust.species import State
+
+ORCA_DIR = Path(os.environ.get("ORCA_DIR", "/opt/orca"))
+BASENAME = "job"
+# Kept after a run; everything else (scratch, .gbw, densities) is deleted to save space.
+KEEP_SUFFIXES = (".inp", ".out", ".property.json", ".property.txt", ".xyz", ".hess", ".engrad", ".opt")
+
+
+class Task(StrEnum):
+    SP = "sp"
+    OPT = "opt"
+    FREQ = "freq"
+    OPTFREQ = "optfreq"
+
+    @property
+    def optimizes(self) -> bool:
+        return self in (Task.OPT, Task.OPTFREQ)
+
+    @property
+    def has_freq(self) -> bool:
+        return self in (Task.FREQ, Task.OPTFREQ)
+
+
+@dataclass(frozen=True)
+class OrcaJob:
+    state: State
+    geometry: Geometry
+    level: Level
+    task: Task = Task.SP
+    maxcore_mb: int = 600
+
+    def __post_init__(self) -> None:
+        if self.state.n_electrons == 0:
+            raise ValueError("a bare proton has no electronic structure; its energy is 0")
+        if len(self.geometry) != self.state.m or set(self.geometry.symbols) != {"H"}:
+            raise ValueError(f"geometry does not match {self.state.label}")
+
+    @property
+    def effective_task(self) -> Task:
+        """A single atom can be neither optimized nor vibrated."""
+        return Task.SP if len(self.geometry) == 1 else self.task
+
+    def keywords(self) -> str:
+        level, state = self.level, self.state
+        fallback = level.correlated and state.n_electrons < 2
+        words = ["HF" if fallback else level.method, level.basis]
+        if state.mult > 1:
+            words.append("UKS" if level.kind == "dft" and not fallback else "UHF")
+        task = self.effective_task
+        if task.optimizes:
+            words.append("TightOpt")
+            if not level.analytic_gradient and not fallback:
+                words.append("NumGrad")
+        if task.has_freq:
+            words.append("Freq" if level.analytic_hessian or fallback else "NumFreq")
+        words.append("TightSCF")
+        return " ".join(w for w in words if w)
+
+    def render(self) -> str:
+        return (
+            f"# hclust {self.state.label} {self.level.name} {self.effective_task}\n"
+            f"! {self.keywords()}\n"
+            f"%maxcore {self.maxcore_mb}\n"
+            f"* xyz {self.state.charge} {self.state.mult}\n"
+            f"{self.geometry.atom_block()}\n"
+            "*\n"
+        )
+
+    @property
+    def hash(self) -> str:
+        return job_hash(self.render(), orca_version())
+
+
+def job_hash(input_text: str, version: str) -> str:
+    """Content address of a job: same input + same ORCA version -> same result."""
+    return hashlib.sha256(f"orca {version}\n{input_text}".encode()).hexdigest()[:16]
+
+
+@cache
+def orca_version() -> str:
+    out = subprocess.run(
+        [ORCA_DIR / "orca", "--version"], capture_output=True, text=True, timeout=60
+    ).stdout
+    if m := re.search(r"Program Version (\S+)", out):
+        return m[1]
+    raise RuntimeError(f"cannot determine ORCA version from {ORCA_DIR / 'orca'}")
+
+
+def default_jobs_root() -> Path:
+    return Path(os.environ.get("HCLUST_DATA", "data")) / "jobs"
+
+
+def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 3600) -> Result:
+    """Run `job` unless an identical job already terminated normally; return its parsed result."""
+    workdir = (jobs_root or default_jobs_root()) / job.hash
+    out = workdir / f"{BASENAME}.out"
+    is_opt = job.effective_task.optimizes
+
+    if out.exists() and NORMAL_TERMINATION in out.read_text(errors="replace"):
+        return parse_orca(workdir, BASENAME, is_opt)
+
+    workdir.mkdir(parents=True, exist_ok=True)
+    for stale in workdir.iterdir():
+        stale.unlink()
+    (workdir / f"{BASENAME}.inp").write_text(job.render())
+
+    try:
+        with out.open("w") as fh:
+            # ORCA must be started by its absolute path to find its sub-programs.
+            subprocess.run(
+                [ORCA_DIR / "orca", f"{BASENAME}.inp"],
+                cwd=workdir, stdout=fh, stderr=subprocess.STDOUT, timeout=timeout_s,
+            )
+    except subprocess.TimeoutExpired:
+        _cleanup(workdir)
+        return Result(status="failed", error=f"timeout after {timeout_s:.0f} s", workdir=workdir)
+
+    subprocess.run(
+        [ORCA_DIR / "orca_2json", BASENAME, "-property"],
+        cwd=workdir, capture_output=True, timeout=120,
+    )
+    _cleanup(workdir)
+    return parse_orca(workdir, BASENAME, is_opt)
+
+
+def _cleanup(workdir: Path) -> None:
+    for path in workdir.iterdir():
+        if path.is_file() and not path.name.endswith(KEEP_SUFFIXES):
+            path.unlink()

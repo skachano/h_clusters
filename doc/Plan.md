@@ -48,7 +48,7 @@ There are 30 species in total (29 non-trivial).
 
 **Allowed multiplicities** follow from electron parity: an even N gives
 1, 3, 5, …; an odd N gives 2, 4, 6, …. The maximum is N + 1.
-- Baseline: the lowest allowed multiplicity plus the next one (≈ 58 states).
+- Baseline: the lowest allowed multiplicity plus the next one (57 states: H⁺, H and H₂⁺ have only one spin state).
 - Extended (optional): up to the third allowed multiplicity where N permits
   (≈ 80 states).
 
@@ -63,7 +63,7 @@ regression tests.
 | H₂⁺ | r_e ≈ 1.06 Å, D_e ≈ 2.79 eV; DFT with self-interaction error gets this badly wrong |
 | H⁻ | Bound, EA(H) = 0.754 eV; needs diffuse basis functions |
 | H₂⁻ | Not bound (a resonance); a calculation in a finite basis may falsely "bind" it |
-| H₃⁺ | Equilateral triangle (D₃h), r ≈ 0.873 Å, very stable; proton affinity of H₂ ≈ 4.4 eV |
+| H₃⁺ | Equilateral triangle (D₃h), r ≈ 0.873 Å, very stable; D_e(H₃⁺ → H₂ + H⁺) = 4.61 eV (the proton affinity, 4.4 eV, includes ZPE and thermal terms) |
 | H₃ | Ground state is repulsive (dissociates to H₂ + H); linear saddle point |
 | H₅⁺, H₇⁺, H₉⁺ | H₃⁺ core solvated by H₂ molecules; binding decreases with shell size |
 | H₄⁺, H₆⁺, … | Even cations are less stable than their odd neighbours (odd–even alternation) |
@@ -172,7 +172,7 @@ For each state, computed from the best structure at each level:
   /opt/orca ──►│  worker (Python)      api (Python, FastAPI)    web (TypeScript)  │
    (ro mount)  │  - campaign planner   - read-only REST over    - Vite + React    │
                │  - job runner pool      results DB              - 3Dmol.js viewer │
-               │  - ORCA/xtb adapters  - thermo recompute       - Plotly charts   │
+               │  - ORCA adapter       - thermo recompute       - Plotly charts   │
                │  - parsers            - fragmentation calc     - served by nginx │
                │        │                     ▲                      │            │
                │        ▼                     │                      │            │
@@ -214,11 +214,13 @@ h_clusters/
 │   ├── pyproject.toml         # uv-managed
 │   └── src/hclust/
 │       ├── species.py         # (m, charge, mult) enumeration, parity rules
+│       ├── geometry.py        # Geometry + XYZ I/O
+│       ├── levels.py          # method ladder L0…L2
+│       ├── results.py         # engine-independent Result
 │       ├── structures.py      # templates, random generator, dedup/fingerprints
 │       ├── engines/
-│       │   ├── orca.py        # input rendering (Jinja2), run, parse
-│       │   └── xtb.py
-│       ├── parse.py           # orca_2json / property file → typed results
+│       │   └── orca.py        # input rendering, hashing, run (xtb runs via ORCA GOAT)
+│       ├── parse.py           # property.json (orca_2json) + text-only items → Result
 │       ├── db.py              # SQLModel tables
 │       ├── runner.py          # job queue, process pool, retries, timeouts
 │       ├── workflow.py        # stage DAG: L0 → dedup → L1 → freq → L2 → L3
@@ -398,12 +400,49 @@ Each phase has a concrete **done when** criterion.
 - GOAT-EXPLORE with r²SCAN-3c is far too slow on one core (estimated ~5 h
   for H₃⁺: ~1400 gradients per GOAT worker, at least 24 worker runs).
 
-### Phase 1: Single-job engine + parsing (1–2 days)
-- ORCA/xtb adapters, input templating, output parsing into `Result`, and
-  job hashing.
+### Phase 1: Single-job engine + parsing (1–2 days) — ✅ done 2026-10-09
+- ORCA adapter, input templating, output parsing into `Result`, and job
+  hashing.
 - **Done when** H, H⁻, H₂, H₂⁺ and H₃⁺ at L1 and L2 reproduce the anchors in
   §1.2 (r_e within 0.01 Å, energies within 0.05 eV of the references for
   CCSD(T)). Encode these as `pytest` regression tests.
+- How to run the tests:
+  - `docker compose run --rm worker python -m pytest` runs everything.
+  - Add `-m "not orca"` to skip ORCA and use only the stored fixtures.
+  - Job directories are `data/jobs/<sha256(ORCA version + input)[:16]>/`.
+    Finished jobs are reused rather than rerun.
+
+**Findings:**
+- Structured data comes from `orca_2json job -property`: energies,
+  geometries, frequencies, normal modes, RRHO terms and charges. ⟨S²⟩,
+  orbital energies, optimization convergence and point group are parsed
+  from the `.out` text.
+- A job counts as successful only if "ORCA TERMINATED NORMALLY" is in the
+  output. A failed CCSD(T) run still leaves a `property.json` behind from
+  its SCF step.
+- ωB97M-V (VV10) has no analytic Hessian, so L1 uses `NumFreq` (H₃⁺: ~1 min
+  on one core). CCSD(T) aborts with a single electron, so one-electron
+  systems fall back to HF, which is exact within the basis.
+- ORCA's point-group detection is too strict to rely on: it calls an
+  equilateral L1 H₃⁺ (ΔR < 3·10⁻⁴ Å) C₂v. Our own tolerant
+  `symmetry.py` (Phase 5) is required.
+- Anchor results (eV; L1 = ωB97M-V/def2-TZVPPD, L2 = CCSD(T)/aug-cc-pVTZ
+  at the L1 geometry):
+
+  | Quantity | L2 | L1 | Exact |
+  |---|---|---|---|
+  | E(H) error | 0.005 | 0.160 | 0 |
+  | EA(H) | 0.728 | **0.052** | 0.755 |
+  | D_e(H₂) | 4.707 | 4.715 | 4.748 |
+  | D_e(H₂⁺ → H + H⁺) | 2.761 | 2.717 | 2.793 |
+  | D_e(H₃⁺ → H₂ + H⁺) | 4.602 | 4.422 | 4.609 |
+  | r_e(H₂⁺), Å | — | **1.137** | 1.057 |
+
+  The self-interaction error of DFT is plain to see. ωB97M-V barely binds
+  the electron in H⁻ and stretches H₂⁺ by 0.08 Å (recorded as a strict
+  `xfail`). DFT *ranking* of anions and of odd-electron cations must
+  therefore be checked against L2. Other L1 values: r(H₂) = 0.740 Å,
+  ω(H₂) = 4454 cm⁻¹ (exact 4401), r(H₃⁺) = 0.8754 Å.
 
 ### Phase 2: Job DB + runner (2 days)
 - SQLModel schema, campaign YAML, stage DAG, process pool, retries, the
@@ -419,7 +458,7 @@ Each phase has a concrete **done when** criterion.
 
 ### Phase 4: Full baseline campaign (1 day, plus compute time)
 - Run L0 → L1 (+freq) → L2 for all 29 species × baseline multiplicities.
-- Rough budget: ~58 states × ~30 candidates × L0, then ~58 × 8 × L1, then L2
+- Rough budget: ~57 states × ~30 candidates × L0, then ~57 × 8 × L1, then L2
   on the minima. That is a few thousand jobs, hours of wall time on 16
   workers.
 - **Done when** every state has a terminal status, and failures are

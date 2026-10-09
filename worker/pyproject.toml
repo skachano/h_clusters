@@ -1,0 +1,23 @@
+[project]
+name = "hclust"
+version = "0.1.0"
+description = "High-throughput screening of hydrogen clusters H_m^n with ORCA"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "orca: runs real ORCA calculations (needs /opt/orca mounted)",
+]
