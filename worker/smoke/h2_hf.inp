@@ -1,0 +1,7 @@
+! HF def2-SVP TightSCF
+%maxcore 600
+%pal nprocs 1 end
+* xyz 0 1
+H 0.0 0.0 0.0
+H 0.0 0.0 0.74
+*
