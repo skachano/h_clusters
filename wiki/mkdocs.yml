@@ -28,6 +28,64 @@ theme:
         icon: material/weather-sunny
         name: Light mode
 
+plugins:
+  - search
+  # Japanese pages are page.ja.md next to page.md; missing ones fall back to English.
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          name: English
+          default: true
+          build: true
+        - locale: ja
+          name: 日本語
+          build: true
+          site_name: H-Clusters ウィキ
+          site_description: h_clusters 実験の背後にある概念・手法・技法
+          nav_translations:
+            Home: ホーム
+            Foundations: 基礎
+            Methods: 計算手法
+            Techniques: 計算技法
+            Pitfalls: 落とし穴
+            High-throughput computing: ハイスループット計算
+            Writing pages: ページの書き方
+            Schrödinger equation: シュレーディンガー方程式
+            Born–Oppenheimer approximation: ボルン–オッペンハイマー近似
+            Potential energy surface: ポテンシャルエネルギー曲面
+            Spin and multiplicity: スピンと多重度
+            Units: 単位
+            Hartree–Fock: ハートリー–フォック法
+            Density functional theory: 密度汎関数理論
+            MP2: MP2
+            Coupled cluster: 結合クラスター法
+            Semi-empirical tight binding (GFN2-xTB): 半経験的タイトバインディング (GFN2-xTB)
+            Basis sets: 基底関数系
+            Resolution of the identity (RI): 恒等分解 (RI)
+            Geometry optimization: 構造最適化
+            Frequencies and the Hessian: 振動数とヘッセ行列
+            Zero-point energy: 零点エネルギー
+            Thermochemistry: 熱化学
+            Global structure search: 大域的構造探索
+            Point groups and symmetry: 点群と対称性
+            Fragmentation channels: 解離チャネル
+            Ionization energy and electron affinity: イオン化エネルギーと電子親和力
+            Self-interaction error: 自己相互作用誤差
+            Missing dispersion: 分散力の欠如
+            Missing diffuse functions: 分散関数の欠如
+            'Finite-basis "binding" of unbound anions': 有限基底による非束縛アニオンの見かけの「束縛」
+            Spin contamination: スピン汚染
+            Quantum nuclear effects: 原子核の量子効果
+            Job hashing and deduplication: ジョブのハッシュ化と重複排除
+            Provenance and resumability: 来歴管理と再開可能性
+            Method ladders: 手法のはしご
+            Selection barriers: 選抜バリア
+            Resource budgeting: 計算資源の配分
+
 markdown_extensions:
   - abbr
   - admonition
@@ -37,6 +95,11 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+      # Unicode-aware, so Japanese headings get readable anchors.
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+          normalize: NFKC
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.details

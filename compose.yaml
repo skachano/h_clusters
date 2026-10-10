@@ -16,7 +16,9 @@ services:
 
   # Learning wiki (wiki/). Live preview: docker compose --profile docs up docs
   docs:
-    image: squidfunk/mkdocs-material:9.6.14
+    build:
+      context: ./wiki
+    image: hclust-docs:dev
     profiles: [docs]
     ports:
       - "127.0.0.1:${DOCS_PORT:-8001}:8000"

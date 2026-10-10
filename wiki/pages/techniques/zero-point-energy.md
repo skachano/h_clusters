@@ -36,7 +36,7 @@ $$
 
 ([binding energy](../foundations/potential-energy-surface.md#binding-energy-d_e-and-d_0)).
 
-## Example: H₅⁺ → H₃⁺ + H₂
+## Example: H₅⁺ → H₃⁺ + H₂ { #example-h5-h3-h2 }
 
 From the baseline campaign: electronic energies at CCSD(T)/aug-cc-pVTZ,
 ZPEs from RI-MP2/aug-cc-pVTZ harmonic frequencies, both at the MP2 geometries.
