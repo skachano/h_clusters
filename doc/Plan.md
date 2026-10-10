@@ -209,7 +209,11 @@ For each state, computed from the best structure at each level:
 - **`web`**: Node 22 for development (`vite dev`). Production build is
   served by nginx, which also proxies `/api` to the `api` service.
 
-Compose profiles: `compute` (worker) and `serve` (api + web), so the
+- **`docs`**: MkDocs Material (pinned image) serving the learning wiki in
+  `wiki/` at `localhost:8001` (`DOCS_PORT`). Pages are plain Markdown with
+  KaTeX math, so the web app can later link to or render the same files.
+
+Compose profiles: `compute` (worker), `serve` (api + web) and `docs`, so the
 visualisation can run while no calculations are running, and the reverse.
 
 ### 3.2 Repository layout
@@ -246,6 +250,9 @@ h_clusters/
 ├── web/
 │   ├── Dockerfile
 │   └── src/ (React + TS)
+├── wiki/
+│   ├── mkdocs.yml             # site config + nav
+│   └── pages/                 # learning wiki (Markdown + KaTeX)
 ├── campaigns/
 │   └── baseline.yaml          # declarative experiment definition
 ├── data/                      # git-ignored: hclust.sqlite, jobs/<hash>/…

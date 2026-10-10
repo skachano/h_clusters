@@ -13,3 +13,12 @@ services:
       - ./worker:/app
       - ./campaigns:/campaigns:ro
     working_dir: /app
+
+  # Learning wiki (wiki/). Live preview: docker compose --profile docs up docs
+  docs:
+    image: squidfunk/mkdocs-material:9.6.14
+    profiles: [docs]
+    ports:
+      - "127.0.0.1:${DOCS_PORT:-8001}:8000"
+    volumes:
+      - ./wiki:/docs
