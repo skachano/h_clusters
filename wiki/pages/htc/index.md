@@ -2,10 +2,8 @@
 
 How to run thousands of calculations reproducibly.
 
-Planned pages:
-
-- Job hashing and deduplication
-- Provenance and resumability
-- Method ladders: screening cheaply, refining selectively
-- Selection barriers between stages
-- Resource budgeting (memory, scratch, worker pools)
+- [Job hashing and deduplication](job-hashing.md): content addresses for calculations
+- [Provenance and resumability](provenance.md): the database as a ledger; interrupt and resume
+- [Method ladders](method-ladder.md): screening cheaply, refining selectively
+- [Selection barriers](selection-barriers.md): per-state ranking, dedup and promotion
+- [Resource budgeting](resource-budgeting.md): workers, memory, timeouts, scratch disk

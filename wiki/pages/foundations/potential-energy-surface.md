@@ -1,7 +1,8 @@
 # Potential energy surface
 
 !!! info "Prerequisites"
-    None. This is a good first page.
+    None, though [Schrödinger equation](schrodinger-equation.md) and
+    [Born–Oppenheimer approximation](born-oppenheimer.md) give the background.
 
 A molecule's energy depends on where its nuclei are. The **potential energy
 surface** (PES) is that function: energy versus nuclear positions. Shapes of
@@ -56,24 +57,112 @@ The slope of the surface is the **gradient** $\mathbf{g} = \partial E /
 | **Asymptote** | goes to zero | | Fragments far apart, e.g. H₂ → H + H |
 
 The gradient finds points where the surface is flat; only the Hessian tells
-a minimum from a saddle point. That is why the project computes frequencies
-(which come from the Hessian) after every optimization.
+a minimum from a saddle point. That is why the project computes
+[vibrational frequencies](#vibrations-and-vibrational-levels) (which come from
+the Hessian) after every optimization.
 
-### Binding energy
+### Vibrations and vibrational levels
 
-The **dissociation energy** $D_e$ is the depth of the well: the energy of the
-separated fragments minus the energy at the minimum. Real molecules can't sit
-at the very bottom, because quantum mechanics gives each vibration a minimum
-**zero-point energy** (ZPE). The measurable binding energy is therefore
+A minimum is where the nuclei *want* to be, but they never sit still there.
+Push a ball off the bottom of a bowl and it rolls back, overshoots and rolls
+back again. Nuclei on a PES do the same: in H₂ the bond keeps stretching and
+compressing around $R_e$. That oscillation is a **vibration**.
+
+Near the bottom, any well looks like a parabola, $E \approx E_\text{min} +
+\tfrac{1}{2}k(R - R_e)^2$, where the **force constant** $k$ is the curvature of
+the PES at the minimum. Classically this is a spring, and it vibrates at
 
 $$
-D_0 = D_e - \text{ZPE}
+\omega = \sqrt{k/\mu}
 $$
 
-For H₂, $D_e$ = 4.75 eV and $D_0$ = 4.48 eV: the ZPE costs 0.27 eV, about 6 %.
-Hydrogen is the lightest atom, so its ZPE effects are the largest of any element. For
-the weakly bound clusters in this project ZPE can exceed $D_e$ entirely, so a
-cluster with a well on the PES can still fall apart.
+with $\mu$ the reduced mass ($m_\text{H}/2$ for H₂). A stiff bond (large $k$)
+and light atoms (small $\mu$) vibrate fast. H₂ completes one vibration every
+7.6 femtoseconds.
+
+Quantum mechanics changes one thing: the vibration can't have any energy it
+likes. Only a ladder of **vibrational levels** is allowed, numbered by the
+**vibrational quantum number** $v = 0, 1, 2, \ldots$. For a parabola they are
+evenly spaced:
+
+$$
+E_v = \hbar\omega\left(v + \tfrac{1}{2}\right)
+$$
+
+A real well widens towards the top, so its levels crowd together there, and
+only a finite number fit below the dissociation limit. H₂ has 15 (v = 0 to 14).
+A molecule that receives more energy than the top of the ladder falls apart.
+
+The important level is the lowest. Even at $v = 0$, at absolute zero, the
+energy is $\tfrac{1}{2}\hbar\omega$ above the bottom of the well, not zero.
+That leftover is the **zero-point energy** (ZPE). It is forced by the
+uncertainty principle: a nucleus confined to a well can't also have exactly
+zero momentum, so it can't be at rest at the minimum. At room temperature
+almost every H₂ molecule is in $v = 0$ (the gap to $v = 1$ is about 20 times
+the thermal energy), so $v = 0$ is the state that matters for stability.
+
+!!! note "Units"
+    Vibrational energies are usually quoted as wavenumbers in cm⁻¹
+    (1 eV = 8065.5 cm⁻¹), which is what ORCA prints. H₂'s harmonic frequency
+    is 4401 cm⁻¹, so its harmonic ZPE is half of that, 2200 cm⁻¹ = 0.27 eV.
+
+**More atoms, more vibrations.** A molecule with $N$ atoms has $3N - 6$
+independent vibrations, the **normal modes**: one per PES dimension. Each has
+its own frequency, found from the Hessian (the curvatures of the PES), and
+each contributes its own zero-point energy, so
+
+$$
+\text{ZPE} = \sum_{i=1}^{3N-6} \tfrac{1}{2}\hbar\omega_i
+$$
+
+A negative curvature gives an imaginary frequency: that direction is downhill,
+not a vibration, and the structure is a saddle point rather than a minimum.
+
+### Binding energy: $D_e$ and $D_0$
+
+Both measure how much energy it takes to pull a molecule apart into its
+fragments. They differ in where you start:
+
+- $D_e$ starts from the **bottom of the well**, the minimum of the PES. The
+  subscript *e* stands for *equilibrium* geometry. It is what an electronic
+  structure calculation gives directly, but no real molecule has this much
+  binding, because none sits at the very bottom.
+- $D_0$ starts from the **lowest vibrational level**, $v = 0$. It is the energy
+  actually needed to break a molecule in its ground state, and what experiments
+  measure.
+
+The diagram shows H₂'s well with its vibrational levels, from a Morse
+potential: a standard model curve fitted to H₂'s measured well depth and
+vibration frequency. (The Morse model holds 17 levels rather than H₂'s real
+15, but its ZPE and $D_0$ come out right.) Hover a level for its energy.
+
+--8<-- "morse_levels.svg.html"
+
+For a diatomic like H₂, the fragments are single atoms, which can't vibrate.
+So the whole ZPE of the molecule is lost on breaking, and
+
+$$
+D_0 = D_e - \text{ZPE}: \qquad 4.48\ \text{eV} = 4.75\ \text{eV} - 0.27\ \text{eV}
+$$
+
+**When the fragments are molecules too**, they keep zero-point energy of their
+own. In general it is the *change* in ZPE that counts:
+
+$$
+D_0 = D_e - \Delta\text{ZPE}, \qquad
+\Delta\text{ZPE} = \text{ZPE}(\text{cluster}) - \sum_\text{fragments} \text{ZPE}(\text{fragment})
+$$
+
+Take H₅⁺ → H₃⁺ + H₂. The cluster has $3 \cdot 5 - 6 = 9$ normal modes; the
+fragments have $3 + 1 = 4$ between them. The extra five are the soft motions
+of H₂ against H₃⁺ that hold the cluster together, and each brings its own
+zero-point energy. So $\Delta\text{ZPE}$ is typically positive and $D_0 < D_e$.
+
+Hydrogen is the lightest atom, so its frequencies and ZPE are the largest of
+any element. For the weakly bound clusters in this project, $\Delta\text{ZPE}$
+can be larger than $D_e$. Then $D_0$ is negative: the PES has a well, but it
+is too shallow to hold even the $v = 0$ level, and the cluster falls apart
+even at absolute zero.
 
 ### One surface per electronic state
 
@@ -155,7 +244,12 @@ appear or vanish.
   (L0, L1, L1M) follows the gradient downhill to the nearest minimum.
 - **Frequencies** check that each optimized structure is a minimum (all
   positive Hessian eigenvalues) and give its ZPE (`doc/Plan.md` §1, question 2).
-  H₃ is a known case where the stationary point is a saddle point.
+  H₃ is a known case where the stationary point is a saddle point. ORCA
+  computes *harmonic* frequencies (the parabola approximation), which is least
+  reliable for the floppy H₂-against-core motions (`doc/Plan.md` §7).
+- **$D_e$ vs $D_0$:** binding energies are reported both without and with ZPE
+  (ΔE and ΔE₀, `doc/Plan.md` §1.2), because the two can disagree on whether a
+  cluster is bound.
 - **Fragmentation channels** are the asymptotes: $D_\text{min}$ is the
   smallest dissociation energy over all ways of splitting a cluster
   (`doc/Plan.md` §1, question 3).

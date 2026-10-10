@@ -51,3 +51,10 @@
 /* Same specificity as the fill rules above, so it must stay after them. */
 .viz-pt circle.viz-hit { fill: transparent; stroke: none; }
 .viz-pt:hover circle:not(.viz-hit) { r: 6; }
+.viz-level { stroke: var(--md-default-fg-color--light); stroke-width: 1.5; }
+.viz-level.s1 { stroke: var(--viz-s1); stroke-width: 2; }
+.viz-pt .viz-hit-line { stroke: transparent; stroke-width: 8; }
+.viz-pt:hover .viz-level { stroke-width: 3; }
+.viz-dot.s2 { fill: var(--viz-s2); stroke: var(--md-default-bg-color); stroke-width: 2; }
+.viz-arrow-line { stroke: var(--md-default-fg-color); stroke-width: 1.5; }
+.viz-arrowhead { fill: var(--md-default-fg-color); }

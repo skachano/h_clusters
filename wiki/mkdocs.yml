@@ -1,6 +1,12 @@
 site_name: H-Clusters Wiki
 site_description: Concepts, methods and techniques behind the h_clusters experiment
 docs_dir: pages
+# Broken links and anchors fail `build --strict`.
+validation:
+  anchors: warn
+# Snippets and charts included from here; rebuild the live preview when they change.
+watch:
+  - examples
 
 theme:
   name: material
@@ -62,11 +68,43 @@ nav:
   - Home: index.md
   - Foundations:
       - foundations/index.md
+      - Schrödinger equation: foundations/schrodinger-equation.md
+      - Born–Oppenheimer approximation: foundations/born-oppenheimer.md
       - Potential energy surface: foundations/potential-energy-surface.md
+      - Spin and multiplicity: foundations/spin-and-multiplicity.md
+      - Units: foundations/units.md
   - Methods:
       - methods/index.md
       - Hartree–Fock: methods/hartree-fock.md
-  - Techniques: techniques/index.md
-  - Pitfalls: pitfalls/index.md
-  - High-throughput computing: htc/index.md
+      - Density functional theory: methods/dft.md
+      - MP2: methods/mp2.md
+      - Coupled cluster: methods/coupled-cluster.md
+      - Semi-empirical tight binding (GFN2-xTB): methods/xtb.md
+      - Basis sets: methods/basis-sets.md
+      - Resolution of the identity (RI): methods/resolution-of-identity.md
+  - Techniques:
+      - techniques/index.md
+      - Geometry optimization: techniques/geometry-optimization.md
+      - Frequencies and the Hessian: techniques/frequencies.md
+      - Zero-point energy: techniques/zero-point-energy.md
+      - Thermochemistry: techniques/thermochemistry.md
+      - Global structure search: techniques/structure-search.md
+      - Point groups and symmetry: techniques/point-groups.md
+      - Fragmentation channels: techniques/fragmentation.md
+      - Ionization energy and electron affinity: techniques/ionization-and-electron-affinity.md
+  - Pitfalls:
+      - pitfalls/index.md
+      - Self-interaction error: pitfalls/self-interaction-error.md
+      - Missing dispersion: pitfalls/dispersion.md
+      - Missing diffuse functions: pitfalls/diffuse-functions.md
+      - 'Finite-basis "binding" of unbound anions': pitfalls/unbound-anions.md
+      - Spin contamination: pitfalls/spin-contamination.md
+      - Quantum nuclear effects: pitfalls/quantum-nuclear-effects.md
+  - High-throughput computing:
+      - htc/index.md
+      - Job hashing and deduplication: htc/job-hashing.md
+      - Provenance and resumability: htc/provenance.md
+      - Method ladders: htc/method-ladder.md
+      - Selection barriers: htc/selection-barriers.md
+      - Resource budgeting: htc/resource-budgeting.md
   - Writing pages: writing-pages.md

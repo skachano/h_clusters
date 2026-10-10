@@ -2,13 +2,11 @@
 
 What is done with a method once it can compute an energy.
 
-Planned pages:
-
-- Geometry optimization
-- Harmonic frequencies, the Hessian and imaginary modes
-- Zero-point energy
-- Thermochemistry: enthalpy, entropy and free energy at T and p (RRHO, qRRHO)
-- Global structure search (GOAT, seeded candidates)
-- Point groups and symmetry
-- Fragmentation channels and binding energies
-- Ionization energy, electron affinity and detachment energies
+- [Geometry optimization](geometry-optimization.md): Newton steps, trust radii, restarts
+- [Frequencies and the Hessian](frequencies.md): normal modes, imaginary frequencies, saddle points
+- [Zero-point energy](zero-point-energy.md): why H₅⁺ loses a third of its binding
+- [Thermochemistry](thermochemistry.md): enthalpy, entropy, free energy; is H₅⁺ stable at 298 K?
+- [Global structure search](structure-search.md): templates, random seeds, fingerprints, dissociation
+- [Point groups and symmetry](point-groups.md): D₃h, C₂ᵥ, D₂d; degenerate modes, symmetry numbers
+- [Fragmentation channels](fragmentation.md): the weakest way apart, and stability verdicts
+- [Ionization energy and electron affinity](ionization-and-electron-affinity.md): losing or gaining an electron
