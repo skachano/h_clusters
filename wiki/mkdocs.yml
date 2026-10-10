@@ -36,6 +36,10 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight
   - pymdownx.inlinehilite
+  # Pages include runnable code and generated charts from wiki/examples.
+  - pymdownx.snippets:
+      base_path: [examples]
+      check_paths: true
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.superfences:
@@ -50,13 +54,18 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js
   - https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js
 extra_css:
+  - stylesheets/extra.css
   - https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css
 
 # Every page must be listed here (see "Writing pages").
 nav:
   - Home: index.md
-  - Foundations: foundations/index.md
-  - Methods: methods/index.md
+  - Foundations:
+      - foundations/index.md
+      - Potential energy surface: foundations/potential-energy-surface.md
+  - Methods:
+      - methods/index.md
+      - Hartree–Fock: methods/hartree-fock.md
   - Techniques: techniques/index.md
   - Pitfalls: pitfalls/index.md
   - High-throughput computing: htc/index.md

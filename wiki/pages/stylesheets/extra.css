@@ -1,0 +1,53 @@
+/* Charts (.viz): page colors come from the Material theme; series colors are
+   the validated categorical slots 1-2, stepped separately for dark mode. */
+.viz {
+  --viz-s1: #2a78d6;
+  --viz-s2: #eb6834;
+  margin: 1.5em 0;
+}
+[data-md-color-scheme="slate"] .viz {
+  --viz-s1: #3987e5;
+  --viz-s2: #d95926;
+}
+.viz svg {
+  width: 100%;
+  height: auto;
+  font-size: 12px;
+  overflow: visible;
+}
+.viz-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.5em;
+  font-size: 0.75rem;
+  color: var(--md-default-fg-color--light);
+}
+.viz-key {
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+  margin-right: 0.5em;
+  vertical-align: middle;
+  border-radius: 1px;
+}
+.viz-key.s1 { background: var(--viz-s1); }
+.viz-key.s2 { background: var(--viz-s2); }
+.viz-grid { stroke: var(--md-default-fg-color--lightest); stroke-width: 1; }
+.viz-axis { stroke: var(--md-default-fg-color--lighter); stroke-width: 1; }
+.viz-ref { stroke: var(--md-default-fg-color--light); stroke-width: 1; }
+.viz-tick, .viz-note { fill: var(--md-default-fg-color--light); }
+.viz-title, .viz-label { fill: var(--md-default-fg-color); }
+.viz-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.viz-line.s1 { stroke: var(--viz-s1); }
+.viz-line.s2 { stroke: var(--viz-s2); }
+.viz-pt circle { stroke: var(--md-default-bg-color); stroke-width: 2; }
+.viz-pt.s1 circle { fill: var(--viz-s1); }
+.viz-pt.s2 circle { fill: var(--viz-s2); }
+/* Same specificity as the fill rules above, so it must stay after them. */
+.viz-pt circle.viz-hit { fill: transparent; stroke: none; }
+.viz-pt:hover circle:not(.viz-hit) { r: 6; }
