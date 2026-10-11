@@ -104,15 +104,20 @@ export function setBonds(atoms: { index?: number; bonds?: number[]; bondOrder?: 
 
 /** Bond orders below this are not drawn (van der Waals contacts are ~0.01). */
 export const MIN_BOND_ORDER = 0.03;
+const MAX_OPACITY = 0.75; // a full bond stays see-through
+const OPACITY_GROWTH = 3; // e-folds of opacity over orders 0 -> 1
 
 /**
  * Cylinder for a bond order: radius grows with sqrt(order), so 0.1-0.3 links stay visible
- * next to a full H2 bond, and opacity grows linearly from a floor that keeps them findable.
+ * next to a full H2 bond; opacity grows exponentially, (e^(k·order) - 1) / (e^k - 1), so weak
+ * links are almost transparent (order 0.3: 6 %, 0.5: 14 %) while strong bonds stand out, up
+ * to a ceiling below 1 so even a full bond never hides the bonds behind it.
  * Orders above 1 are drawn as 1.
  */
 export function bondStyle(order: number): { radius: number; opacity: number } | null {
   if (order < MIN_BOND_ORDER) return null;
   const o = Math.min(order, 1);
-  return { radius: 0.025 + 0.085 * Math.sqrt(o), opacity: 0.2 + 0.8 * o };
+  const k = OPACITY_GROWTH;
+  return { radius: 0.025 + 0.085 * Math.sqrt(o), opacity: MAX_OPACITY * Math.expm1(k * o) / Math.expm1(k) };
 }
 

@@ -10,6 +10,7 @@ import { LevelDiagram } from "../components/charts/LevelDiagram";
 import { useConditions } from "../lib/conditions";
 import { fmt, multiplicityName, pretty, signed, species } from "../lib/format";
 import { atomLabel, atomSummaries } from "../lib/atoms";
+import { HALO_FULL, haloStyle, halos as haloList, type Highlight } from "../lib/halos";
 import { bondStyle, MIN_BOND_ORDER, parseXyz } from "../lib/geometry";
 import { VERDICT_FILL, VERDICT_INK, VERDICT_LABEL } from "../lib/scales";
 
@@ -74,6 +75,13 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
   const byOrder = bondView === "order" && bonds.data != null;
   const atoms = useMemo(() => (bonds.data ? atomSummaries(bonds.data) : null), [bonds.data]);
   const atomLabels = useMemo(() => atoms?.map(atomLabel) ?? null, [atoms]);
+  const openShell = atoms?.some((a) => a.spin != null) ?? false;
+  const [highlight, setHighlight] = useState<Highlight>("none");
+  const shownHighlight: Highlight = highlight === "spin" && !openShell ? "none" : highlight;
+  const halos = useMemo(
+    () => (atoms && shownHighlight !== "none" ? haloList(atoms, shownHighlight) : null),
+    [atoms, shownHighlight],
+  );
 
   if (!s.structure_id) return <NoStructure s={s} />;
 
@@ -89,7 +97,7 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
           </div>
           {shownXyz && (
             <MoleculeViewer xyz={shownXyz} mode={mode} bondOrders={byOrder ? bonds.data!.loewdin : null}
-              atomLabels={atomLabels} label={`3D structure of ${pretty(s.label)}`} />
+              atomLabels={atomLabels} halos={halos} label={`3D structure of ${pretty(s.label)}`} />
           )}
           {bonds.data && (
             <div className="row" style={{ justifyContent: "space-between", alignItems: "end", flexWrap: "wrap", gap: 10 }}>
@@ -98,6 +106,16 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
                 { value: "distance", label: "by distance", title: `H–H shorter than 1.15 Å` },
               ]} />
               {byOrder && <BondLegend animating={mode != null} />}
+            </div>
+          )}
+          {atoms && (
+            <div className="row" style={{ justifyContent: "space-between", alignItems: "end", flexWrap: "wrap", gap: 10 }}>
+              <Segmented label="Highlight atoms" value={shownHighlight} onChange={setHighlight} options={[
+                { value: "none", label: "none" },
+                { value: "charge", label: "charge", title: "Löwdin atomic charge" },
+                ...(openShell ? [{ value: "spin" as const, label: "spin", title: "Löwdin spin population: where the unpaired electrons sit" }] : []),
+              ]} />
+              {shownHighlight !== "none" && <HaloLegend kind={shownHighlight} animating={mode != null} />}
             </div>
           )}
           {modes.data && (
@@ -263,7 +281,7 @@ function NoStructure({ s }: { s: StateDetail }) {
 
 function BondLegend({ animating }: { animating: boolean }) {
   if (animating) return <span className="secondary">Bond orders return when the vibration stops.</span>;
-  const samples = [0.1, 0.5, 1];
+  const samples = [0.25, 0.5, 0.75, 1];
   return (
     <figure className="row" style={{ gap: 8, alignItems: "center", margin: 0 }} aria-label="Bond order legend">
       <figcaption className="secondary">Löwdin bond order</figcaption>
@@ -272,7 +290,7 @@ function BondLegend({ animating }: { animating: boolean }) {
         return (
           <span key={o} className="row" style={{ gap: 4, alignItems: "center" }}>
             <svg width="28" height="12" aria-hidden="true">
-              <line x1="2" y1="6" x2="26" y2="6" stroke="var(--text-secondary)" strokeOpacity={st.opacity}
+              <line x1="2" y1="6" x2="26" y2="6" stroke="var(--text-primary)" strokeOpacity={st.opacity}
                 strokeWidth={st.radius * 2 * 40} strokeLinecap="round" />
             </svg>
             <span className="secondary">{o}</span>
@@ -349,6 +367,32 @@ function AtomTable({ atoms, method }: { atoms: ReturnType<typeof atomSummaries>;
         </tbody>
       </table>
     </details>
+  );
+}
+
+
+function HaloLegend({ kind, animating }: { kind: Exclude<Highlight, "none">; animating: boolean }) {
+  if (animating) return <span className="secondary">Halos return when the vibration stops.</span>;
+  const full = HALO_FULL[kind];
+  const samples = [-full, -full / 2, full / 2, full];
+  const name = kind === "charge" ? "Löwdin charge" : "Spin population";
+  return (
+    <figure className="row" style={{ gap: 8, alignItems: "center", margin: 0 }} aria-label={`${name} legend`}>
+      <figcaption className="secondary">{name}</figcaption>
+      {samples.map((v) => {
+        const st = haloStyle(v, kind)!;
+        return (
+          <span key={v} className="row" style={{ gap: 3, alignItems: "center" }}>
+            <svg width="18" height="18" aria-hidden="true">
+              <circle cx="9" cy="9" r={st.radius * 12} fill={`var(${st.color})`} fillOpacity={st.opacity} />
+              <circle cx="9" cy="9" r="3" fill="var(--text-muted)" />
+            </svg>
+            <span className="secondary">{signed(v, 2)}</span>
+          </span>
+        );
+      })}
+      <span className="secondary">· fixed scale for every species; |{kind}| &lt; {(0.02 * full).toFixed(2)} not drawn</span>
+    </figure>
   );
 }
 

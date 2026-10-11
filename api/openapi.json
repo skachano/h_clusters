@@ -1236,6 +1236,31 @@
             "title": "Xyz",
             "description": "geometry of the ground state's best structure"
           },
+          "bonds": {
+            "anyOf": [
+              {
+                "items": {
+                  "prefixItems": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "integer"
+                    }
+                  ],
+                  "type": "array",
+                  "maxItems": 2,
+                  "minItems": 2
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bonds",
+            "description": "atom pairs (XYZ order, 0-based) with Löwdin bond order above 0.33, for the thumbnail; None when the structure has no bond orders"
+          },
           "value": {
             "anyOf": [
               {

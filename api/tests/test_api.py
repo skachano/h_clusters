@@ -112,6 +112,11 @@ def test_structure_bonds(client):
     out = client.get(url).json()
     assert out["loewdin"] == [{"i": 0, "j": 1, "order": 0.98}] and out["mayer"][0]["order"] == 1.0
     assert len(out["atoms"]) == 2 and out["atoms"][0]["spin"] is None
+    # the grid thumbnail gets the pairs above 0.33
+    cells = client.get("/api/campaigns/mini/grid").json()["cells"]
+    h2 = next(c for c in cells if (c["m"], c["charge"]) == (2, 0))
+    assert h2["bonds"] == [[0, 1]]
+    assert next(c for c in cells if (c["m"], c["charge"]) == (3, 1))["bonds"] is None
 
 
 def test_trends(client):

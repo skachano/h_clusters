@@ -449,6 +449,14 @@ export interface components {
              */
             xyz?: string | null;
             /**
+             * Bonds
+             * @description atom pairs (XYZ order, 0-based) with Löwdin bond order above 0.33, for the thumbnail; None when the structure has no bond orders
+             */
+            bonds?: [
+                number,
+                number
+            ][] | null;
+            /**
              * Value
              * @description the requested quantity of the ground state, eV
              */

@@ -52,6 +52,9 @@ class GridCell(BaseModel):
     species: str
     ground: StateBrief | None = Field(None, description="the species' lowest-energy state")
     xyz: str | None = Field(None, description="geometry of the ground state's best structure")
+    bonds: list[tuple[int, int]] | None = Field(
+        None, description="atom pairs (XYZ order, 0-based) with Löwdin bond order above 0.33, for the "
+        "thumbnail; None when the structure has no bond orders")
     value: float | None = Field(None, description="the requested quantity of the ground state, eV")
     survives: bool | None = Field(None, description="value > 0")
     states: list[StateBrief]

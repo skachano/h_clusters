@@ -1051,9 +1051,20 @@ the same structures):**
 - **Web:** the 3D viewer draws bonds either by distance (now our 1.15 Å rule:
   3Dmol's own guess only bonded H–H between 0.71 and 0.99 Å and dropped the
   1.04–1.06 Å bonds of H₂⁺ and the H₂⁺ cores of H₆⁺/H₈⁺/H₁₀⁺) or by bond
-  order (one cylinder per bond, thickness ∝ √order, opacity from 0.2;
+  order (one cylinder per bond, thickness ∝ √order, opacity 0.75·(e^{3·order} − 1)/(e³ − 1): weak links almost transparent, none solid;
   below 0.03 not drawn; legend). Hovering a bond or an atom shows its
-  numbers; the same data is in atom and bond tables. Small clusters are
+  numbers; the same data is in atom and bond tables. "Highlight atoms"
+  (none / charge / spin) draws a see-through halo per atom: colour = sign
+  (red/blue for charge, orange/green for spin), size and opacity = magnitude
+  on one fixed scale for all species (charge ±0.5, spin ±1), so neutral
+  clusters stay plain while e.g. H⁻ in H₃⁻ glows red; atoms turn grey so only
+  halos carry colour. It shows that the unpaired electron of H₆⁺ is spread
+  over all six atoms (0.27 on each central H, 0.12 on each outer one).
+  Grid thumbnails draw bonds with Löwdin order > 0.33 (served with the grid,
+  one query), the distance rule only as a fallback: H₅⁺/H₇⁺/H₉⁺ now read as an
+  H₃⁺ triangle with separate H₂ units (links 0.2–0.3), while the anions' H⁻
+  links (≈ 0.4 with ωB97X-D4, likely overstated by self-interaction error)
+  are drawn as bonds. Small clusters are
   zoomed in (3Dmol fits at least a 5 Å box).
 - Not done (still open): multiplicities `all_upto: 3`, framework port,
   bigger m, per-atom/per-bond energy decomposition (LED/EDA).

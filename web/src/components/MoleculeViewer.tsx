@@ -4,7 +4,9 @@
 import { useEffect, useRef } from "react";
 import { createViewer, type GLViewer, type Label } from "3dmol";
 import type { BondOrder } from "../api/client";
+import type { Halo } from "../lib/halos";
 import { bondStyle, inFrame, parseXyz, principalFrame, setBonds } from "../lib/geometry";
+import { useThemeVersion } from "../lib/theme";
 
 function cssVar(name: string, fallback: string) {
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -36,6 +38,32 @@ export function smallZoom(xyz: string): number {
   return Math.min(4, Math.max(1, 5 / (extent + 0.6))); // 0.6 Å: room for the atom spheres
 }
 
+type Node3D = { material?: { depthWrite?: boolean }; children?: Node3D[] };
+
+/**
+ * Let transparent shapes (bonds, halos) show through each other, not only through the
+ * opaque atoms.
+ * 3Dmol first writes the depth of every transparent object, then draws only the frontmost
+ * one at each pixel; a bond that writes no depth is blended back to front (3Dmol sorts
+ * transparent objects by distance) instead. The material only exists once 3Dmol builds
+ * the shape, so this wraps that step (GLShape.globj, 3Dmol 2.x).
+ */
+function seeThrough(shape: unknown) {
+  const s = shape as { globj?: (group: unknown) => void; renderedShapeObj?: Node3D } | undefined;
+  if (!s) return;
+  const build = s.globj?.bind(s);
+  if (!build) return;
+  s.globj = (group) => {
+    build(group);
+    const visit = (o?: Node3D) => {
+      if (!o) return;
+      if (o.material) o.material.depthWrite = false;
+      o.children?.forEach(visit);
+    };
+    visit(s.renderedShapeObj);
+  };
+}
+
 /** Hover labels sit in the viewer's top-left corner: anchored at the atom they ran off the edge. */
 function cornerLabel(text: string) {
   return {
@@ -48,19 +76,26 @@ function cornerLabel(text: string) {
   };
 }
 
-export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, height = 340, label }: {
+export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, halos, height = 340, label }: {
   xyz: string; mode?: number[][] | null; height?: number; label: string;
   /** Hover text per atom, in XYZ order. */
   atomLabels?: string[] | null;
+  /** Charge or spin halos; null = no highlight. While highlighting, atoms turn neutral grey
+   * so only the halos carry colour. Not drawn while a mode animates (shapes do not move). */
+  halos?: Halo[] | null;
   /** Draw these instead of distance bonds (ignored while a mode animates: shapes do not move). */
   bondOrders?: BondOrder[] | null;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const viewer = useRef<GLViewer | null>(null);
+  const themeVersion = useThemeVersion();
 
   useEffect(() => {
-    if (!host.current) return;
-    viewer.current = createViewer(host.current, {
+    // Rebuilt on a theme change: repainting a live WebGL canvas in the new colours left
+    // light seams along its rounded corners.
+    const el = host.current;
+    if (!el) return;
+    viewer.current = createViewer(el, {
       backgroundColor: cssVar("--surface-1", "#fcfcfb"),
       antialias: true,
     });
@@ -70,8 +105,9 @@ export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, height = 340
       window.removeEventListener("resize", onResize);
       viewer.current?.clear();
       viewer.current = null;
+      el.replaceChildren(); // 3Dmol's canvases
     };
-  }, []);
+  }, [themeVersion]);
 
   useEffect(() => {
     const v = viewer.current;
@@ -80,12 +116,12 @@ export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, height = 340
     v.clear();
     const model = v.addModel(xyzWithMode(xyz, mode ?? null), "xyz", { assignBonds: false });
     const atoms = model.selectedAtoms({});
-    const atom = cssVar("--series-1", "#2a78d6");
+    const atom = halos ? cssVar("--text-muted", "#898781") : cssVar("--series-1", "#2a78d6");
     const byOrder = bondOrders && !mode;
     if (byOrder) {
       setBonds(atoms, "0\n\n"); // no sticks: every bond is a cylinder below
       v.setStyle({}, { sphere: { scale: 0.22, color: atom } });
-      const ink = cssVar("--text-secondary", "#52514e");
+      const ink = cssVar("--text-primary", "#0b0b0b"); // full contrast: opacity alone grades the bonds
       let hovered: Label | null = null;
       for (const b of bondOrders) {
         const style = bondStyle(b.order);
@@ -94,8 +130,10 @@ export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, height = 340
         const start = { x: p.x ?? 0, y: p.y ?? 0, z: p.z ?? 0 };
         const end = { x: q.x ?? 0, y: q.y ?? 0, z: q.z ?? 0 };
         const d = Math.hypot(end.x - start.x, end.y - start.y, end.z - start.z);
-        v.addCylinder({
-          start, end, radius: style.radius, opacity: style.opacity, color: ink,
+        const cylinder = v.addCylinder({
+          // 3Dmol applies a shape's opacity twice (it renders as opacity²): pass the square
+          // root so the bond looks as opaque as bondStyle and the legend say.
+          start, end, radius: style.radius, opacity: Math.sqrt(style.opacity), color: ink,
           hoverable: true,
           hover_callback: () => {
             const { text, spec } = cornerLabel(`H${b.i + 1}–H${b.j + 1}: bond order ${b.order.toFixed(2)}, ${d.toFixed(2)} Å`);
@@ -106,11 +144,22 @@ export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, height = 340
             hovered = null;
           },
         });
+        seeThrough(cylinder);
       }
     } else {
       setBonds(atoms, xyz); // before vibrate(), which copies the atoms into frames
       const bond = cssVar("--axis", "#c3c2b7");
       v.setStyle({}, { sphere: { scale: 0.22, color: atom }, stick: { radius: 0.07, color: bond } });
+    }
+    if (halos && !mode) {
+      for (const h of halos) {
+        const a = atoms[h.i];
+        if (!a) continue;
+        seeThrough(v.addSphere({
+          center: { x: a.x ?? 0, y: a.y ?? 0, z: a.z ?? 0 }, radius: h.radius,
+          color: cssVar(h.color, "#898781"), opacity: Math.sqrt(h.opacity), // 3Dmol squares it
+        }));
+      }
     }
     if (atomLabels) {
       const labels = new Map<number, Label>();
@@ -133,7 +182,7 @@ export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, height = 340
     v.zoomTo();
     v.zoom(0.85 * smallZoom(xyz));
     v.render();
-  }, [xyz, mode, bondOrders, atomLabels]);
+  }, [xyz, mode, bondOrders, atomLabels, halos, themeVersion]);
 
   return (
     <div

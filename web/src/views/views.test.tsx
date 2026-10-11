@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import type { GridOut, StateDetail } from "../api/client";
 import { GridView } from "./GridView";
 import { SpeciesView } from "./SpeciesView";
+import { Thumbnail } from "../components/Thumbnail";
 
 vi.mock("3dmol", () => ({
   createViewer: () => ({
@@ -126,3 +127,17 @@ describe("SpeciesView", () => {
     expect(atoms.queryByText("Spin")).toBeNull(); // closed shell
   });
 });
+
+describe("Thumbnail", () => {
+  const triangle = "3\n\nH 0 0 0\nH 0.87 0 0\nH 0.435 0.753 0\n";
+  const lines = (el: HTMLElement) => el.querySelectorAll("line").length;
+  it("draws the bonds it is given (bond order > 0.33) instead of the distance rule", () => {
+    const { container } = render(<Thumbnail xyz={triangle} bonds={[[0, 1]]} />);
+    expect(lines(container)).toBe(1);
+  });
+  it("falls back to distances without bond orders", () => {
+    expect(lines(render(<Thumbnail xyz={triangle} bonds={null} />).container)).toBe(3);
+    expect(lines(render(<Thumbnail xyz={triangle} bonds={[]} />).container)).toBe(0); // all weak
+  });
+});
+

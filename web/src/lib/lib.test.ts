@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
+import { act, renderHook } from "@testing-library/react";
+import { useThemeVersion } from "./theme";
 import { niceExtent, ticks } from "../components/charts/frame";
 import { atomLabel, atomSummaries } from "./atoms";
+import { haloStyle, halos } from "./halos";
 import { pretty, signed, species } from "./format";
 import { bondStyle, bonds, parseXyz, project, setBonds } from "./geometry";
 import { valueStep } from "./scales";
@@ -61,9 +64,12 @@ describe("bond-order styling", () => {
     expect(link.radius).toBeLessThan(h2.radius);
     expect(link.opacity).toBeLessThan(h2.opacity);
     expect(h2.radius).toBeCloseTo(0.11, 9);
-    expect(h2.opacity).toBe(1);
+    expect(h2.opacity).toBeCloseTo(0.75, 9); // never solid: a full bond must not hide others
     expect(bondStyle(1.2)).toEqual(h2);
-    expect(bondStyle(0.03)!.opacity).toBeGreaterThanOrEqual(0.2);
+    // exponential: weak links almost transparent, half a bond well under half the opacity
+    expect(bondStyle(0.03)!.opacity).toBeLessThan(0.01);
+    expect(bondStyle(0.3)!.opacity).toBeCloseTo(0.057, 3);
+    expect(bondStyle(0.5)!.opacity).toBeLessThan(h2.opacity / 4);
   });
 });
 
@@ -88,6 +94,44 @@ describe("atom summaries", () => {
     expect(atomLabel(h1)).not.toContain("free valence");
     const closed = atomSummaries({ ...bonds, atoms: bonds.atoms.map((x) => ({ ...x, spin: null })) });
     expect(atomLabel(closed[0])).toBe("H1: charge +0.00, Σ bond order 0.99");
+  });
+});
+
+describe("theme changes", () => {
+  it("bump a version so canvases redraw with the new colours", async () => {
+    const { result } = renderHook(() => useThemeVersion());
+    expect(result.current).toBe(0);
+    await act(async () => {
+      document.documentElement.dataset.theme = "dark";
+      await Promise.resolve(); // MutationObserver callbacks are microtasks
+    });
+    expect(result.current).toBe(1);
+    delete document.documentElement.dataset.theme;
+  });
+});
+
+describe("charge and spin halos", () => {
+  it("colour the sign and grow with the magnitude on a fixed scale", () => {
+    expect(haloStyle(0.005, "charge")).toBeNull(); // neutral-cluster noise: nothing drawn
+    const [plus, minus, full] = [haloStyle(0.29, "charge")!, haloStyle(-0.29, "charge")!, haloStyle(0.5, "charge")!];
+    expect(plus.color).toBe("--div-pos-2");
+    expect(minus.color).toBe("--div-neg-2");
+    expect(plus.radius).toBe(minus.radius);
+    expect(plus.radius).toBeLessThan(full.radius);
+    expect(full.opacity).toBeCloseTo(0.65, 9);
+    expect(haloStyle(0.25, "charge")!.opacity).toBeGreaterThan(0.15); // half scale stays visible
+    expect(haloStyle(0.05, "charge")!.opacity).toBeLessThan(0.05); // neutral-cluster noise fades
+    expect(haloStyle(2, "charge")).toEqual(full); // capped
+    expect(haloStyle(0.99, "spin")!.color).toBe("--series-2");
+  });
+  it("skips atoms without a value (no spin in closed shells)", () => {
+    const atoms = [
+      { name: "H1", charge: 0.3, spin: null, bondSum: 0.4, freeValence: 0 },
+      { name: "H2", charge: 0.001, spin: null, bondSum: 1, freeValence: 0 },
+    ];
+    expect(halos(atoms, "charge").map((h) => h.i)).toEqual([0]);
+    expect(halos(atoms, "spin")).toEqual([]);
+    expect(halos(atoms, "none")).toEqual([]);
   });
 });
 

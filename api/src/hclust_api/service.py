@@ -136,11 +136,31 @@ def ground_states(analyses: list[StateAnalysis], data: list[StateData]) -> dict[
     return ground
 
 
+THUMBNAIL_BOND_ORDER = 0.33  # thumbnails draw bonds above this Löwdin order
+
+
+def strong_bonds(session: Session, structure_ids: list[int]) -> dict[int, list[tuple[int, int]]]:
+    """Pairs above THUMBNAIL_BOND_ORDER per structure, from the bonds study, in one query."""
+    keys = {bond_study.key(i): i for i in structure_ids}
+    rows = session.exec(
+        select(StudyResult)
+        .where(StudyResult.study.startswith(f"{bond_study.STUDY}@"), StudyResult.key.in_(list(keys)),
+               StudyResult.status == "ok")
+        .order_by(StudyResult.updated_at)
+    ).all()
+    out = {}
+    for row in rows:  # newest last, so it wins
+        if row.data and "loewdin" in row.data:
+            out[keys[row.key]] = [(i, j) for i, j, v in row.data["loewdin"] if v > THUMBNAIL_BOND_ORDER]
+    return out
+
+
 def grid(store: Store, session: Session, campaign: str, temperature: float, pressure: float,
          quantity: schemas.Quantity) -> schemas.GridOut:
     analyses = store.analyses(session, campaign, temperature, pressure)
     _, data = store.data(session, campaign)
     ground = ground_states(analyses, data)
+    thumbnail_bonds = strong_bonds(session, [g.reference.structure_id for g in ground.values() if g.reference])
     cells = []
     for (m, charge), g in sorted(ground.items()):
         states = sorted((a for a in analyses if (a.state.m, a.state.charge) == (m, charge)),
@@ -149,6 +169,7 @@ def grid(store: Store, session: Session, campaign: str, temperature: float, pres
         cells.append(schemas.GridCell(
             m=m, charge=charge, species=species_label(m, charge), ground=brief(g), value=value,
             xyz=g.reference.geometry.to_xyz() if g.reference else None,
+            bonds=thumbnail_bonds.get(g.reference.structure_id) if g.reference else None,
             survives=None if value is None else value > 0, states=[brief(a) for a in states],
         ))
     return schemas.GridOut(campaign=campaign, temperature=temperature, pressure=pressure,

@@ -117,7 +117,7 @@ function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, sea
         <span className="cell-name">{species(m, charge)}</span>
         <span className="cell-mult num" title="multiplicity 2S+1">{g.mult}</span>
       </div>
-      <div className="cell-thumb">{cell.xyz ? <Thumbnail xyz={cell.xyz} size={52} ink={ink} /> : <span className="cell-none">—</span>}</div>
+      <div className="cell-thumb">{cell.xyz ? <Thumbnail xyz={cell.xyz} bonds={cell.bonds} size={52} ink={ink} /> : <span className="cell-none">—</span>}</div>
       <div className="cell-verdict">{VERDICT_SHORT[g.verdict]}</div>
       <div className="cell-value num">{cell.value == null ? " " : signed(cell.value, cell.value !== 0 && Math.abs(cell.value) < 0.1 ? 3 : 2)}</div>
     </Link>
