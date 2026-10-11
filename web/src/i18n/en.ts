@@ -18,7 +18,6 @@ export const en = {
   "theme.dark": "Theme: dark",
   "theme.light": "Theme: light",
   "lang.title": "Language",
-  "lang.other": "日本語",
   "common.loading": "Loading…",
   "common.none": "none",
   "common.yes": "yes",

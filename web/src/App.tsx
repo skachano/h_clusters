@@ -1,7 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useCampaigns } from "./api/client";
-import { useLang } from "./i18n";
+import { useLang, type Lang } from "./i18n";
+
+// Each language named in itself, so a reader who cannot read the current one finds theirs.
+const LANGS: { code: Lang; label: string; name: string }[] = [
+  { code: "en", label: "EN", name: "English" },
+  { code: "ja", label: "JA", name: "日本語" },
+];
 import { BenchmarkView } from "./views/BenchmarkView";
 import { GridView } from "./views/GridView";
 import { JobsView } from "./views/JobsView";
@@ -56,24 +62,33 @@ function Shell() {
           <NavLink to={link("/studies")}>{t("nav.studies")}</NavLink>
           <NavLink to={link("/jobs")}>{t("nav.jobs")}</NavLink>
         </nav>
-        <div className="spacer" />
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-          <label className="secondary" htmlFor="campaign" style={{ fontSize: 12 }}>{t("campaign.label")}</label>
-          <select id="campaign" value={campaign} onChange={(e) => navigate(`/c/${e.target.value}${keep}`)}>
-            {(campaigns.data ?? [{ name: campaign, n_states: 0, n_jobs: 0 }]).map((c) => (
-              <option key={c.name} value={c.name}>{c.name}{c.n_states ? ` (${t("campaign.states", { n: c.n_states })})` : ""}</option>
-            ))}
-          </select>
-        </span>
-        <button type="button" className="segmented" style={{ padding: "5px 10px", background: "transparent", cursor: "pointer" }}
-          onClick={() => setTheme(theme === "dark" ? "light" : theme === "light" ? null : "dark")}
-          title={t("theme.title")}>
-          {theme === null ? t("theme.auto") : theme === "dark" ? t("theme.dark") : t("theme.light")}
-        </button>
-        <button type="button" className="segmented" style={{ padding: "5px 10px", background: "transparent", cursor: "pointer" }}
-          onClick={() => setLang(lang === "en" ? "ja" : "en")} title={t("lang.title")} lang={lang === "en" ? "ja" : "en"}>
-          {t("lang.other")}
-        </button>
+        {/* One group: when the row is full, these move under the navigation together instead of
+            leaving the last item (the language buttons) alone on a line of its own. */}
+        <div className="topbar-tools">
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <label className="secondary" htmlFor="campaign" style={{ fontSize: 12 }}>{t("campaign.label")}</label>
+            <select id="campaign" value={campaign} onChange={(e) => navigate(`/c/${e.target.value}${keep}`)}>
+              {(campaigns.data ?? [{ name: campaign, n_states: 0, n_jobs: 0 }]).map((c) => (
+                <option key={c.name} value={c.name}>{c.name}{c.n_states ? ` (${t("campaign.states", { n: c.n_states })})` : ""}</option>
+              ))}
+            </select>
+          </span>
+          <span className="topbar-pair">
+            <button type="button" className="segmented" style={{ padding: "5px 10px", background: "transparent", cursor: "pointer" }}
+              onClick={() => setTheme(theme === "dark" ? "light" : theme === "light" ? null : "dark")}
+              title={t("theme.title")}>
+              {theme === null ? t("theme.auto") : theme === "dark" ? t("theme.dark") : t("theme.light")}
+            </button>
+            <div className="segmented" role="group" aria-label={t("lang.title")}>
+              {LANGS.map((l) => (
+                <button key={l.code} type="button" lang={l.code} title={l.name} aria-pressed={lang === l.code}
+                  onClick={() => setLang(l.code)}>
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          </span>
+        </div>
       </header>
       <main>
         <Routes>

@@ -19,7 +19,6 @@ export const ja: Record<Key, string> = {
   "theme.dark": "テーマ: ダーク",
   "theme.light": "テーマ: ライト",
   "lang.title": "言語",
-  "lang.other": "English",
   "common.loading": "読み込み中…",
   "common.none": "なし",
   "common.yes": "はい",

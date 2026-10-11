@@ -162,7 +162,8 @@ code, .mono { font-family: var(--mono); font-size: 12.5px; }
 }
 .nav a:hover { background: var(--surface-2); text-decoration: none; }
 .nav a.active { color: var(--text-primary); background: var(--surface-2); font-weight: 600; }
-.topbar .spacer { flex: 1; }
+.topbar-tools { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.topbar-pair { display: inline-flex; align-items: center; gap: 8px; }
 
 .card {
   background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px;
