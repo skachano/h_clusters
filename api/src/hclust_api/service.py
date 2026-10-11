@@ -147,6 +147,7 @@ def grid(store: Store, session: Session, campaign: str, temperature: float, pres
         value = ev(g.d[QUANTITY_KEY[quantity]][0]) if g.d.get(QUANTITY_KEY[quantity]) else None
         cells.append(schemas.GridCell(
             m=m, charge=charge, species=species_label(m, charge), ground=brief(g), value=value,
+            xyz=g.reference.geometry.to_xyz() if g.reference else None,
             survives=None if value is None else value > 0, states=[brief(a) for a in states],
         ))
     return schemas.GridOut(campaign=campaign, temperature=temperature, pressure=pressure,

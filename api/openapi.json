@@ -971,6 +971,18 @@
             ],
             "description": "the species' lowest-energy state"
           },
+          "xyz": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Xyz",
+            "description": "geometry of the ground state's best structure"
+          },
           "value": {
             "anyOf": [
               {

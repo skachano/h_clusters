@@ -23,7 +23,7 @@ services:
       context: .
       dockerfile: api/Dockerfile
     image: hclust-api:dev
-    profiles: [serve]
+    profiles: [serve, prod]
     environment:
       HCLUST_DATA: /data
     volumes:
@@ -37,6 +37,46 @@ services:
     command: >-
       uvicorn --factory hclust_api.main:create_app --host 0.0.0.0 --port 8000
       --reload --reload-dir /app/src --reload-dir /hclust/src
+
+  # Web app, development server with hot reload: http://localhost:5173
+  web:
+    build:
+      context: ./web
+      target: dev
+    image: hclust-web:dev
+    profiles: [serve]
+    environment:
+      API_PROXY: http://api:8000
+    volumes:
+      - ./web:/app
+      - ./api/openapi.json:/api/openapi.json:ro  # npm run gen:api reads ../api/openapi.json
+      - /app/node_modules  # the image's, not the host's
+    ports:
+      - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-5173}:5173"
+    depends_on: [api]
+
+  # Production build served by nginx (also proxies /api): http://localhost:8080
+  web-prod:
+    build:
+      context: ./web
+      target: prod
+    image: hclust-web:prod
+    profiles: [prod]
+    ports:
+      - "${WEB_BIND:-127.0.0.1}:${WEB_PROD_PORT:-8080}:80"
+    depends_on: [api]
+
+  # Browser smoke test (Plan §6) against the running serve stack:
+  #   docker compose --profile serve up -d && docker compose --profile test run --rm e2e
+  e2e:
+    image: mcr.microsoft.com/playwright:v1.55.0-noble  # matches @playwright/test in web/package.json
+    profiles: [test]
+    environment:
+      E2E_BASE_URL: http://web:5173
+    volumes:
+      - ./web:/app
+    working_dir: /app
+    command: npx playwright test
 
   # Learning wiki (wiki/). Live preview: docker compose --profile docs up docs
   docs:

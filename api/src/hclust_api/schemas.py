@@ -51,6 +51,7 @@ class GridCell(BaseModel):
     charge: int
     species: str
     ground: StateBrief | None = Field(None, description="the species' lowest-energy state")
+    xyz: str | None = Field(None, description="geometry of the ground state's best structure")
     value: float | None = Field(None, description="the requested quantity of the ground state, eV")
     survives: bool | None = Field(None, description="value > 0")
     states: list[StateBrief]

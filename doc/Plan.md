@@ -260,8 +260,11 @@ h_clusters/
 │   ├── Dockerfile
 │   └── src/hclust_api/        # reuses hclust package (installed as dep)
 ├── web/
-│   ├── Dockerfile
-│   └── src/ (React + TS)
+│   ├── Dockerfile             # dev (Vite) and prod (nginx) targets
+│   ├── src/api/               # schema.d.ts generated from api/openapi.json + hooks
+│   ├── src/views/             # Grid, Species, Trends, Benchmark, Jobs
+│   ├── src/components/        # 3D viewer, thumbnails, SVG charts
+│   └── e2e/                   # Playwright smoke test
 ├── wiki/
 │   ├── mkdocs.yml             # site config + nav
 │   └── pages/                 # learning wiki (Markdown + KaTeX)
@@ -924,9 +927,56 @@ the same structures):**
   CCSD(T) at that geometry says −0.22 eV: delocalization error, as for
   H₅⁺ in Phase 3. MP2 underbinds H⁻ by 0.25 eV.
 
-### Phase 7: Web app (4–6 days)
+### Phase 7: Web app (4–6 days) — ✅ done 2026-10-11
 - Grid → detail → trends → conditions → benchmark/dashboard, in that order.
   The grid plus the 3D viewer are the minimum viable app.
+- What was built (`web/`, React 19 + TypeScript + Vite 7):
+  - `docker compose --profile serve up` → http://localhost:5173 (Vite dev
+    server, hot reload, proxies `/api`). `--profile prod` builds the static
+    app into nginx (75 MB image, port 8080; nginx proxies `/api` and serves
+    client-side routes).
+  - Typed client: `npm run gen:api` turns `api/openapi.json` into
+    `src/api/schema.d.ts` (openapi-typescript); requests go through
+    openapi-fetch and TanStack Query (refetches keep the previous frame).
+  - **Grid:** rows = charge, columns = m; each cell is the species' ground
+    state with a projected shape thumbnail, multiplicity, verdict and the
+    chosen D. **Conditions** are a log temperature slider (10–3000 K), a
+    log pressure slider (10⁻⁶–10³ atm) and D_e / D₀ / D_H / D_G; they live
+    in the URL, so every view and link agrees, and the grid recolours live
+    (cached evaluations, Phase 6). A table view carries the same data.
+  - **Species detail:** 3Dmol.js viewer (structure rotated onto its
+    principal axes) with **normal-mode animation** (imaginary modes
+    labelled), channel chart (each spin-allowed split and where it ends
+    up, D_e/D₀/D_G), isomer table, spin-state ladder, properties, and links
+    to the raw ORCA input/output. Lazy-loaded: 3Dmol is most of the bundle.
+  - **Trends** (binding per atom, D_e, D₀, D_G, Δ₂E, HOMO–LUMO gap),
+    **Benchmark** (parity plots ωB97X-D4 and RI-MP2 vs CCSD(T), error
+    tiles, worst states), **Jobs** dashboard (counts, per-stage table,
+    run-time histograms, failure log with output links).
+  - Light and dark themes (system default plus a toggle); phone width works
+    (the grid scrolls inside its card).
+- **Charts follow a data-viz method** (plain SVG, no chart library):
+  - Colour is assigned by job and the palettes were *validated*, not
+    eyeballed: charge = 3 categorical slots (all-pairs CVD ΔE ≥ 9.2);
+    stability = 3-step ordinal blue (metastable < bound < bound with ZPE;
+    the three "no structure" verdicts are neutral gray plus text); D = a
+    binned blue/red diverging scale with a gray midpoint (|D| < 0.01 eV).
+    The red arm was derived at the blue ramp's OKLCH lightness; both arms
+    pass the ordinal checks in light and dark.
+  - Identity is never colour alone: verdict text in every cell, legends,
+    marker shapes per charge (anion and neutral binding energies per atom
+    coincide almost exactly, so the anions are rings around the neutral
+    dots), table views, tooltips on hover and keyboard focus.
+- **Tests:** 10 Vitest tests (helpers; grid and species views against a
+  mocked API, 3Dmol mocked) and a Playwright smoke test in the
+  `mcr.microsoft.com/playwright` image (`--profile test run --rm e2e`):
+  grid → H₃⁺ detail (weakest channel H₂ + H⁺, 3D canvas present), and
+  H₇⁺ D_G changing sign between 20 K and 1000 K.
+- Found by looking at screenshots (Playwright, light/dark/phone): the 3D
+  view showed H₅⁺ from an uninformative angle; trend lines scaled their
+  text to ~18 px; anion markers hid under neutral ones; duplicate isomers
+  (the same structure reached on several paths) cluttered the ladder; and
+  Vite rejected the `web` host name used by the test container.
 
 ### Phase 8: Extensions (pick any)
 - **Multiplicities:** extend to `all_upto: 3`, with the spin-ladder view.
