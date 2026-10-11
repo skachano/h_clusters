@@ -53,17 +53,25 @@ class OrcaJob:
     maxcore_mb: int = 600
     # Retry modifiers such as "SlowConv", appended to the keyword line.
     extra_keywords: tuple[str, ...] = ()
+    # Atoms (indices into geometry) that carry only basis functions: no nucleus, no electrons
+    # (counterpoise corrections, Phase 8). `state` describes the real atoms.
+    ghosts: tuple[int, ...] = ()
+    # Extra input blocks, e.g. "%scf EField 0, 0, 0.01 end" or "%cpcm epsilon 10 end".
+    blocks: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.state.n_electrons == 0:
             raise ValueError("a bare proton has no electronic structure; its energy is 0")
-        if len(self.geometry) != self.state.m or set(self.geometry.symbols) != {"H"}:
+        real = len(self.geometry) - len(set(self.ghosts))
+        if real != self.state.m or set(self.geometry.symbols) != {"H"}:
             raise ValueError(f"geometry does not match {self.state.label}")
+        if any(not 0 <= i < len(self.geometry) for i in self.ghosts):
+            raise ValueError("ghost index out of range")
 
     @property
     def effective_task(self) -> Task:
         """A single atom can be neither optimized nor vibrated; H2 has one shape (no GOAT)."""
-        if len(self.geometry) == 1:
+        if len(self.geometry) - len(self.ghosts) == 1:
             return Task.SP
         if self.task is Task.GOAT and len(self.geometry) < 3:
             return Task.OPT
@@ -89,16 +97,25 @@ class OrcaJob:
         return " ".join(w for w in words if w)
 
     def render(self) -> str:
+        blocks = "".join(f"{b.rstrip()}\n" for b in self.blocks)
         return (
             f"# hclust {self.state.label} {self.level.name} {self.effective_task}\n"
             f"! {self.keywords()}\n"
             f"%maxcore {self.maxcore_mb}\n"
             f"{GOAT_BLOCK if self.effective_task is Task.GOAT else ''}"
             f"{self._geom_block()}"
+            f"{blocks}"
             f"* xyz {self.state.charge} {self.state.mult}\n"
-            f"{self.geometry.atom_block()}\n"
+            f"{self._atoms()}\n"
             "*\n"
         )
+
+    def _atoms(self) -> str:
+        """The coordinate block; ghost atoms are written 'H:' (ORCA's ghost syntax)."""
+        lines = self.geometry.atom_block().split("\n")
+        for i in self.ghosts:
+            lines[i] = lines[i].replace("H ", "H:", 1)
+        return "\n".join(lines)
 
     def _geom_block(self) -> str:
         if self.effective_task.optimizes and self.level.opt_max_iter:

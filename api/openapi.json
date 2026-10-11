@@ -452,6 +452,98 @@
         }
       }
     },
+    "/api/campaigns/{campaign}/studies": {
+      "get": {
+        "summary": "Studies",
+        "description": "Phase 8 studies with a saved report (python -m hclust study <name>).",
+        "operationId": "studies_api_campaigns__campaign__studies_get",
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Campaign"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Studies Api Campaigns  Campaign  Studies Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaign}/studies/{name}": {
+      "get": {
+        "summary": "Study",
+        "operationId": "study_api_campaigns__campaign__studies__name__get",
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Campaign"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/structures/{structure_id}.xyz": {
       "get": {
         "summary": "Structure Xyz",
@@ -513,6 +605,45 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ModesOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/structures/{structure_id}/bonds": {
+      "get": {
+        "summary": "Structure Bonds",
+        "operationId": "structure_bonds_api_structures__structure_id__bonds_get",
+        "parameters": [
+          {
+            "name": "structure_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Structure Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BondsOut"
                 }
               }
             }
@@ -614,6 +745,59 @@
   },
   "components": {
     "schemas": {
+      "AtomProps": {
+        "properties": {
+          "charge": {
+            "type": "number",
+            "title": "Charge",
+            "description": "Löwdin atomic charge"
+          },
+          "spin": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spin",
+            "description": "Löwdin spin population; None for closed shells"
+          },
+          "valence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valence",
+            "description": "Mayer total valence VA"
+          },
+          "free_valence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free Valence",
+            "description": "Mayer free valence FA: ~1 on an atom with an unpaired electron"
+          }
+        },
+        "type": "object",
+        "required": [
+          "charge",
+          "spin",
+          "valence",
+          "free_valence"
+        ],
+        "title": "AtomProps"
+      },
       "AttemptOut": {
         "properties": {
           "n": {
@@ -809,6 +993,75 @@
           "test"
         ],
         "title": "BenchmarkPoint"
+      },
+      "BondOrder": {
+        "properties": {
+          "i": {
+            "type": "integer",
+            "title": "I",
+            "description": "atom index (0-based, order of the structure's XYZ)"
+          },
+          "j": {
+            "type": "integer",
+            "title": "J"
+          },
+          "order": {
+            "type": "number",
+            "title": "Order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "i",
+          "j",
+          "order"
+        ],
+        "title": "BondOrder"
+      },
+      "BondsOut": {
+        "properties": {
+          "structure_id": {
+            "type": "integer",
+            "title": "Structure Id"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "loewdin": {
+            "items": {
+              "$ref": "#/components/schemas/BondOrder"
+            },
+            "type": "array",
+            "title": "Loewdin",
+            "description": "Löwdin (Wiberg-type) bond orders >= 0.001"
+          },
+          "mayer": {
+            "items": {
+              "$ref": "#/components/schemas/BondOrder"
+            },
+            "type": "array",
+            "title": "Mayer",
+            "description": "Mayer bond orders >= 0.001 in magnitude"
+          },
+          "atoms": {
+            "items": {
+              "$ref": "#/components/schemas/AtomProps"
+            },
+            "type": "array",
+            "title": "Atoms",
+            "description": "per atom, in the order of the structure's XYZ"
+          }
+        },
+        "type": "object",
+        "required": [
+          "structure_id",
+          "method",
+          "loewdin",
+          "mayer",
+          "atoms"
+        ],
+        "title": "BondsOut"
       },
       "CampaignOut": {
         "properties": {
@@ -1927,6 +2180,34 @@
           "multiplicities"
         ],
         "title": "StateDetail"
+      },
+      "StudyOut": {
+        "properties": {
+          "campaign": {
+            "type": "string",
+            "title": "Campaign"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "rows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "campaign",
+          "name",
+          "rows"
+        ],
+        "title": "StudyOut",
+        "description": "A Phase 8 study report: one row per item, columns depend on the study."
       },
       "TrendPoint": {
         "properties": {

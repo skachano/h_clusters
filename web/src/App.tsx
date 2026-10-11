@@ -4,6 +4,7 @@ import { useCampaigns } from "./api/client";
 import { BenchmarkView } from "./views/BenchmarkView";
 import { GridView } from "./views/GridView";
 import { JobsView } from "./views/JobsView";
+import { StudiesView } from "./views/StudiesView";
 import { TrendsView } from "./views/TrendsView";
 
 // 3Dmol.js is most of the bundle and only the species page needs it.
@@ -50,6 +51,7 @@ function Shell() {
           <NavLink end to={link("")}>Grid</NavLink>
           <NavLink to={link("/trends")}>Trends</NavLink>
           <NavLink to={link("/benchmark")}>Benchmark</NavLink>
+          <NavLink to={link("/studies")}>Extensions</NavLink>
           <NavLink to={link("/jobs")}>Jobs</NavLink>
         </nav>
         <div className="spacer" />
@@ -73,6 +75,7 @@ function Shell() {
           <Route path="s/:m/:charge/:mult" element={<Suspense fallback={<p className="loading">Loading…</p>}><SpeciesView /></Suspense>} />
           <Route path="trends" element={<TrendsView />} />
           <Route path="benchmark" element={<BenchmarkView />} />
+          <Route path="studies" element={<StudiesView />} />
           <Route path="jobs" element={<JobsView />} />
         </Routes>
       </main>

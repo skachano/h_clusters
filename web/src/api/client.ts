@@ -12,6 +12,8 @@ export type TrendsOut = Schemas["TrendsOut"];
 export type BenchmarkOut = Schemas["BenchmarkOut"];
 export type JobsSummaryOut = Schemas["JobsSummaryOut"];
 export type ModesOut = Schemas["ModesOut"];
+export type BondsOut = Schemas["BondsOut"];
+export type BondOrder = Schemas["BondOrder"];
 export type Quantity = GridOut["quantity"];
 export type TrendQuantity = TrendsOut["quantity"];
 export type Verdict = StateBrief["verdict"];
@@ -95,6 +97,30 @@ export const useModes = (structureId: number | null | undefined) =>
       unwrap(api.GET("/api/structures/{structure_id}/modes", {
         params: { path: { structure_id: structureId as number } },
       })),
+  });
+
+export const useBonds = (structureId: number | null | undefined) =>
+  useQuery({
+    queryKey: ["bonds", structureId],
+    enabled: structureId != null,
+    retry: false,
+    queryFn: () =>
+      unwrap(api.GET("/api/structures/{structure_id}/bonds", {
+        params: { path: { structure_id: structureId as number } },
+      })),
+  });
+
+export const useStudies = (campaign: string) =>
+  useQuery({
+    queryKey: ["studies", campaign],
+    queryFn: () => unwrap(api.GET("/api/campaigns/{campaign}/studies", { params: { path: { campaign } } })),
+  });
+
+export const useStudy = (campaign: string, name: string) =>
+  useQuery({
+    queryKey: ["study", campaign, name],
+    queryFn: () =>
+      unwrap(api.GET("/api/campaigns/{campaign}/studies/{name}", { params: { path: { campaign, name } } })),
   });
 
 export const jobFileUrl = (jobId: number, name: string) => `/api/jobs/${jobId}/files/${name}`;

@@ -978,21 +978,85 @@ the same structures):**
   (the same structure reached on several paths) cluttered the ladder; and
   Vite rejected the `web` host name used by the test container.
 
-### Phase 8: Extensions (pick any)
-- **Multiplicities:** extend to `all_upto: 3`, with the spin-ladder view.
-- **L3/L4:** CCSD(T) geometries and a basis-set convergence study (TZ → QZ
-  → CBS).
-- **Electric field:** `%scf EField` scan to see field-induced
-  (de)stabilization and alignment.
-- **Dielectric environment:** CPCM with a few ε values. This is educational
-  only; a hydrogen cluster in solvent is unphysical, but it shows how charged
-  species respond.
-- **Anharmonic ZPE / quantum nuclear effects:** a VPT2 spot-check on H₅⁺,
-  or a discussion of path-integral approaches.
-- **Framework port:** reimplement Phase 2 with jobflow/quacc or AiiDA and
-  compare.
-- **Bigger m:** push to m = 15–20 to see where the H₃⁺(H₂)_k shell picture
-  breaks down.
+### Phase 8: Extensions — ✅ first round done 2026-10-11
+- Chosen: gap-fillers (vertical energies, counterpoise), anharmonic ZPE for
+  H₅⁺, electric field and CPCM, the L3/L4 basis study; added on the way:
+  bond orders and per-atom populations in the 3D viewer.
+- **Study framework** (`worker/src/hclust/studies/`): jobs outside the stage
+  DAG, run with `python -m hclust study <name>`. Same content-addressed
+  jobs and resume as the campaign (one SlowConv retry on SCF failure),
+  results in the `study_result` table, a report in
+  `data/studies/<name>@<campaign>.json`, served at
+  `/api/campaigns/{c}/studies/{name}` and shown on the **Extensions** page.
+  A study's `data()` is recomputed from the kept outputs on every rerun,
+  so analysis fixes need no new ORCA runs. Engine additions: ghost atoms
+  (`H:`) and extra input blocks; inputs without them hash as before.
+- **Vertical energies** (CCSD(T)/aVTZ, 39 jobs): VDE(H⁻) = 0.728 eV
+  (experiment 0.754; 0.748 at CBS). Vertical ionization of the radical
+  neutrals ≈ 13.5 eV (the H atom's, 13.6) and of the closed-shell ones
+  ≈ 16.1 eV (H₂'s), against adiabatic 8.2–9.0 and 13.0–13.5 eV: the cation
+  relaxes to an H₃⁺ (or H₂⁺) core. The metastable
+  high-spin anions have positive VDEs (0.8–2.1 eV) although the extra
+  electron is unbound adiabatically.
+- **Counterpoise** (88 jobs; fragments of the weakest channel, ghosts on the
+  partner): BSSE ≤ 5 meV, every complex stays bound in D_e. D₀ after CP is
+  unchanged in sign: ZPE, not basis-set error, unbinds the neutral and
+  H⁻(H₂)ₖ complexes.
+- **Anharmonic ZPE (VPT2, RI-MP2).** ORCA 6.1's VPT2 could not be used (it
+  needs analytic Hessians, which RI-MP2 lacks; DFT has no C2v H₅⁺
+  minimum), so it is ours (`analysis/vpt2.py`): quartic force field from
+  Hessians at ±0.05 amu^½·bohr along each mode, χ from Franke, Stanton &
+  Douberly (JPCA 2021), G₀, Watson and Coriolis terms. Validated by exact
+  diagonalization of model potentials (error ∝ λ⁴; deliberately broken
+  formulas fail). Results: H₂ correction −22 cm⁻¹ (matches the exact
+  −ωₑxₑ/4 + Y₀₀); H₃⁺ VPT2 ZPE 4417 cm⁻¹ against ≈ 4362 accurate (VPT2 is
+  known to struggle there); H₅⁺ −444 cm⁻¹, so **D₀(H₅⁺ → H₃⁺ + H₂) rises
+  from 0.244 to 0.280 eV**. The 203 cm⁻¹ torsion and the shared-proton
+  modes make H₅⁺ a hard case for VPT2: treat ±0.02 eV as the uncertainty.
+- **Basis set and geometry (L3/L4):** CCSD(T) aVTZ → CBS(3/4) changes D_e by
+  ≤ 0.045 eV (H₂: 4.751 eV, exact 4.748). CCSD(T)/aVTZ optimizations lower
+  the energy by only 3–8 cm⁻¹ against the RI-MP2 structures (H₃⁺ 0.8749 Å,
+  accurate 0.873). H₅⁺ D2d − C2v: 0.135 → 0.139 kcal/mol (≈ 48 cm⁻¹) — far
+  below the ZPE, so H₅⁺ is effectively fluxional.
+- **Dielectric (CPCM, ωB97X-D4, ε = 2/10/80):** ion–molecule complexes lose
+  80–95 % of D_e by ε = 80; neutral H₄ barely changes. The gas-phase DFT
+  numbers overbind the H⁻ complexes (H₃⁻: 0.43 eV vs 0.05 eV at CCSD(T),
+  self-interaction error), so only the trend means anything.
+- **Electric field (ωB97X-D4, 0–0.02 a.u. ≈ 1 V/Å, neutral clusters):** α_zz(H₂)
+  = 6.54 a.u. (reference 6.38), rising with F. D_e changes by ≤ 3 meV ≈
+  −½·Δα·F²: van der Waals binding is insensitive. Getting there took two
+  fixes: with a field ORCA optimizes in Cartesians, and (1) the orientational
+  torque (~10⁻⁵ Eh/rad²) is the size of the DFT grid noise, so every field
+  job uses DefGrid3; (2) the loose H₆/H₈ complexes slide on flat surfaces
+  without ever meeting TightOpt's step criteria (energy still falling
+  ~10⁻⁸ Eh per cycle), so the field jobs use ORCA's normal criteria with
+  400 cycles (ORCA then accepts converged energy and gradient). An exact
+  initial Hessian made it worse (near-zero rotational curvature, 0.19 Å
+  steps).
+- **Bond orders and atoms** (one ωB97X-D4 single point per stored
+  structure, 118): the campaign outputs print Mayer orders only above 0.1
+  and from the HF density at the correlated levels, so this study prints the
+  overlap, density and spin-density matrices and computes the **Wiberg
+  index in the Löwdin basis with the spin density included**,
+  B_AB = 2Σ(P̃α² + P̃β²). ORCA's own Löwdin orders omit the spin term (H₂⁺:
+  0.25 instead of 0.5), and its UKS "DENSITY" print is the α density
+  (trace N_α), told apart from the total by the electron count. Checks:
+  H₂ 1.00, H₂⁺ 0.50, H₃⁺ 4/9, triplet H₂ 0, closed shells equal to ORCA's
+  values to 4 digits. Findings: H₂ units in neutral clusters stay at
+  0.97–0.99 with ≈ 0.02 links (van der Waals); ion cores hold their H₂
+  units with 0.2–0.35 links; the H₂ unit attached to H₃⁺ in H₅⁺ drops to
+  0.60. Mayer orders (kept for comparison) dip below zero with these diffuse
+  bases. Per atom: Löwdin charge and spin, Mayer free valence (≈ 0.99 on
+  the radical H of doublet H₃).
+- **Web:** the 3D viewer draws bonds either by distance (now our 1.15 Å rule:
+  3Dmol's own guess only bonded H–H between 0.71 and 0.99 Å and dropped the
+  1.04–1.06 Å bonds of H₂⁺ and the H₂⁺ cores of H₆⁺/H₈⁺/H₁₀⁺) or by bond
+  order (one cylinder per bond, thickness ∝ √order, opacity from 0.2;
+  below 0.03 not drawn; legend). Hovering a bond or an atom shows its
+  numbers; the same data is in atom and bond tables. Small clusters are
+  zoomed in (3Dmol fits at least a 5 Å box).
+- Not done (still open): multiplicities `all_upto: 3`, framework port,
+  bigger m, per-atom/per-bond energy decomposition (LED/EDA).
 
 ---
 

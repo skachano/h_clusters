@@ -80,3 +80,39 @@ function topEigenvectors(m: number[][]): [number[], number[]] {
   if (!Number.isFinite(v2[0]) || Math.hypot(...v2) < 0.5) v2 = norm(cross(v1, Math.abs(v1[2]) < 0.9 ? [0, 0, 1] : [0, 1, 0]));
   return [v1, v2];
 }
+
+/**
+ * Bonds for the 3D viewer from our own rule (d < BOND_CUTOFF, as the thumbnails and the
+ * composition labels), not 3Dmol's guess: that one only bonds H-H between 0.71 and 0.99 Å, so
+ * it drops the 1.04-1.06 Å bond of H2+ and of the H2+ core in H6+, H8+, H10+. Atoms keep the
+ * order of the XYZ. 3Dmol fills `index` only when it guesses bonds itself, and draws a bond
+ * only from the lower index, so it is set here too.
+ */
+export function setBonds(atoms: { index?: number; bonds?: number[]; bondOrder?: number[] }[], xyz: string) {
+  for (const [i, a] of atoms.entries()) {
+    a.index = i;
+    a.bonds = [];
+    a.bondOrder = [];
+  }
+  for (const [i, j] of bonds(parseXyz(xyz))) {
+    atoms[i].bonds!.push(j);
+    atoms[i].bondOrder!.push(1);
+    atoms[j].bonds!.push(i);
+    atoms[j].bondOrder!.push(1);
+  }
+}
+
+/** Bond orders below this are not drawn (van der Waals contacts are ~0.01). */
+export const MIN_BOND_ORDER = 0.03;
+
+/**
+ * Cylinder for a bond order: radius grows with sqrt(order), so 0.1-0.3 links stay visible
+ * next to a full H2 bond, and opacity grows linearly from a floor that keeps them findable.
+ * Orders above 1 are drawn as 1.
+ */
+export function bondStyle(order: number): { radius: number; opacity: number } | null {
+  if (order < MIN_BOND_ORDER) return null;
+  const o = Math.min(order, 1);
+  return { radius: 0.025 + 0.085 * Math.sqrt(o), opacity: 0.2 + 0.8 * o };
+}
+

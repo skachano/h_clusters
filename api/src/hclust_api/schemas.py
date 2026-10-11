@@ -4,7 +4,7 @@ Units: dissociation and relative energies in eV, absolute energies in Eh, temper
 pressure in atm, distances in Å, frequencies in cm⁻¹.
 """
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -110,6 +110,27 @@ class ModesOut(BaseModel):
     modes: list[list[list[float]]] = Field(description="(n_vib, n_atoms, 3), Cartesian displacements")
 
 
+class BondOrder(BaseModel):
+    i: int = Field(description="atom index (0-based, order of the structure's XYZ)")
+    j: int
+    order: float
+
+
+class AtomProps(BaseModel):
+    charge: float = Field(description="Löwdin atomic charge")
+    spin: float | None = Field(description="Löwdin spin population; None for closed shells")
+    valence: float | None = Field(description="Mayer total valence VA")
+    free_valence: float | None = Field(description="Mayer free valence FA: ~1 on an atom with an unpaired electron")
+
+
+class BondsOut(BaseModel):
+    structure_id: int
+    method: str
+    loewdin: list[BondOrder] = Field(description="Löwdin (Wiberg-type) bond orders >= 0.001")
+    mayer: list[BondOrder] = Field(description="Mayer bond orders >= 0.001 in magnitude")
+    atoms: list[AtomProps] = Field(description="per atom, in the order of the structure's XYZ")
+
+
 class TrendPoint(BaseModel):
     m: int
     value: float | None
@@ -205,3 +226,11 @@ class JobOut(BaseModel):
     wall_s: float | None
     files: list[str]
     history: list[AttemptOut]
+
+
+class StudyOut(BaseModel):
+    """A Phase 8 study report: one row per item, columns depend on the study."""
+
+    campaign: str
+    name: str
+    rows: list[dict[str, Any]]

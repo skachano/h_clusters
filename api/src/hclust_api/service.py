@@ -17,8 +17,9 @@ from hclust.analysis.fragments import Asymptotes, StateEnergy, Verdict, species_
 from hclust.analysis.shape import radius_of_gyration, shape_class
 from hclust.analysis.thermo import rrho
 from hclust.analysis.verdicts import PROTON, StateAnalysis, StateData, evaluate, load
-from hclust.db import Attempt, Campaign, Job, JobResult, StateRow, Structure
+from hclust.db import Attempt, Campaign, Job, JobResult, StateRow, Structure, StudyResult
 from hclust.structures import composition
+from hclust.studies import bonds as bond_study
 from hclust.units import HARTREE_TO_EV
 
 from hclust_api import schemas
@@ -209,6 +210,23 @@ def structure_xyz(session: Session, structure_id: int) -> str | None:
     return None if s is None else s.xyz
 
 
+def bonds(session: Session, structure_id: int) -> schemas.BondsOut | None:
+    """Bond orders and per-atom populations from the bonds study (structures are shared
+    between campaigns)."""
+    row = session.exec(
+        select(StudyResult)
+        .where(StudyResult.study.startswith(f"{bond_study.STUDY}@"),
+               StudyResult.key == bond_study.key(structure_id), StudyResult.status == "ok")
+        .order_by(StudyResult.updated_at.desc())
+    ).first()
+    if row is None or not row.data:
+        return None
+    pairs = {kind: [schemas.BondOrder(i=i, j=j, order=v) for i, j, v in row.data.get(kind, [])]
+             for kind in ("loewdin", "mayer")}
+    atoms = [schemas.AtomProps(**a) for a in row.data.get("atoms", [])]
+    return schemas.BondsOut(structure_id=structure_id, method=bond_study.METHOD, atoms=atoms, **pairs)
+
+
 def modes(session: Session, structure_id: int) -> schemas.ModesOut | None:
     """Normal modes of the frequency job that produced this structure."""
     row = session.exec(
@@ -355,3 +373,25 @@ def job_file(session: Session, job_id: int, name: str, jobs_root: Path) -> Path 
         return None
     path = jobs_root / job.hash / name
     return path if path.is_file() else None
+
+
+# --------------------------------------------------------------------------- studies
+
+
+def studies_dir(jobs_root: Path) -> Path:
+    return jobs_root.parent / "studies"
+
+
+def study_names(jobs_root: Path, campaign: str) -> list[str]:
+    return sorted(p.name.split("@")[0] for p in studies_dir(jobs_root).glob(f"*@{campaign}.json"))
+
+
+def study(jobs_root: Path, campaign: str, name: str) -> schemas.StudyOut | None:
+    import json
+
+    if not name.isidentifier():
+        return None
+    path = studies_dir(jobs_root) / f"{name}@{campaign}.json"
+    if not path.is_file():
+        return None
+    return schemas.StudyOut(campaign=campaign, name=name, rows=json.loads(path.read_text()))

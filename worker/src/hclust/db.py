@@ -180,6 +180,28 @@ class VerdictRow(SQLModel, table=True):
     n_candidates: int = 0  # reference energies considered for this state
 
 
+class StudyResult(SQLModel, table=True):
+    """One ORCA run of a Phase 8 study (hclust.studies), keyed within its study.
+
+    Studies run outside the stage DAG (other charges, ghost atoms, fields, ...); the ORCA
+    files are content-addressed under data/jobs/<hash> like every campaign job.
+    """
+
+    __tablename__ = "study_result"
+    __table_args__ = (UniqueConstraint("study", "key"),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    study: str = Field(index=True)
+    key: str  # e.g. "H3-(1)|vde|0|2"
+    hash: str
+    status: str  # ok | failed
+    energy: float | None = None
+    error: str | None = None
+    wall_s: float | None = None
+    data: dict | None = Field(default=None, sa_column=Column(JSON))  # study-specific details
+    updated_at: datetime = Field(default_factory=_now)
+
+
 def default_db_path() -> Path:
     return Path(os.environ.get("HCLUST_DATA", "data")) / "hclust.sqlite"
 

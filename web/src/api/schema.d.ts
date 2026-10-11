@@ -132,6 +132,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/campaigns/{campaign}/studies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Studies
+         * @description Phase 8 studies with a saved report (python -m hclust study <name>).
+         */
+        get: operations["studies_api_campaigns__campaign__studies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/campaigns/{campaign}/studies/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Study */
+        get: operations["study_api_campaigns__campaign__studies__name__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/structures/{structure_id}.xyz": {
         parameters: {
             query?: never;
@@ -158,6 +195,23 @@ export interface paths {
         };
         /** Structure Modes */
         get: operations["structure_modes_api_structures__structure_id__modes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/structures/{structure_id}/bonds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Structure Bonds */
+        get: operations["structure_bonds_api_structures__structure_id__bonds_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -207,6 +261,29 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AtomProps */
+        AtomProps: {
+            /**
+             * Charge
+             * @description Löwdin atomic charge
+             */
+            charge: number;
+            /**
+             * Spin
+             * @description Löwdin spin population; None for closed shells
+             */
+            spin: number | null;
+            /**
+             * Valence
+             * @description Mayer total valence VA
+             */
+            valence: number | null;
+            /**
+             * Free Valence
+             * @description Mayer free valence FA: ~1 on an atom with an unpaired electron
+             */
+            free_valence: number | null;
+        };
         /** AttemptOut */
         AttemptOut: {
             /** N */
@@ -276,6 +353,40 @@ export interface components {
              * @description D_e at the test level, eV
              */
             test: number;
+        };
+        /** BondOrder */
+        BondOrder: {
+            /**
+             * I
+             * @description atom index (0-based, order of the structure's XYZ)
+             */
+            i: number;
+            /** J */
+            j: number;
+            /** Order */
+            order: number;
+        };
+        /** BondsOut */
+        BondsOut: {
+            /** Structure Id */
+            structure_id: number;
+            /** Method */
+            method: string;
+            /**
+             * Loewdin
+             * @description Löwdin (Wiberg-type) bond orders >= 0.001
+             */
+            loewdin: components["schemas"]["BondOrder"][];
+            /**
+             * Mayer
+             * @description Mayer bond orders >= 0.001 in magnitude
+             */
+            mayer: components["schemas"]["BondOrder"][];
+            /**
+             * Atoms
+             * @description per atom, in the order of the structure's XYZ
+             */
+            atoms: components["schemas"]["AtomProps"][];
         };
         /** CampaignOut */
         CampaignOut: {
@@ -658,6 +769,20 @@ export interface components {
             /** Multiplicities */
             multiplicities: components["schemas"]["StateBrief"][];
         };
+        /**
+         * StudyOut
+         * @description A Phase 8 study report: one row per item, columns depend on the study.
+         */
+        StudyOut: {
+            /** Campaign */
+            campaign: string;
+            /** Name */
+            name: string;
+            /** Rows */
+            rows: {
+                [key: string]: unknown;
+            }[];
+        };
         /** TrendPoint */
         TrendPoint: {
             /** M */
@@ -953,6 +1078,69 @@ export interface operations {
             };
         };
     };
+    studies_api_campaigns__campaign__studies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    study_api_campaigns__campaign__studies__name__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     structure_xyz_api_structures__structure_id__xyz_get: {
         parameters: {
             query?: never;
@@ -1002,6 +1190,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ModesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    structure_bonds_api_structures__structure_id__bonds_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                structure_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BondsOut"];
                 };
             };
             /** @description Validation Error */

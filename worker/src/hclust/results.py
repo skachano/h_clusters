@@ -27,6 +27,7 @@ class Result:
     mulliken_charges: list[float] | None = None
     frequencies: np.ndarray | None = field(default=None, repr=False)  # cm^-1, vibrations only; imaginary < 0
     modes: np.ndarray | None = field(default=None, repr=False)  # (n_vib, n_atoms, 3)
+    hessian: np.ndarray | None = field(default=None, repr=False)  # Cartesian, Eh/bohr^2
     thermo: dict[str, float] | None = None  # ORCA RRHO terms at 298.15 K, Eh
     point_group: str | None = None
     symmetry_number: int | None = None

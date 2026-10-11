@@ -2,13 +2,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { jobFileUrl, useModes, useStateDetail, type StateDetail } from "../api/client";
+import { jobFileUrl, useBonds, useModes, useStateDetail, type BondsOut, type StateDetail } from "../api/client";
 import { ConditionsBar, Segmented } from "../components/ConditionsBar";
 import { MoleculeViewer } from "../components/MoleculeViewer";
 import { DivergingBars } from "../components/charts/DivergingBars";
 import { LevelDiagram } from "../components/charts/LevelDiagram";
 import { useConditions } from "../lib/conditions";
 import { fmt, multiplicityName, pretty, signed, species } from "../lib/format";
+import { atomLabel, atomSummaries } from "../lib/atoms";
+import { bondStyle, MIN_BOND_ORDER, parseXyz } from "../lib/geometry";
 import { VERDICT_FILL, VERDICT_INK, VERDICT_LABEL } from "../lib/scales";
 
 type ChannelQ = "d_e" | "d_0" | "d_g";
@@ -67,6 +69,11 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
   const [modeIndex, setModeIndex] = useState<number | null>(null);
   useEffect(() => setModeIndex(null), [structureId]);
   const mode = modeIndex != null && modes.data ? modes.data.modes[modeIndex] : null;
+  const bonds = useBonds(structureId);
+  const [bondView, setBondView] = useState<"order" | "distance">("order");
+  const byOrder = bondView === "order" && bonds.data != null;
+  const atoms = useMemo(() => (bonds.data ? atomSummaries(bonds.data) : null), [bonds.data]);
+  const atomLabels = useMemo(() => atoms?.map(atomLabel) ?? null, [atoms]);
 
   if (!s.structure_id) return <NoStructure s={s} />;
 
@@ -80,7 +87,19 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
               {isomer?.point_group} · {isomer?.shape} · units {isomer?.composition} · optimized at {isomer?.geometry_level === "L1M" ? "RI-MP2" : "ωB97X-D4"}
             </span>
           </div>
-          {shownXyz && <MoleculeViewer xyz={shownXyz} mode={mode} label={`3D structure of ${pretty(s.label)}`} />}
+          {shownXyz && (
+            <MoleculeViewer xyz={shownXyz} mode={mode} bondOrders={byOrder ? bonds.data!.loewdin : null}
+              atomLabels={atomLabels} label={`3D structure of ${pretty(s.label)}`} />
+          )}
+          {bonds.data && (
+            <div className="row" style={{ justifyContent: "space-between", alignItems: "end", flexWrap: "wrap", gap: 10 }}>
+              <Segmented label="Bonds" value={bondView} onChange={setBondView} options={[
+                { value: "order", label: "by bond order", title: "Löwdin bond order sets thickness and opacity" },
+                { value: "distance", label: "by distance", title: `H–H shorter than 1.15 Å` },
+              ]} />
+              {byOrder && <BondLegend animating={mode != null} />}
+            </div>
+          )}
           {modes.data && (
             <div className="control">
               <label htmlFor="mode">Animate a normal mode (cm⁻¹, at {modes.data.level === "L1M" ? "RI-MP2" : "ωB97X-D4"})</label>
@@ -95,6 +114,13 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
         </div>
         <Properties s={s} />
       </div>
+
+      {bonds.data && atoms && shownXyz && (
+        <div className="cols-2">
+          <AtomTable atoms={atoms} method={bonds.data.method} />
+          <BondTable bonds={bonds.data} xyz={shownXyz} />
+        </div>
+      )}
 
       <div className="cols-2">
         <Channels s={s} />
@@ -233,3 +259,96 @@ function NoStructure({ s }: { s: StateDetail }) {
     </div>
   );
 }
+
+
+function BondLegend({ animating }: { animating: boolean }) {
+  if (animating) return <span className="secondary">Bond orders return when the vibration stops.</span>;
+  const samples = [0.1, 0.5, 1];
+  return (
+    <figure className="row" style={{ gap: 8, alignItems: "center", margin: 0 }} aria-label="Bond order legend">
+      <figcaption className="secondary">Löwdin bond order</figcaption>
+      {samples.map((o) => {
+        const st = bondStyle(o)!;
+        return (
+          <span key={o} className="row" style={{ gap: 4, alignItems: "center" }}>
+            <svg width="28" height="12" aria-hidden="true">
+              <line x1="2" y1="6" x2="26" y2="6" stroke="var(--text-secondary)" strokeOpacity={st.opacity}
+                strokeWidth={st.radius * 2 * 40} strokeLinecap="round" />
+            </svg>
+            <span className="secondary">{o}</span>
+          </span>
+        );
+      })}
+      <span className="secondary">· below {MIN_BOND_ORDER} not drawn</span>
+    </figure>
+  );
+}
+
+function BondTable({ bonds, xyz }: { bonds: BondsOut; xyz: string }) {
+  const atoms = parseXyz(xyz);
+  const mayer = new Map(bonds.mayer.map((b) => [`${b.i}-${b.j}`, b.order]));
+  const rows = [...bonds.loewdin]
+    .filter((b) => b.order >= MIN_BOND_ORDER || Math.abs(mayer.get(`${b.i}-${b.j}`) ?? 0) >= MIN_BOND_ORDER)
+    .sort((a, b) => b.order - a.order);
+  const distance = (i: number, j: number) =>
+    Math.hypot(atoms[i].x - atoms[j].x, atoms[i].y - atoms[j].y, atoms[i].z - atoms[j].z);
+  return (
+    <details className="card">
+      <summary><h2 style={{ display: "inline" }}>Bond orders</h2> <span className="secondary">({rows.length} {rows.length === 1 ? "contact" : "contacts"} ≥ {MIN_BOND_ORDER}, {bonds.method})</span></summary>
+      <p className="secondary">
+        How many electron pairs each H–H contact shares (Wiberg index in the Löwdin basis, spin density
+        included): 1 for H₂, 0.5 for the one-electron bond of H₂⁺, 4/9 ≈ 0.44 on each side of H₃⁺ (two
+        electrons over three bonds), and near 0 for van der Waals contacts. Mayer orders, from the same
+        calculation, are noisier with this diffuse basis set and can dip below zero.
+      </p>
+      <table>
+        <thead><tr><th>Atoms</th><th className="num">Distance (Å)</th><th className="num">Löwdin</th><th className="num">Mayer</th></tr></thead>
+        <tbody>
+          {rows.map((b) => (
+            <tr key={`${b.i}-${b.j}`}>
+              <td>H{b.i + 1}–H{b.j + 1}</td>
+              <td className="num">{distance(b.i, b.j).toFixed(3)}</td>
+              <td className="num">{b.order.toFixed(3)}</td>
+              <td className="num">{mayer.has(`${b.i}-${b.j}`) ? mayer.get(`${b.i}-${b.j}`)!.toFixed(3) : "–"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+
+function AtomTable({ atoms, method }: { atoms: ReturnType<typeof atomSummaries>; method: string }) {
+  const open = atoms.some((a) => a.spin != null);
+  return (
+    <details className="card">
+      <summary><h2 style={{ display: "inline" }}>Atoms</h2> <span className="secondary">({atoms.length}, {method})</span></summary>
+      <p className="secondary">
+        Löwdin charge{open ? " and spin population (unpaired electron density)" : ""} on each atom, the sum of its
+        bond orders, and Mayer's free valence: bonding capacity the atom has left, about 1 on an atom carrying an
+        unpaired electron. Hover an atom in the 3D view for the same numbers.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Atom</th><th className="num">Charge</th>{open && <th className="num">Spin</th>}
+            <th className="num">Σ bond order</th><th className="num">Free valence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {atoms.map((a) => (
+            <tr key={a.name}>
+              <td>{a.name}</td>
+              <td className="num">{signed(a.charge, 3)}</td>
+              {open && <td className="num">{a.spin == null ? "–" : signed(a.spin, 3)}</td>}
+              <td className="num">{a.bondSum.toFixed(3)}</td>
+              <td className="num">{a.freeValence == null ? "–" : a.freeValence.toFixed(3)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+

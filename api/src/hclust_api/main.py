@@ -87,6 +87,18 @@ def create_app(db_path: Path | None = None, jobs_root: Path | None = None) -> Fa
     def jobs_summary(session: SessionDep, campaign: str):
         return service.jobs_summary(session, campaign_or_404(session, campaign))
 
+    @app.get("/api/campaigns/{campaign}/studies", response_model=list[str])
+    def studies(session: SessionDep, request: Request, campaign: str):
+        """Phase 8 studies with a saved report (python -m hclust study <name>)."""
+        return service.study_names(request.app.state.jobs_root, campaign_or_404(session, campaign))
+
+    @app.get("/api/campaigns/{campaign}/studies/{name}", response_model=schemas.StudyOut)
+    def study(session: SessionDep, request: Request, campaign: str, name: str):
+        out = service.study(request.app.state.jobs_root, campaign_or_404(session, campaign), name)
+        if out is None:
+            raise HTTPException(404, f"no report for study {name!r}")
+        return out
+
     @app.get("/api/structures/{structure_id}.xyz", response_class=PlainTextResponse)
     def structure_xyz(session: SessionDep, structure_id: int):
         xyz = service.structure_xyz(session, structure_id)
@@ -99,6 +111,13 @@ def create_app(db_path: Path | None = None, jobs_root: Path | None = None) -> Fa
         out = service.modes(session, structure_id)
         if out is None:
             raise HTTPException(404, "no frequency calculation produced this structure")
+        return out
+
+    @app.get("/api/structures/{structure_id}/bonds", response_model=schemas.BondsOut)
+    def structure_bonds(session: SessionDep, structure_id: int):
+        out = service.bonds(session, structure_id)
+        if out is None:
+            raise HTTPException(404, "no bond orders computed for this structure")
         return out
 
     @app.get("/api/jobs/{job_id}", response_model=schemas.JobOut)

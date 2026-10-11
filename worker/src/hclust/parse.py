@@ -20,6 +20,9 @@ _VERSION = re.compile(r"Program Version (\S+)")
 _S2 = re.compile(r"Expectation value of <S\*\*2>\s*:\s*(-?\d+\.\d+)")
 _POINT_GROUP = re.compile(r"Point Group:\s*(\S+),\s*Symmetry Number:\s*(\d+)")
 _ORBITAL_ROW = re.compile(r"^\s*\d+\s+(\d+\.\d+)\s+(-?\d+\.\d+)\s+-?\d+\.\d+\s*$")
+_LOEWDIN_ATOM = re.compile(r"^\s*(\d+)\s+\w+\s*:\s*(-?\d+\.\d+)(?:\s+(-?\d+\.\d+))?\s*$")
+_MAYER_ATOM = re.compile(r"^\s*(\d+)\s+\w+" + r"\s+(-?\d+\.\d+)" * 6 + r"\s*$")
+_BOND = re.compile(r"B\(\s*(\d+)-\w+\s*,\s*(\d+)-\w+\s*\)\s*:\s*(-?\d+\.\d+)")
 # Most specific first: "Error (ORCA_MDCI): ...", then any line starting with "Error".
 _ERRORS = (re.compile(r"\bError \(.*"), re.compile(r"^Error\b.*"))
 
@@ -124,6 +127,7 @@ def _add_vibrations(result: Result, entry: dict, n_atoms: int) -> None:
         for key in ("temperature", "pressure", "elEnergy", "zpe", "innerEnergyU",
                     "enthalpyH", "entropyS", "freeEnergyG")
     }
+    result.hessian = np.array(entry["Hessian"]["HESSIAN"], dtype=float)
     # MODES is (3N, 3N) with one normal mode per column, like the .hess file.
     modes = np.array(entry["Hessian"]["MODES"], dtype=float)
     result.modes = modes[:, n_zero:].T.reshape(-1, n_atoms, 3)
@@ -153,3 +157,86 @@ def _error_message(out: str) -> str:
             if m := pattern.search(line):
                 return m[0]
     return lines[-1]
+
+
+def bond_orders(out: str) -> dict[str, list[tuple[int, int, float]]]:
+    """Löwdin and Mayer bond orders (atom i < j, 0-based) from the last blocks of an output.
+
+    ORCA prints only orders above a threshold: set MAYER_BONDORDERTHRESH and
+    LOEWDIN_BONDORDERTHRESH in %method, and Print[P_BondOrder_L] 1 in %output for Löwdin.
+    """
+    found = {}
+    for kind, header in (("loewdin", "LOEWDIN BOND ORDERS"), ("mayer", "Mayer bond orders larger than")):
+        start = out.rfind(header)
+        if start < 0:
+            continue
+        lines = out[start:].splitlines()[1:]
+        pairs = []
+        for line in lines:
+            if set(line.strip()) <= {"-"} and not pairs:
+                continue  # the underline below the header, or a blank line before the rows
+            if not line.strip():
+                break
+            pairs.extend((int(i), int(j), float(v)) for i, j, v in _BOND.findall(line))
+        found[kind] = sorted((min(i, j), max(i, j), v) for i, j, v in pairs)
+    return found
+
+
+def printed_matrix(out: str, title: str) -> np.ndarray | None:
+    """A square matrix printed by ORCA (%output Print[P_Overlap], Print[P_Density], ...).
+
+    The last block titled exactly `title` (a line of its own, underlined with dashes), in
+    column groups of six: a header line of column indices, then one row per basis function.
+    """
+    lines = out.splitlines()
+    starts = [k for k in range(len(lines) - 1)
+              if lines[k].strip() == title and set(lines[k + 1].strip()) == {"-"}]
+    if not starts:
+        return None
+    columns: list[int] = []
+    entries: dict[tuple[int, int], float] = {}
+    for line in lines[starts[-1] + 2:]:
+        tokens = line.split()
+        if tokens and all(t.isdigit() for t in tokens):
+            columns = [int(t) for t in tokens]
+        elif tokens and tokens[0].isdigit() and len(tokens) == len(columns) + 1:
+            row = int(tokens[0])
+            for c, v in zip(columns, tokens[1:]):
+                entries[row, c] = float(v)
+        elif entries:
+            break
+    if not entries:
+        return None
+    n = max(max(k) for k in entries) + 1
+    matrix = np.zeros((n, n))
+    for (i, j), v in entries.items():
+        matrix[i, j] = v
+    return matrix
+
+
+def atom_populations(out: str) -> list[dict] | None:
+    """Per atom: Löwdin charge and spin population (None for closed shells), and Mayer's
+    total valence VA and free valence FA, from the last population analysis of an output."""
+    lines = out.splitlines()
+    heads = [k for k, line in enumerate(lines)
+             if line.strip() in ("LOEWDIN ATOMIC CHARGES", "LOEWDIN ATOMIC CHARGES AND SPIN POPULATIONS")]
+    if not heads:
+        return None
+    atoms: list[dict] = []
+    for line in lines[heads[-1] + 2:]:
+        m = _LOEWDIN_ATOM.match(line)
+        if not m:
+            break
+        atoms.append({"charge": float(m[2]), "spin": float(m[3]) if m[3] else None,
+                      "valence": None, "free_valence": None})
+    heads = [k for k, line in enumerate(lines) if line.split()[:7] == ["ATOM", "NA", "ZA", "QA", "VA", "BVA", "FA"]]
+    if heads:
+        for line in lines[heads[-1] + 1:]:
+            m = _MAYER_ATOM.match(line)
+            if not m:
+                break
+            i = int(m[1])
+            if i < len(atoms):
+                atoms[i]["valence"], atoms[i]["free_valence"] = float(m[5]), float(m[7])
+    return atoms or None
+

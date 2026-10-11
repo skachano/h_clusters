@@ -200,6 +200,71 @@ def analyze(
         store(session, name, analyses)
 
 
+STUDIES = ("vertical", "counterpoise", "anharmonic", "solvent", "field", "basis", "bonds")
+
+
+@app.command()
+def study(
+    name: Annotated[str, typer.Argument(help=f"one of: {', '.join(STUDIES)}")],
+    campaign: Annotated[str, typer.Option(help="campaign whose best structures to use")] = "baseline",
+    workers: Annotated[int, typer.Option(help="concurrent ORCA jobs")] = 8,
+    dry_run: Annotated[bool, typer.Option(help="only list the jobs")] = False,
+) -> None:
+    """Run a Phase 8 study on a finished campaign and print (and save) its report."""
+    import importlib
+
+    from hclust.analysis.verdicts import analyze as analyze_campaign
+    from hclust.studies.base import run_jobs
+
+    if name not in STUDIES:
+        raise typer.BadParameter(f"unknown study {name!r}; choose from {', '.join(STUDIES)}")
+    module = importlib.import_module(f"hclust.studies.{name}")
+    signal.signal(signal.SIGTERM, _raise_keyboard_interrupt)
+    with Session(get_engine()) as session:
+        _campaign(session, campaign)
+        analyses = analyze_campaign(session, campaign)
+        if hasattr(module, "run"):  # multi-step studies drive their own jobs
+            try:
+                rows = module.run(session, campaign, analyses, workers, typer.echo)
+            except KeyboardInterrupt:
+                typer.echo("interrupted; rerun to resume")
+                sys.exit(130)
+            _report(rows, module.STUDY, campaign)
+            return
+        jobs = module.build(analyses)
+        if dry_run:
+            for key, job in jobs.items():
+                typer.echo(f"{key:<40} {job.state.label:<10} {job.level.name} {job.effective_task} {job.hash}")
+            typer.echo(f"{len(jobs)} jobs")
+            return
+        try:
+            results = run_jobs(session, f"{module.STUDY}@{campaign}", jobs, workers=workers,
+                               data=getattr(module, "data", None))
+        except KeyboardInterrupt:
+            typer.echo("interrupted; rerun to resume")
+            sys.exit(130)
+        energies = {k: (r.energy if r.ok else None) for k, r in results.items()}
+        rows = module.report(analyses, energies)
+    _report(rows, module.STUDY, campaign)
+
+
+def _report(rows: list[dict], study_name: str, campaign: str) -> None:
+    """Print a study's rows and save them to data/studies/<study>@<campaign>.json."""
+    import json
+
+    from hclust.db import default_db_path
+
+    out = default_db_path().parent / "studies" / f"{study_name}@{campaign}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(rows, indent=1))
+    if rows:
+        cols = list(dict.fromkeys(c for r in rows for c in r))
+        typer.echo("  ".join(f"{c:>12}" for c in cols))
+        for r in rows:
+            typer.echo("  ".join(f"{'' if r.get(c) is None else r[c]!s:>12}" for c in cols))
+    typer.echo(f"report: {out}")
+
+
 def _campaign(session: Session, name: str) -> Campaign:
     campaign = session.exec(select(Campaign).where(Campaign.name == name)).first()
     if campaign is None:

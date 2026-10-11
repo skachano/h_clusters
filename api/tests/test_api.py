@@ -97,6 +97,23 @@ def test_structure_xyz_and_modes(client):
     assert modes["frequencies"] == [1000.0] and np.array(modes["modes"]).shape == (1, 2, 3)
 
 
+def test_structure_bonds(client):
+    from hclust.db import StudyResult
+    from hclust.studies import bonds
+
+    s = client.get("/api/campaigns/mini/states/2/0/1").json()
+    url = f"/api/structures/{s['structure_id']}/bonds"
+    assert client.get(url).status_code == 404
+    with Session(get_engine(client.jobs_root.parent / "hclust.sqlite")) as session:
+        session.add(StudyResult(study="bonds@mini", key=bonds.key(s["structure_id"]), hash="x", status="ok",
+                                data={"loewdin": [[0, 1, 0.98]], "mayer": [[0, 1, 1.0]],
+                                      "atoms": [{"charge": 0.0, "spin": None, "valence": 1.0, "free_valence": 0.0}] * 2}))
+        session.commit()
+    out = client.get(url).json()
+    assert out["loewdin"] == [{"i": 0, "j": 1, "order": 0.98}] and out["mayer"][0]["order"] == 1.0
+    assert len(out["atoms"]) == 2 and out["atoms"][0]["spin"] is None
+
+
 def test_trends(client):
     t = client.get("/api/campaigns/mini/trends", params={"quantity": "binding_per_atom"}).json()
     neutral = next(s for s in t["series"] if s["charge"] == 0)
@@ -135,3 +152,16 @@ def test_committed_openapi_schema_is_up_to_date(client):
     from hclust_api.openapi import SCHEMA_PATH
 
     assert json.loads(SCHEMA_PATH.read_text()) == client.app.openapi()
+
+
+def test_study_reports(client):
+    import json
+
+    studies = client.jobs_root.parent / "studies"
+    studies.mkdir(exist_ok=True)
+    (studies / "vertical@mini.json").write_text(json.dumps([{"state": "H3- (1)", "vertical_ev": 1.2}]))
+    assert client.get("/api/campaigns/mini/studies").json() == ["vertical"]
+    out = client.get("/api/campaigns/mini/studies/vertical").json()
+    assert out["rows"][0]["vertical_ev"] == 1.2
+    assert client.get("/api/campaigns/mini/studies/nope").status_code == 404
+    assert client.get("/api/campaigns/mini/studies/..%2Fhclust").status_code == 404

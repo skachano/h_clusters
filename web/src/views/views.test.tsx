@@ -8,9 +8,10 @@ import { SpeciesView } from "./SpeciesView";
 
 vi.mock("3dmol", () => ({
   createViewer: () => ({
-    addModel: () => ({ vibrate: vi.fn() }),
+    addModel: () => ({ vibrate: vi.fn(), selectedAtoms: () => [{}, {}, {}] }),
     setStyle: vi.fn(), zoomTo: vi.fn(), zoom: vi.fn(), render: vi.fn(), clear: vi.fn(),
     animate: vi.fn(), stopAnimate: vi.fn(), resize: vi.fn(),
+    setHoverable: vi.fn(), setHoverDuration: vi.fn(), addCylinder: vi.fn(), addLabel: vi.fn(), removeLabel: vi.fn(),
   }),
 }));
 
@@ -44,8 +45,15 @@ const detail: StateDetail = {
   multiplicities: [brief()],
 };
 
+const bonds = {
+  structure_id: 7, method: "ωB97X-D4/def2-TZVPPD", mayer: [{ i: 0, j: 1, order: 0.44 }],
+  loewdin: [{ i: 0, j: 1, order: 0.444 }, { i: 0, j: 2, order: 0.444 }, { i: 1, j: 2, order: 0.444 }],
+  atoms: [0, 1, 2].map(() => ({ charge: 0.333, spin: null, valence: 0.89, free_valence: 0 })),
+};
+
 function respond(url: string): Response {
   const body = url.includes("/grid") ? grid
+    : url.includes("/structures/7/bonds") ? bonds
     : url.includes("/states/3/1/1") ? detail
     : url.includes("/modes") ? null
     : url.includes("/api/campaigns") ? [{ name: "mini", n_states: 2, n_jobs: 3 }]
@@ -109,5 +117,12 @@ describe("SpeciesView", () => {
     expect(screen.getAllByText("+4.601").length).toBeGreaterThan(0);
     expect(screen.getByText("D3h · planar")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "output" })).toHaveAttribute("href", "/api/jobs/11/files/job.out");
+    // bond orders and atoms from the bonds study
+    expect(await screen.findByText("H1–H2")).toBeInTheDocument();
+    const atoms = within(screen.getByRole("heading", { name: "Atoms" }).closest("details")!);
+    expect(atoms.getAllByRole("row")).toHaveLength(4);
+    expect(atoms.getAllByText("+0.333")).toHaveLength(3);
+    expect(atoms.getAllByText("0.888")).toHaveLength(3); // 2 × 0.444
+    expect(atoms.queryByText("Spin")).toBeNull(); // closed shell
   });
 });

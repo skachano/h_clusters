@@ -61,5 +61,11 @@ LEVELS: dict[str, Level] = {
             analytic_gradient=False, analytic_hessian=False, scratch_gb_m10=12.5,
             unbound_homo_ev=0.5,  # HOMO of the HF reference
         ),
+        # Basis-set limit (Phase 8): ORCA runs aVTZ and aVQZ and extrapolates (SCF exponential,
+        # correlation 1/X^3). aVQZ needs ~16x the aVTZ scratch, so only small clusters.
+        Level(
+            "L4", "CCSD(T)", "Extrapolate(3/4,aug-cc)", kind="wft", correlated=True,
+            analytic_gradient=False, analytic_hessian=False, scratch_gb_m10=200,
+        ),
     )
 }
