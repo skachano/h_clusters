@@ -16,7 +16,7 @@ asks ("what shape is H₅⁺?", "is H₃ stable?") is a question about a PES.
 
 A proton is 1836 times heavier than an electron. Electrons move so much faster
 that, as far as they are concerned, the nuclei stand still. This is the
-**Born–Oppenheimer approximation**: fix the nuclei at positions $\mathbf{R}$,
+[**Born–Oppenheimer approximation**](born-oppenheimer.md): fix the nuclei at positions $\mathbf{R}$,
 solve for the electrons only, and repeat for every $\mathbf{R}$ you care about.
 Each solve gives one number, the electronic energy plus the repulsion between
 the fixed nuclei:
@@ -70,15 +70,18 @@ compressing around $R_e$. That oscillation is a **vibration**.
 
 Near the bottom, any well looks like a parabola, $E \approx E_\text{min} +
 \tfrac{1}{2}k(R - R_e)^2$, where the **force constant** $k$ is the curvature of
-the PES at the minimum. Classically this is a spring, and it vibrates at
+the PES at the minimum. Classically this is a spring, and it vibrates with
+the **angular frequency**
 
 $$
 \omega = \sqrt{k/\mu}
 $$
 
-with $\mu$ the reduced mass ($m_\text{H}/2$ for H₂). A stiff bond (large $k$)
-and light atoms (small $\mu$) vibrate fast. H₂ completes one vibration every
-7.6 femtoseconds.
+with $\mu$ the reduced mass ($m_\text{H}/2$ for H₂). $\omega$ is measured in
+radians per second; the ordinary frequency, the number of oscillations per
+second, is $\nu = \omega/2\pi$. A stiff bond (large $k$) and light atoms
+(small $\mu$) vibrate fast. H₂ completes one vibration every
+$1/\nu$ = 7.6 femtoseconds.
 
 Quantum mechanics changes one thing: the vibration can't have any energy it
 likes. Only a ladder of **vibrational levels** is allowed, numbered by the
@@ -102,9 +105,18 @@ almost every H₂ molecule is in $v = 0$ (the gap to $v = 1$ is about 20 times
 the thermal energy), so $v = 0$ is the state that matters for stability.
 
 !!! note "Units"
-    Vibrational energies are usually quoted as wavenumbers in cm⁻¹
-    (1 eV = 8065.5 cm⁻¹), which is what ORCA prints. H₂'s harmonic frequency
-    is 4401 cm⁻¹, so its harmonic ZPE is half of that, 2200 cm⁻¹ = 0.27 eV.
+    Vibrations are usually quoted as wavenumbers in cm⁻¹, which is what
+    ORCA prints:
+
+    $$
+    \tilde\nu = \frac{\nu}{c} = \frac{\omega}{2\pi c}
+    $$
+
+    Chemists still call $\tilde\nu$ the "frequency". The energy quantum is
+    $\hbar\omega = h\nu = hc\tilde\nu$, so in cm⁻¹ it is just $\tilde\nu$
+    (1 eV = 8065.5 cm⁻¹). H₂'s harmonic frequency is 4401 cm⁻¹
+    ($\nu$ = 1.32 × 10¹⁴ Hz, $\omega$ = 8.29 × 10¹⁴ rad/s), so its harmonic ZPE
+    is half of that, 2200 cm⁻¹ = 0.27 eV.
 
 **More atoms, more vibrations.** A molecule with $N$ atoms has $3N - 6$
 independent vibrations, the **normal modes**: one per PES dimension. Each has
@@ -254,8 +266,10 @@ appear or vanish.
   smallest dissociation energy over all ways of splitting a cluster
   (`doc/Plan.md` §1, question 3).
 - **Method dependence is real here:** the DFT levels L0 and L1 turn the C₂ᵥ
-  H₅⁺ minimum into a proton-shared D₂d structure, while MP2 keeps it (comment on L1M in
-  `worker/src/hclust/levels.py`). This is exactly why the project has more than
+  H₅⁺ minimum into a proton-shared D₂d structure, while MP2 keeps it (comment on
+  L1M in `worker/src/hclust/levels.py`). C₂ᵥ and D₂d are
+  [point groups](../techniques/point-groups.md), names for the two shapes'
+  symmetry. This is exactly why the project has more than
   one geometry level.
 
 ## References

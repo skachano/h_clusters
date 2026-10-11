@@ -33,8 +33,18 @@ eigenfunctions) solve it, each with one definite energy $E$. The lowest is the
 
 ### The molecular Hamiltonian
 
-For electrons $i, j$ and nuclei $A, B$ with charges $Z_A$ and masses $M_A$,
-in [atomic units](units.md):
+Label the electrons $i, j, \ldots$ and the nuclei $A, B, \ldots$. Electron $i$ is
+at position $\mathbf{r}_i$, and nucleus $A$, with charge $Z_A$ and mass $M_A$, is
+at $\mathbf{R}_A$ (throughout this wiki, lowercase $\mathbf{r}$ is for electrons
+and uppercase $\mathbf{R}$ for nuclei). The potential energy depends only on
+the distances between the particles:
+
+- $r_{iA} = |\mathbf{r}_i - \mathbf{R}_A|$, between electron $i$ and nucleus $A$,
+- $r_{ij} = |\mathbf{r}_i - \mathbf{r}_j|$, between two electrons,
+- $R_{AB} = |\mathbf{R}_A - \mathbf{R}_B|$, between two nuclei.
+
+$\nabla_i^2$ and $\nabla_A^2$ take second derivatives with respect to the
+coordinates of electron $i$ and of nucleus $A$. In [atomic units](units.md):
 
 $$
 \hat{H} =

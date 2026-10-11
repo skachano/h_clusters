@@ -51,7 +51,8 @@ def join(text: str) -> str:
             continue
         if stripped and prev_joinable and not is_block_start(stripped):
             prev = out[-1].rstrip()
-            space = "" if no_space(prev[-1:], stripped[:1]) else " "
+            # Look past emphasis markers: "*word*" next to Japanese needs no space either.
+            space = "" if no_space(prev.rstrip("*_")[-1:], stripped.lstrip("*_")[:1]) else " "
             out[-1] = prev + space + stripped
             continue
         out.append(line)

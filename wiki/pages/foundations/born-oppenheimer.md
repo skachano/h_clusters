@@ -4,7 +4,7 @@
     [Schrödinger equation](schrodinger-equation.md)
 
 The full Schrödinger equation treats electrons and nuclei together, which is
-hopeless beyond the simplest cases. The Born–Oppenheimer (BO) approximation
+hopeless beyond the simplest cases. The Born–Oppenheimer approximation
 splits it in two: first solve for the electrons with the nuclei frozen in
 place, then let the nuclei move on the resulting energy landscape. It is the
 reason a molecule has a shape at all, and the reason the
@@ -48,9 +48,9 @@ vibrations, rigid rotation; see [thermochemistry](../techniques/thermochemistry.
 
 ### One surface for all isotopes
 
-Nuclear masses appear only in the second step. So within BO, H₂, HD and D₂
-share **exactly the same** potential energy surface: the same bond length
-and the same well depth $D_e$. They differ only in how the nuclei move on it.
+Nuclear masses appear only in the second step. So within the Born–Oppenheimer
+approximation, H₂, HD and D₂ share **exactly the same** potential energy
+surface: the same bond length and the same well depth $D_e$. They differ only in how the nuclei move on it.
 Deuterium is twice as heavy, so it vibrates more slowly and has a smaller
 zero-point energy, which makes D₂ harder to break:
 
@@ -62,16 +62,16 @@ zero-point energy, which makes D₂ harder to break:
 
 ### When it breaks down
 
-BO assumes the electrons always stay on one surface. That fails where two
-electronic states come close in energy (near crossings of surfaces), where a
+The approximation assumes the electrons always stay on one surface. That
+fails where two electronic states come close in energy (near crossings of surfaces), where a
 small nuclear motion can switch the electrons from one state to another.
 This matters for photochemistry and some reactions. For the ground states of
-the clusters in this project, BO is excellent: corrections to H₂'s
+the clusters in this project, it is excellent: corrections to H₂'s
 dissociation energy are below 0.01 eV.
 
-!!! note "BO is not the same as treating nuclei classically"
-    Within BO, the nuclei are still quantum particles: they have zero-point
-    energy and can tunnel. Treating them as classical balls on the PES is a
+!!! note "Born–Oppenheimer is not the same as treating nuclei classically"
+    Within the approximation, the nuclei are still quantum particles: they
+    have zero-point energy and can tunnel. Treating them as classical balls on the PES is a
     *further* approximation, and for hydrogen a poor one
     ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
 
