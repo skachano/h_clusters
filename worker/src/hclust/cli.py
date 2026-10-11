@@ -1,4 +1,4 @@
-"""Command line: python -m hclust plan|run|status."""
+"""Command line: python -m hclust plan|run|status|analyze|..."""
 
 import signal
 import sys
@@ -13,7 +13,7 @@ from hclust.campaign import CampaignSpec
 from hclust.db import Campaign, Candidate, Job, JobResult, JobStatus, StateRow, Structure, get_engine
 from hclust.geometry import Geometry
 from hclust.structures import composition
-from hclust.units import HARTREE_TO_KCAL
+from hclust.units import HARTREE_TO_EV, HARTREE_TO_KCAL
 from hclust.runner import (
     Runner, flag_unbound, plan as plan_campaign, relabel_dissociated, requeue_failed,
     reselect as reselect_campaign,
@@ -155,6 +155,49 @@ def _source(session: Session, job: Job, sources: dict[int, str]) -> str:
             return sources[job.id]
         job = session.get(Job, job.parent_id) if job.parent_id else None
     return "?"
+
+
+@app.command()
+def analyze(
+    name: Annotated[str, typer.Argument(help="campaign name or YAML file")],
+    temperature: Annotated[float, typer.Option("--temperature", "-T", help="K")] = 298.15,
+    pressure: Annotated[float, typer.Option("--pressure", "-p", help="atm")] = 1.0,
+    check: Annotated[bool, typer.Option(help="also check the sanity anchors of Plan 1.2")] = False,
+) -> None:
+    """Stability verdict per state from CCSD(T) energies; stored in the verdict table."""
+    from hclust.analysis.anchors import check_anchors
+    from hclust.analysis.shape import shape_class
+    from hclust.analysis.verdicts import analyze as analyze_campaign, store
+
+    if name.endswith((".yaml", ".yml")):
+        name = CampaignSpec.load(Path(name)).name
+    ev = lambda x: "" if x is None else f"{x * HARTREE_TO_EV:+.3f}"  # noqa: E731
+    with Session(get_engine()) as session:
+        _campaign(session, name)
+        analyses = analyze_campaign(session, name, temperature, pressure)
+        typer.echo(f"D = lowest channel - state (eV; > 0 bound). D_G at {temperature} K, {pressure} atm.")
+        typer.echo(
+            f"{'state':<10} {'verdict':<16} {'D_e':>7} {'D_0':>7} {'D_G':>7}  {'lowest channel':<20} "
+            f"{'shape':<6} {'PG':<7} {'units':<14} {'geom':<4} {'spin gap':>8}"
+        )
+        for a in analyses:
+            d = {q: (v[0] if v else None) for q, v in a.d.items()}
+            g = a.geometry
+            typer.echo(
+                f"{a.state.to_state().label:<10} {a.verdict.value:<16} {ev(d.get('E')):>7} "
+                f"{ev(d.get('E0')):>7} {ev(d.get('G')):>7}  "
+                f"{a.d['E'][1] if a.d.get('E') else '':<20} {shape_class(g) if g else '':<6} "
+                f"{a.point_group or '':<7} "
+                f"{composition(g) if g else '':<14} "
+                f"{a.parent_job.level if a.parent_job else '':<4} {ev(a.spin_gap):>8}"
+                + (" S2!" if a.spin_contaminated else "")
+            )
+        if check:
+            checks = check_anchors(analyses)
+            typer.echo(f"\nSanity anchors (Plan 1.2): {sum(c.ok for c in checks)}/{len(checks)} pass")
+            for c in checks:
+                typer.echo(f"  {'✓' if c.ok else '✗'} {c.anchor:<48} expected {c.expected}\n      found {c.found}")
+        store(session, name, analyses)
 
 
 def _campaign(session: Session, name: str) -> Campaign:

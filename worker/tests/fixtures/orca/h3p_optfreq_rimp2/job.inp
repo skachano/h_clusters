@@ -1,0 +1,8 @@
+# hclust H3+ (1) L1M optfreq
+! RI-MP2 RIJK aug-cc-pVTZ aug-cc-pVTZ/C aug-cc-pVTZ/JK TightOpt NumFreq TightSCF
+%maxcore 500
+* xyz 1 1
+H      0.3073645184     0.3834480442     0.1062477079
+H      0.1054297257    -0.3079640252    -0.3831913260
+H     -0.4127942442    -0.0754840190     0.2769436180
+*

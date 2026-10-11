@@ -1,0 +1,12 @@
+# hclust H4 (1) L1M optfreq
+! RI-MP2 RIJK aug-cc-pVTZ aug-cc-pVTZ/C aug-cc-pVTZ/JK TightOpt NumFreq TightSCF
+%maxcore 500
+%geom
+  MaxIter 150
+end
+* xyz 0 1
+H      2.0212835448     0.0000000002     0.0000000000
+H     -1.3889262075     0.3687773500    -0.0000000000
+H     -1.3889262059    -0.3687773499    -0.0000000000
+H      2.7588636225    -0.0000000003    -0.0000000000
+*

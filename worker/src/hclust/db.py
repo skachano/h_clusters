@@ -142,6 +142,44 @@ class Candidate(SQLModel, table=True):
     selected: bool = False
 
 
+class VerdictRow(SQLModel, table=True):
+    """Stability analysis of one state (hclust.analysis.verdicts), redone by `analyze`.
+
+    Energies in Eh. D_q = lowest fragmentation channel minus the state: positive = bound.
+    """
+
+    __tablename__ = "verdict"
+    __table_args__ = (UniqueConstraint("campaign_id", "state_id"),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    campaign_id: int = Field(foreign_key="campaign.id", index=True)
+    state_id: int = Field(foreign_key="state.id", index=True)
+    verdict: str
+    temperature: float  # K, for d_h and d_g
+    pressure: float  # atm, for d_g
+    ref_job_id: int | None = Field(default=None, foreign_key="job.id")  # best CCSD(T) energy
+    structure_id: int | None = Field(default=None, foreign_key="structure.id")
+    geometry_level: str | None = None  # level that optimized the best structure
+    energy: float | None = None
+    zpe: float | None = None
+    d_e: float | None = None
+    d_0: float | None = None
+    d_h: float | None = None
+    d_g: float | None = None
+    channel: str | None = None  # lowest channel for D_e, e.g. "H3+ + H2"
+    channel_g: str | None = None  # lowest channel for D_g (can differ)
+    spin_gap: float | None = None  # E - lowest E over the species' multiplicities
+    detachment: float | None = None  # anions: E(lowest neutral limit) - E, adiabatic
+    ionization: float | None = None  # E(lowest cation limit) - E, adiabatic
+    homo: float | None = None  # of the reference (HF) wave function
+    s2: float | None = None
+    spin_contaminated: bool | None = None  # <S^2> off by more than 10 % of S(S+1)
+    point_group: str | None = None
+    shape: str | None = None  # atom | linear | planar | 3D
+    composition: str | None = None  # bonded units, e.g. "H3·H2"
+    n_candidates: int = 0  # reference energies considered for this state
+
+
 def default_db_path() -> Path:
     return Path(os.environ.get("HCLUST_DATA", "data")) / "hclust.sqlite"
 

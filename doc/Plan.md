@@ -159,7 +159,8 @@ For each state, computed from the best structure at each level:
 - **Point group** and shape class (linear / planar / 3D), principal moments
   of inertia, radius of gyration, bond graph.
 - **Fragmentation energies** for all channels. Fragments can be in any charge
-  and spin state, so use each fragment's best computed energy. This is why
+  state, and their spins must couple to the state's spin (spin is conserved;
+  see Phase 5). Each fragment uses its best computed energy. This is why
   the *whole* species grid must be computed: a nice HTC "closure" property.
   - D_min = min over channels of ΔE_frag. Also ΔE₀ = ΔE + ΔZPE, ΔH(T) and
     ΔG(T, p).
@@ -245,9 +246,12 @@ h_clusters/
 │       ├── runner.py          # planning, thread pool, retries, resume
 │       ├── workflow.py        # stage DAG: L0 → dedup → L1 → freq → L2 → L3
 │       ├── analysis/
-│       │   ├── symmetry.py    # point group (pymatgen PointGroupAnalyzer)
+│       │   ├── shape.py       # inertia, shape class, radius of gyration
+│       │   ├── symmetry.py    # tolerant point groups + symmetry numbers (own code)
 │       │   ├── thermo.py      # RRHO / qRRHO at arbitrary T, p
-│       │   └── fragments.py   # channel enumeration, D_min, verdicts
+│       │   ├── fragments.py   # channels, spin-allowed asymptotes, D_q, verdicts
+│       │   ├── verdicts.py    # DB → best reference per state → verdict rows
+│       │   └── anchors.py     # §1.2 sanity anchors as checks
 │       └── cli.py             # typer: `python -m hclust plan|run|status` (+ analyze|export later)
 ├── api/
 │   ├── Dockerfile
@@ -304,7 +308,10 @@ resources: { workers: 16, maxcore_mb: 600, timeout_min: 120 }
   error_kind, action, cached, wall_s)`: one row per ORCA run.
 - `Result(job_id, energy, final_structure_id, s2, homo, lumo, charges,
   frequencies, modes, thermo, n_imag, point_group, opt_converged)`
-- `Verdict(state_id, level, best_structure_id, d_min, d0_min, verdict, channel)`
+- `Verdict(campaign_id, state_id, verdict, temperature, pressure, ref_job_id,
+  structure_id, geometry_level, energy, zpe, d_e, d_0, d_h, d_g, channel,
+  channel_g, spin_gap, detachment, ionization, homo, s2, spin_contaminated,
+  point_group, shape, composition, n_candidates)`: rewritten by `analyze`.
 
 **Provenance and idempotence.** The job hash is
 `sha256(rendered ORCA input + engine version)`. Rerunning the campaign skips
@@ -462,7 +469,7 @@ Each phase has a concrete **done when** criterion.
   systems fall back to HF, which is exact within the basis.
 - ORCA's point-group detection is too strict to rely on: it calls an
   equilateral L1 H₃⁺ (ΔR < 3·10⁻⁴ Å) C₂v. Our own tolerant
-  `symmetry.py` (Phase 5) is required.
+  `symmetry.py` (Phase 5) is required. (Done in Phase 5: it finds D₃h.)
 - Anchor results (eV; L1 = ωB97M-V/def2-TZVPPD, L2 = CCSD(T)/aug-cc-pVTZ
   at the L1 geometry):
 
@@ -770,11 +777,103 @@ molecules at ~1.8 Å.
   functions and little self-interaction error; the energy comparison is the
   real one.
 
-### Phase 5: Analysis library (2 days)
+### Phase 5: Analysis library (2 days) — ✅ done 2026-10-11
 - Point groups, thermo (RRHO/qRRHO at any T, p, cross-checked against
   ORCA's own thermo at 298 K), fragmentation channels, and verdicts.
 - **Done when** `hclust analyze` produces a verdict table that agrees with
   §1.2.
+- What was built (`worker/src/hclust/analysis/`):
+  - `thermo.py`: ideal-gas RRHO with Grimme's quasi-RRHO entropy at any T
+    and p, ORCA's conventions (harmonic thermal energy, qRRHO entropy with
+    ν₀ = 100 cm⁻¹, modes < 1 cm⁻¹ dropped, S_el = k ln(2S+1)).
+  - `symmetry.py`: our own point-group detector with a 0.05 Å tolerance
+    (no pymatgen dependency) and the rotational symmetry number.
+  - `shape.py`: principal moments, linear/planar/3D, radius of gyration.
+  - `fragments.py`: binary channels (charges −1…+1) plus electron
+    detachment for anions, lowest asymptotes by recursion (so binary
+    channels reach every multi-fragment limit), D_q for q = E, E₀, H(T),
+    G(T, p), and the verdict ladder.
+  - `verdicts.py`: picks each state's reference structure and writes the
+    `verdict` table; `anchors.py`: §1.2 as 17 checks.
+  - `python -m hclust analyze <campaign> [-T K] [-p atm] [--check]`.
+- **The reference energy of a state** is its lowest CCSD(T)/aVTZ single
+  point (on an ωB97X-D4 or RI-MP2 geometry, whichever is lower) on a
+  structure that is a minimum at its geometry level and not flagged as an
+  unbound anion. ZPE and thermal terms come from that geometry's own
+  frequencies (ωB97X-D4 or RI-MP2, unscaled).
+- Verdicts for states without a reference: `unbound_electron` (an anion
+  whose results are all flagged), `not_a_minimum` (intact structures, none
+  a minimum), `dissociates` (nothing intact). H and H⁺ are `atom`.
+
+**Decisions made while building it:**
+- **Spin is conserved.** First version: fragments took their lowest energy
+  over all spins. Then every high-spin state "dissociated" into low-spin
+  fragments and its D just repeated its spin gap (H₄⁻ quartet: −7.2 eV
+  against H₂ + H₂ + e⁻). Now fragment spins must couple to the state's
+  spin, |S₁ − S₂| ≤ S ≤ S₁ + S₂ (the electron has S = ½). Hydrogen has no
+  spin–orbit coupling to drive a spin-forbidden break-up; that a state is
+  not the species' ground state is what the separate `spin_gap` says.
+- **Own point groups.** ORCA's detection is too strict (Phase 1). Ours
+  agrees with ORCA on the symmetric cases (H₂, H₂⁺, C₂ᵥ H₅⁺/H₇⁺, D₃h H₃⁺)
+  and finds the textbook symmetry where ORCA says C₁: D₂d H₆⁺, D₃h H₉⁺,
+  D₃h for the triplet H₃⁻. 23 of 42 best structures differ from ORCA;
+  at a 0.005 Å tolerance most floppy ones drop back to C₁, which measures
+  how floppy they are.
+- **qRRHO residual.** ORCA reproduces to 10⁻⁶ Eh except for modes below
+  ~50 cm⁻¹, where ORCA's free-rotor entropy is ~0.03 k per mode lower than
+  Grimme's published formula (survey of 300 jobs; no single constant
+  explains it). Effect: ≤ 1.5·10⁻⁴ Eh (0.1 kcal/mol) in TS at 298 K for the
+  floppiest clusters.
+- **Conventions and gaps:** the free electron has E = 0 and no thermal
+  terms; the bare proton has E = 0 and translational terms only. No
+  counterpoise correction: van der Waals D_e values of ~0.01 eV are of the
+  order of the aVTZ basis-set superposition error. Vertical detachment
+  energies need neutral single points at anion geometries, which were not
+  run; the HF HOMO (Koopmans) is stored instead.
+
+**Results (CCSD(T)/aug-cc-pVTZ, 298.15 K, 1 atm):** 17/17 anchors pass.
+
+| Anchor | Computed | Reference |
+|---|---|---|
+| H₂ r_e, D_e, D₀ | 0.743 Å, 4.707 eV, 4.432 eV | 0.741 Å, 4.747, 4.478 |
+| H₂⁺ r_e, D_e | 1.058 Å, 2.789 eV | 1.057 Å, 2.79 |
+| EA(H) | 0.728 eV | 0.754 |
+| H₃⁺ | D₃h, 0.871 Å, D_e(H₂ + H⁺) 4.601 eV | D₃h, 0.873 Å, 4.61 |
+| H₂⁻ (both spins) | unbound_electron | not bound |
+| H₃ (2) | bound by 0.001 eV (van der Waals H₂·H), D₀ −0.008 eV | falls apart |
+| H₅⁺, H₇⁺, H₉⁺ | H₃⁺ core + H₂, D_e 0.370 > 0.216 > 0.191 eV | binding decreases |
+| H-atom separation energy of Hₙ⁺ | odd n 4.6–6.5 eV, even n 0.08–0.29 eV | odd–even alternation |
+| Neutral H_m, m > 2 | D_e ≤ 0.010 eV, D₀ < 0 | weak vdW complexes |
+| Odd H_m⁻ | singlet H⁻(H₂)ₖ, D_e 0.02–0.12 eV | weak complexes |
+| Even H_m⁻ | doublets unbound, quartets metastable | (new anchor, see below) |
+
+Verdicts per state:
+
+| Verdict | States |
+|---|---|
+| bound_with_zpe | H⁻, H₂, H₂⁺, H₃⁺, all doublet/singlet cations H₄⁺–H₁₀⁺, the triplet/quartet cations H₃⁺ (3), H₄⁺ (4), H₅⁺ (3), H₆⁺ (4), H₇⁺ (3), H₁₀⁺ (4) |
+| bound (D_e > 0, D₀ < 0) | neutral ground states H₃–H₉, H₁₀ (3), the H₄/H₆/H₈ triplets and H₉ (4); H₃⁻/H₅⁻/H₇⁻/H₉⁻ singlets; H₈⁺ (4), H₉⁺ (3) |
+| metastable | H₃⁻ (3), H₅⁻ (3), and the H₄⁻–H₁₀⁻ quartets (tetrahedral H₄⁻ core, −2.3 to −2.5 eV) |
+| unbound_electron | H⁻ (3), H₂⁻, H₄⁻/H₆⁻/H₈⁻/H₁₀⁻ doublets, H₉⁻ (3) |
+| not_a_minimum | H₇ (4), H₁₀ (1): floppy (H₂)₅ with 2–3 imaginary modes below 80 cm⁻¹ after 3 displacements |
+| dissociates | H₂ (3), H₃ (4), H₅ (4), H₇⁻ (3) |
+
+**Findings:**
+- **Zero-point energy decides most weak complexes.** Every neutral cluster
+  (D_e 0.001–0.010 eV) and every H⁻(H₂)ₖ anion (0.016–0.115 eV) is bound
+  in D_e and unbound in D₀: the physics caveat of §1.2, now quantified.
+- **The ion clusters survive ZPE:** H₅⁺ (D₀ 0.24 eV), H₇⁺ (0.10), H₉⁺
+  (0.11) and the even H₄⁺–H₁₀⁺ (0.03–0.24 eV). D₀ is not monotonic
+  (H₉⁺ ≥ H₇⁺) although D_e is: harmonic ZPE of floppy modes is the weak
+  point.
+- **Temperature:** D_G(20 K) ≈ D₀. At 298 K and 1 atm, H₇⁺ and H₉⁺ have
+  D_G < 0 (entropy wins); at 1000 K only H₂ and H₃⁺ stay bound.
+- **Triplet H₃⁺** is a bound linear minimum, D_e 0.37 eV against
+  H₂⁺ + H. To my knowledge the literature puts the well depth near this
+  value, though I have not checked a source.
+- **Even anions** have no bound state at all: the doublets cannot hold the
+  electron, and the quartets are trapped tetrahedral H₄⁻ cores ~2.4 eV
+  above H₂ molecules + 2 H + e⁻ (Phase 4).
 
 ### Phase 6: API (1–2 days)
 - FastAPI endpoints from §4, an OpenAPI schema, and caching for `/grid`.
