@@ -1069,6 +1069,66 @@ the same structures):**
 - Not done (still open): multiplicities `all_upto: 3`, framework port,
   bigger m, per-atom/per-bond energy decomposition (LED/EDA).
 
+### Phase 9: Static site on GitHub Pages (2–3 days) — planned
+- **Goal:** publish the web app as a read-only snapshot. Pages serves static
+  files only, so FastAPI does not run there: the app reads JSON exported from
+  the API, at a precomputed grid of conditions. Raw ORCA files go to a GitHub
+  Release archive instead of the site. Target size ≈ 45–50 MB (limit: 1 GB
+  per site, 100 MB per file, ~100 GB/month bandwidth).
+- **Prerequisites (owner):** a GitHub repository with Pages enabled (source:
+  GitHub Actions; free Pages needs a public repo). Publishing ORCA *outputs*
+  is not redistributing ORCA, but check the licence terms once before the
+  first release. `data/` stays untracked: the database never goes to git.
+- **1. Exporter** (`api/src/hclust_api/export.py`,
+  `docker compose --profile serve run --rm --no-deps api python -m hclust_api.export --out site/data`):
+  - Calls the real app through FastAPI's TestClient, so every file is
+    byte-for-byte what the API would answer; path = URL, query folded into
+    the path (`campaigns/baseline/grid/d_g/T298.15_p1.json`).
+  - Conditions grid in `manifest.json`: 20 temperatures log-spaced over
+    10–3000 K plus 298.15 K, × 10 pressures (one per decade, 10⁻⁶–10³ atm,
+    including 1 atm) = 210 conditions.
+  - Export only what depends on what: grid D_e/D₀ once, D_H per
+    temperature, D_G per (T, p); species detail, state list and the D_G
+    trend per (T, p); benchmark, jobs summary, studies, xyz/modes/bonds once.
+    Estimate: 210 × (36 KB grid + 56 × 3 KB details + trends) ≈ 45 MB.
+  - Writes `manifest.json` (conditions, campaigns, git commit, export time,
+    file count, total size) and fails if any file is over 25 MB or the total
+    over 200 MB.
+- **2. Static build of the web app** (`VITE_STATIC=1`, `VITE_BASE=/<repo>/`):
+  - `client.ts`: a static transport behind openapi-fetch's late-bound fetch
+    maps `/api/...?...` to `${BASE}data/...json` (the exporter's naming, one
+    shared function, unit-tested); the views do not change.
+  - Conditions snap to the manifest grid (nearest in log T and log p); the
+    sliders step through grid points and the bar says "precomputed values".
+  - Router: `HashRouter` in the static build (Pages has no fallback for
+    client routes; `/#/c/baseline/s/5/1/1` links keep working);
+    `BrowserRouter` stays for the dev and nginx builds. `vite.config` takes
+    `base` from `VITE_BASE`.
+  - Raw-file links: point to the Release archive and name the path inside it
+    (`jobs/<hash>/job.out`); the "job record" link is hidden.
+- **3. Raw outputs as a Release asset:** `scripts/release-outputs.sh` packs
+  the files behind displayed results (reference CCSD(T) jobs, their geometry
+  and frequency jobs, study jobs: ≈ 350 dirs, ≈ 450 MB → ≈ 50–80 MB as
+  `.tar.xz`), split below 2 GB per asset, `gh release create
+  data-<date>`. The site links the matching release from the manifest.
+- **4. Publishing:** the exported `site/data` is also attached to the
+  release (`site-data.tar.gz`), not committed, so git history stays small.
+  `.github/workflows/pages.yml` (on push to main and manual dispatch):
+  download `site-data.tar.gz` from the latest data release → `npm ci` →
+  static build → copy data → `actions/upload-pages-artifact` →
+  `actions/deploy-pages`. Re-exporting data = new release + workflow run.
+- **5. Tests:**
+  - Exporter: every URL the app can request at a grid point exists
+    (enumerated from the routes and the manifest); exported JSON validates
+    against the OpenAPI schemas; spot-check equality with the live API.
+  - Web: static URL mapping and snapping (Vitest).
+  - Playwright against the static build served by `vite preview` with the
+    real base path: grid → species → 3D viewer, the temperature slider
+    changes D_G, a deep link loads, no request returns 404.
+- **Not included:** live recomputation at arbitrary T and p (would need the
+  thermochemistry ported to TypeScript), per-file raw-output links (the
+  archive is one download), the wiki (could be published alongside later).
+
 ---
 
 ## 6. Testing & validation
