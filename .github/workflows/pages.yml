@@ -20,6 +20,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.data.outputs.tag != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -31,18 +33,22 @@ jobs:
           tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 50 --json tagName,createdAt \
                 --jq '[.[] | select(.tagName | startswith("data-"))] | sort_by(.createdAt) | last | .tagName')
           if [ -z "$tag" ] || [ "$tag" = "null" ]; then
-            echo "::error::no data-* release: run scripts/publish-data.sh first"; exit 1
+            # Not an error: the site cannot be built before the first data release.
+            echo "::notice::no data-* release yet: run scripts/publish-data.sh, then this workflow again"
+            exit 0
           fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern site-data.tar.gz --dir /tmp
 
       - uses: actions/setup-node@v4
+        if: steps.data.outputs.tag != ''
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
 
       - name: Build the static app
+        if: steps.data.outputs.tag != ''
         working-directory: web
         env:
           VITE_STATIC: "1"
@@ -55,12 +61,15 @@ jobs:
           test -f dist/data/manifest.json
 
       - uses: actions/configure-pages@v5
+        if: steps.data.outputs.tag != ''
       - uses: actions/upload-pages-artifact@v3
+        if: steps.data.outputs.tag != ''
         with:
           path: web/dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.ready == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
