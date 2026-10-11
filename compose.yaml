@@ -17,6 +17,27 @@ services:
       - ${SCRATCH_DIR:-/var/tmp/hclust}:/scratch
     working_dir: /app
 
+  # Read-only HTTP API over data/hclust.sqlite: http://localhost:8000/docs
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    image: hclust-api:dev
+    profiles: [serve]
+    environment:
+      HCLUST_DATA: /data
+    volumes:
+      # Writable on purpose: SQLite WAL readers need the -shm file. The API opens the
+      # database with mode=ro, so SQLite itself refuses writes (doc/Plan.md, Phase 6).
+      - ./data:/data
+      - ./api:/app
+      - ./worker/src:/hclust/src:ro
+    ports:
+      - "${API_BIND:-127.0.0.1}:${API_PORT:-8000}:8000"
+    command: >-
+      uvicorn --factory hclust_api.main:create_app --host 0.0.0.0 --port 8000
+      --reload --reload-dir /app/src --reload-dir /hclust/src
+
   # Learning wiki (wiki/). Live preview: docker compose --profile docs up docs
   docs:
     build:

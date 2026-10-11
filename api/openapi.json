@@ -1,0 +1,2069 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "hclust",
+    "description": "Stability and shape of H_m^n clusters (m = 1-10, n = -1, 0, +1). Read-only.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/campaigns": {
+      "get": {
+        "summary": "Campaigns",
+        "operationId": "campaigns_api_campaigns_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CampaignOut"
+                  },
+                  "type": "array",
+                  "title": "Response Campaigns Api Campaigns Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaign}/grid": {
+      "get": {
+        "summary": "Grid",
+        "description": "One cell per species (m × charge): its ground state and the chosen dissociation energy.",
+        "operationId": "grid_api_campaigns__campaign__grid_get",
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Campaign"
+            }
+          },
+          {
+            "name": "temperature",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 5000,
+              "exclusiveMinimum": 0,
+              "description": "K",
+              "default": 298.15,
+              "title": "Temperature"
+            },
+            "description": "K"
+          },
+          {
+            "name": "pressure",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 1000000.0,
+              "exclusiveMinimum": 0,
+              "description": "atm",
+              "default": 1.0,
+              "title": "Pressure"
+            },
+            "description": "atm"
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "d_e",
+                "d_0",
+                "d_h",
+                "d_g"
+              ],
+              "type": "string",
+              "default": "d_e",
+              "title": "Quantity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GridOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaign}/states": {
+      "get": {
+        "summary": "States",
+        "operationId": "states_api_campaigns__campaign__states_get",
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Campaign"
+            }
+          },
+          {
+            "name": "temperature",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 5000,
+              "exclusiveMinimum": 0,
+              "description": "K",
+              "default": 298.15,
+              "title": "Temperature"
+            },
+            "description": "K"
+          },
+          {
+            "name": "pressure",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 1000000.0,
+              "exclusiveMinimum": 0,
+              "description": "atm",
+              "default": 1.0,
+              "title": "Pressure"
+            },
+            "description": "atm"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StateBrief"
+                  },
+                  "title": "Response States Api Campaigns  Campaign  States Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaign}/states/{m}/{charge}/{mult}": {
+      "get": {
+        "summary": "State",
+        "operationId": "state_api_campaigns__campaign__states__m___charge___mult__get",
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Campaign"
+            }
+          },
+          {
+            "name": "m",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "M"
+            }
+          },
+          {
+            "name": "charge",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Charge"
+            }
+          },
+          {
+            "name": "mult",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Mult"
+            }
+          },
+          {
+            "name": "temperature",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 5000,
+              "exclusiveMinimum": 0,
+              "description": "K",
+              "default": 298.15,
+              "title": "Temperature"
+            },
+            "description": "K"
+          },
+          {
+            "name": "pressure",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 1000000.0,
+              "exclusiveMinimum": 0,
+              "description": "atm",
+              "default": 1.0,
+              "title": "Pressure"
+            },
+            "description": "atm"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaign}/trends": {
+      "get": {
+        "summary": "Trends",
+        "description": "One series per charge against m, from each species' ground state.",
+        "operationId": "trends_api_campaigns__campaign__trends_get",
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Campaign"
+            }
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "binding_per_atom",
+                "d_e",
+                "d_0",
+                "d_g",
+                "second_difference",
+                "gap"
+              ],
+              "type": "string",
+              "title": "Quantity"
+            }
+          },
+          {
+            "name": "temperature",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 5000,
+              "exclusiveMinimum": 0,
+              "description": "K",
+              "default": 298.15,
+              "title": "Temperature"
+            },
+            "description": "K"
+          },
+          {
+            "name": "pressure",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 1000000.0,
+              "exclusiveMinimum": 0,
+              "description": "atm",
+              "default": 1.0,
+              "title": "Pressure"
+            },
+            "description": "atm"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaign}/benchmark": {
+      "get": {
+        "summary": "Benchmark",
+        "description": "D_e from the geometry level's own energies against CCSD(T) on the same structures.",
+        "operationId": "benchmark_api_campaigns__campaign__benchmark_get",
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Campaign"
+            }
+          },
+          {
+            "name": "test",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(L1|L1M|L1V|L1b)$",
+              "default": "L1",
+              "title": "Test"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BenchmarkOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campaigns/{campaign}/jobs/summary": {
+      "get": {
+        "summary": "Jobs Summary",
+        "operationId": "jobs_summary_api_campaigns__campaign__jobs_summary_get",
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Campaign"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobsSummaryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/structures/{structure_id}.xyz": {
+      "get": {
+        "summary": "Structure Xyz",
+        "operationId": "structure_xyz_api_structures__structure_id__xyz_get",
+        "parameters": [
+          {
+            "name": "structure_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Structure Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/structures/{structure_id}/modes": {
+      "get": {
+        "summary": "Structure Modes",
+        "operationId": "structure_modes_api_structures__structure_id__modes_get",
+        "parameters": [
+          {
+            "name": "structure_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Structure Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModesOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{job_id}": {
+      "get": {
+        "summary": "Job",
+        "operationId": "job_api_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{job_id}/files/{name}": {
+      "get": {
+        "summary": "Job File",
+        "description": "Raw ORCA files (input, output, property JSON, geometries).",
+        "operationId": "job_file_api_jobs__job_id__files__name__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AttemptOut": {
+        "properties": {
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hash"
+          },
+          "modifiers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Modifiers"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "error_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Kind"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "cached": {
+            "type": "boolean",
+            "title": "Cached"
+          },
+          "wall_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wall S"
+          }
+        },
+        "type": "object",
+        "required": [
+          "n",
+          "hash",
+          "modifiers",
+          "status",
+          "error_kind",
+          "error",
+          "action",
+          "cached",
+          "wall_s"
+        ],
+        "title": "AttemptOut"
+      },
+      "BenchmarkOut": {
+        "properties": {
+          "campaign": {
+            "type": "string",
+            "title": "Campaign"
+          },
+          "test": {
+            "type": "string",
+            "title": "Test"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity",
+            "default": "d_e"
+          },
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "mae": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mae",
+            "description": "eV"
+          },
+          "max_abs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Abs",
+            "description": "eV"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/BenchmarkPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "campaign",
+          "test",
+          "reference",
+          "n",
+          "points"
+        ],
+        "title": "BenchmarkOut"
+      },
+      "BenchmarkPoint": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "m": {
+            "type": "integer",
+            "title": "M"
+          },
+          "charge": {
+            "type": "integer",
+            "title": "Charge"
+          },
+          "mult": {
+            "type": "integer",
+            "title": "Mult"
+          },
+          "reference": {
+            "type": "number",
+            "title": "Reference",
+            "description": "D_e at CCSD(T), eV"
+          },
+          "test": {
+            "type": "number",
+            "title": "Test",
+            "description": "D_e at the test level, eV"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "m",
+          "charge",
+          "mult",
+          "reference",
+          "test"
+        ],
+        "title": "BenchmarkPoint"
+      },
+      "CampaignOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "n_states": {
+            "type": "integer",
+            "title": "N States"
+          },
+          "n_jobs": {
+            "type": "integer",
+            "title": "N Jobs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "n_states",
+          "n_jobs"
+        ],
+        "title": "CampaignOut"
+      },
+      "ChannelOut": {
+        "properties": {
+          "split": {
+            "type": "string",
+            "title": "Split",
+            "description": "binary split, e.g. 'H3 + H'"
+          },
+          "limit": {
+            "type": "string",
+            "title": "Limit",
+            "description": "lowest spin-allowed fragments it leads to, e.g. 'H2 + H + H'"
+          },
+          "d_e": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D E"
+          },
+          "d_0": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D 0"
+          },
+          "d_g": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D G"
+          }
+        },
+        "type": "object",
+        "required": [
+          "split",
+          "limit",
+          "d_e",
+          "d_0",
+          "d_g"
+        ],
+        "title": "ChannelOut"
+      },
+      "FailureOut": {
+        "properties": {
+          "job_id": {
+            "type": "integer",
+            "title": "Job Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "stage": {
+            "type": "string",
+            "title": "Stage"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "error_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Kind"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "attempts": {
+            "type": "integer",
+            "title": "Attempts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job_id",
+          "label",
+          "stage",
+          "status",
+          "error_kind",
+          "error",
+          "attempts"
+        ],
+        "title": "FailureOut"
+      },
+      "GridCell": {
+        "properties": {
+          "m": {
+            "type": "integer",
+            "title": "M"
+          },
+          "charge": {
+            "type": "integer",
+            "title": "Charge"
+          },
+          "species": {
+            "type": "string",
+            "title": "Species"
+          },
+          "ground": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StateBrief"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "the species' lowest-energy state"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value",
+            "description": "the requested quantity of the ground state, eV"
+          },
+          "survives": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Survives",
+            "description": "value > 0"
+          },
+          "states": {
+            "items": {
+              "$ref": "#/components/schemas/StateBrief"
+            },
+            "type": "array",
+            "title": "States"
+          }
+        },
+        "type": "object",
+        "required": [
+          "m",
+          "charge",
+          "species",
+          "states"
+        ],
+        "title": "GridCell"
+      },
+      "GridOut": {
+        "properties": {
+          "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "description": "K"
+          },
+          "pressure": {
+            "type": "number",
+            "title": "Pressure",
+            "description": "atm"
+          },
+          "campaign": {
+            "type": "string",
+            "title": "Campaign"
+          },
+          "quantity": {
+            "type": "string",
+            "enum": [
+              "d_e",
+              "d_0",
+              "d_h",
+              "d_g"
+            ],
+            "title": "Quantity"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/GridCell"
+            },
+            "type": "array",
+            "title": "Cells"
+          }
+        },
+        "type": "object",
+        "required": [
+          "temperature",
+          "pressure",
+          "campaign",
+          "quantity",
+          "cells"
+        ],
+        "title": "GridOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IsomerOut": {
+        "properties": {
+          "structure_id": {
+            "type": "integer",
+            "title": "Structure Id"
+          },
+          "ref_job_id": {
+            "type": "integer",
+            "title": "Ref Job Id"
+          },
+          "geometry_level": {
+            "type": "string",
+            "title": "Geometry Level"
+          },
+          "energy": {
+            "type": "number",
+            "title": "Energy",
+            "description": "CCSD(T), Eh"
+          },
+          "relative": {
+            "type": "number",
+            "title": "Relative",
+            "description": "eV above the state's lowest isomer"
+          },
+          "point_group": {
+            "type": "string",
+            "title": "Point Group"
+          },
+          "shape": {
+            "type": "string",
+            "title": "Shape"
+          },
+          "composition": {
+            "type": "string",
+            "title": "Composition"
+          }
+        },
+        "type": "object",
+        "required": [
+          "structure_id",
+          "ref_job_id",
+          "geometry_level",
+          "energy",
+          "relative",
+          "point_group",
+          "shape",
+          "composition"
+        ],
+        "title": "IsomerOut"
+      },
+      "JobOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "campaign": {
+            "type": "string",
+            "title": "Campaign"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "stage": {
+            "type": "string",
+            "title": "Stage"
+          },
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "task": {
+            "type": "string",
+            "title": "Task"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "attempts": {
+            "type": "integer",
+            "title": "Attempts"
+          },
+          "hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hash"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "input_structure_id": {
+            "type": "integer",
+            "title": "Input Structure Id"
+          },
+          "error_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Kind"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "wall_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wall S"
+          },
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Files"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/AttemptOut"
+            },
+            "type": "array",
+            "title": "History"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "campaign",
+          "label",
+          "stage",
+          "level",
+          "task",
+          "status",
+          "attempts",
+          "hash",
+          "parent_id",
+          "input_structure_id",
+          "error_kind",
+          "error",
+          "wall_s",
+          "files",
+          "history"
+        ],
+        "title": "JobOut"
+      },
+      "JobsSummaryOut": {
+        "properties": {
+          "campaign": {
+            "type": "string",
+            "title": "Campaign"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Counts"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/StageSummary"
+            },
+            "type": "array",
+            "title": "Stages"
+          },
+          "failures": {
+            "items": {
+              "$ref": "#/components/schemas/FailureOut"
+            },
+            "type": "array",
+            "title": "Failures"
+          }
+        },
+        "type": "object",
+        "required": [
+          "campaign",
+          "counts",
+          "stages",
+          "failures"
+        ],
+        "title": "JobsSummaryOut"
+      },
+      "ModesOut": {
+        "properties": {
+          "structure_id": {
+            "type": "integer",
+            "title": "Structure Id"
+          },
+          "job_id": {
+            "type": "integer",
+            "title": "Job Id"
+          },
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "xyz": {
+            "type": "string",
+            "title": "Xyz"
+          },
+          "frequencies": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Frequencies",
+            "description": "cm⁻¹, vibrations only; imaginary < 0"
+          },
+          "modes": {
+            "items": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Modes",
+            "description": "(n_vib, n_atoms, 3), Cartesian displacements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "structure_id",
+          "job_id",
+          "level",
+          "xyz",
+          "frequencies",
+          "modes"
+        ],
+        "title": "ModesOut"
+      },
+      "StageSummary": {
+        "properties": {
+          "stage": {
+            "type": "string",
+            "title": "Stage"
+          },
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Counts"
+          },
+          "retried": {
+            "type": "integer",
+            "title": "Retried"
+          },
+          "cpu_hours": {
+            "type": "number",
+            "title": "Cpu Hours"
+          },
+          "wall_median_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wall Median S"
+          },
+          "histogram_edges_s": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Histogram Edges S"
+          },
+          "histogram_counts": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Histogram Counts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "stage",
+          "level",
+          "counts",
+          "retried",
+          "cpu_hours",
+          "wall_median_s",
+          "histogram_edges_s",
+          "histogram_counts"
+        ],
+        "title": "StageSummary"
+      },
+      "StateBrief": {
+        "properties": {
+          "m": {
+            "type": "integer",
+            "title": "M"
+          },
+          "charge": {
+            "type": "integer",
+            "title": "Charge"
+          },
+          "mult": {
+            "type": "integer",
+            "title": "Mult"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "unbound_electron",
+              "not_a_minimum",
+              "dissociates",
+              "metastable",
+              "bound",
+              "bound_with_zpe",
+              "atom"
+            ],
+            "title": "Verdict"
+          },
+          "d_e": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D E",
+            "description": "eV, lowest spin-allowed channel minus the state"
+          },
+          "d_0": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D 0"
+          },
+          "d_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D H"
+          },
+          "d_g": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D G"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel",
+            "description": "lowest channel for D_e"
+          },
+          "channel_g": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel G",
+            "description": "lowest channel for D_G"
+          },
+          "spin_gap": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spin Gap",
+            "description": "eV above the species' lowest computed state"
+          },
+          "structure_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Structure Id"
+          },
+          "point_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Point Group"
+          },
+          "shape": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shape"
+          },
+          "composition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Composition"
+          }
+        },
+        "type": "object",
+        "required": [
+          "m",
+          "charge",
+          "mult",
+          "label",
+          "verdict"
+        ],
+        "title": "StateBrief"
+      },
+      "StateDetail": {
+        "properties": {
+          "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "description": "K"
+          },
+          "pressure": {
+            "type": "number",
+            "title": "Pressure",
+            "description": "atm"
+          },
+          "m": {
+            "type": "integer",
+            "title": "M"
+          },
+          "charge": {
+            "type": "integer",
+            "title": "Charge"
+          },
+          "mult": {
+            "type": "integer",
+            "title": "Mult"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "unbound_electron",
+              "not_a_minimum",
+              "dissociates",
+              "metastable",
+              "bound",
+              "bound_with_zpe",
+              "atom"
+            ],
+            "title": "Verdict"
+          },
+          "d_e": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D E",
+            "description": "eV, lowest spin-allowed channel minus the state"
+          },
+          "d_0": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D 0"
+          },
+          "d_h": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D H"
+          },
+          "d_g": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "D G"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel",
+            "description": "lowest channel for D_e"
+          },
+          "channel_g": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel G",
+            "description": "lowest channel for D_G"
+          },
+          "spin_gap": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spin Gap",
+            "description": "eV above the species' lowest computed state"
+          },
+          "structure_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Structure Id"
+          },
+          "point_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Point Group"
+          },
+          "shape": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shape"
+          },
+          "composition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Composition"
+          },
+          "campaign": {
+            "type": "string",
+            "title": "Campaign"
+          },
+          "energy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Energy",
+            "description": "CCSD(T) of the best structure, Eh"
+          },
+          "zpe": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zpe",
+            "description": "Eh"
+          },
+          "geometry_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geometry Level"
+          },
+          "xyz": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Xyz"
+          },
+          "homo": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Homo",
+            "description": "eV, HF orbitals of the reference"
+          },
+          "lumo": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lumo",
+            "description": "eV"
+          },
+          "gap": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gap",
+            "description": "eV"
+          },
+          "s2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "S2"
+          },
+          "spin_contaminated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spin Contaminated"
+          },
+          "detachment": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detachment",
+            "description": "anions: eV to the lowest neutral + e- limit"
+          },
+          "ionization": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ionization",
+            "description": "eV to the lowest cation + e- limit"
+          },
+          "radius_of_gyration": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Radius Of Gyration",
+            "description": "Å"
+          },
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/ChannelOut"
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "isomers": {
+            "items": {
+              "$ref": "#/components/schemas/IsomerOut"
+            },
+            "type": "array",
+            "title": "Isomers"
+          },
+          "multiplicities": {
+            "items": {
+              "$ref": "#/components/schemas/StateBrief"
+            },
+            "type": "array",
+            "title": "Multiplicities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "temperature",
+          "pressure",
+          "m",
+          "charge",
+          "mult",
+          "label",
+          "verdict",
+          "campaign",
+          "channels",
+          "isomers",
+          "multiplicities"
+        ],
+        "title": "StateDetail"
+      },
+      "TrendPoint": {
+        "properties": {
+          "m": {
+            "type": "integer",
+            "title": "M"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "m",
+          "value"
+        ],
+        "title": "TrendPoint"
+      },
+      "TrendSeries": {
+        "properties": {
+          "charge": {
+            "type": "integer",
+            "title": "Charge"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/TrendPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "charge",
+          "points"
+        ],
+        "title": "TrendSeries"
+      },
+      "TrendsOut": {
+        "properties": {
+          "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "description": "K"
+          },
+          "pressure": {
+            "type": "number",
+            "title": "Pressure",
+            "description": "atm"
+          },
+          "campaign": {
+            "type": "string",
+            "title": "Campaign"
+          },
+          "quantity": {
+            "type": "string",
+            "enum": [
+              "binding_per_atom",
+              "d_e",
+              "d_0",
+              "d_g",
+              "second_difference",
+              "gap"
+            ],
+            "title": "Quantity"
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/TrendSeries"
+            },
+            "type": "array",
+            "title": "Series"
+          }
+        },
+        "type": "object",
+        "required": [
+          "temperature",
+          "pressure",
+          "campaign",
+          "quantity",
+          "unit",
+          "series"
+        ],
+        "title": "TrendsOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

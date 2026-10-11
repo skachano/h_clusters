@@ -116,7 +116,7 @@ def test_verdicts_from_a_campaign(tmp_path, monkeypatch):
 
     with Session(get_engine(tmp_path / "t.sqlite")) as session:
         Runner(session, spec, execute=FakeOrca(script), log=lambda _: None).run()
-        analyses = {a.state.to_state().label: a for a in analyze(session, "mini")}
+        analyses = {a.state.label: a for a in analyze(session, "mini")}
         h2 = analyses["H2 (1)"]
         assert h2.verdict is Verdict.BOUND_WITH_ZPE
         assert h2.d["E"][0] == pytest.approx(0.17) and h2.d["E"][1] == "H + H"

@@ -201,6 +201,19 @@ def get_engine(path: Path | None = None) -> Engine:
     return engine
 
 
+def get_readonly_engine(path: Path | None = None) -> Engine:
+    """For readers (the API): SQLite refuses writes, and no schema changes are attempted.
+
+    The directory must still be writable: WAL readers need the -shm file (Plan, Phase 6).
+    """
+    path = Path(path or default_db_path()).resolve()
+    if not path.exists():
+        raise FileNotFoundError(path)
+    return create_engine(
+        f"sqlite:///file:{path}?mode=ro&uri=true", connect_args={"check_same_thread": False}
+    )
+
+
 def _add_missing_columns(engine: Engine) -> None:
     """Minimal migration: new nullable columns are added to existing tables."""
     inspector = inspect(engine)

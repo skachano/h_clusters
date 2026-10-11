@@ -211,7 +211,10 @@ For each state, computed from the best structure at each level:
     to `data/jobs/<hash>/`. The scheduler keeps the estimated scratch of
     running jobs under `scratch_budget_gb`. Each level declares its scratch
     use at m = 10, scaled by (m/10)⁴; CCSD(T)/aVTZ on H₁₀ needs ~12 GB.
-- **`api`**: FastAPI + SQLModel. Mounts `./data` read-only.
+- **`api`**: FastAPI + SQLModel, port 8000 (`API_PORT`). Reuses the
+  `hclust` package by mounting `worker/src`. It mounts `./data` writable,
+  because SQLite WAL readers need the `-shm` file, and opens the database
+  with `mode=ro`, so SQLite itself refuses writes.
 - **`web`**: Node 22 for development (`vite dev`). Production build is
   served by nginx, which also proxies `/api` to the `api` service.
 
@@ -397,16 +400,20 @@ The app is read-only over the results. It has five main views:
    - Job counts by status, wall-time histograms and a failure log. This
      shows the operational side of HTC.
 
-API sketch:
+API (built in Phase 6; T in K, p in atm, energies in eV; full schema in
+`api/openapi.json`, interactive at `/docs`):
 ```
-GET /states?level=L2
-GET /states/{m}/{charge}/{mult}
-GET /structures/{id}.xyz
-GET /structures/{id}/modes
-GET /grid?level=L2&T=298&p=1e5&quantity=dG
-GET /trends?level=L2&quantity=d_min
-GET /benchmark?ref=L2&test=L1
-GET /jobs/summary
+GET /api/campaigns
+GET /api/campaigns/{c}/grid?temperature&pressure&quantity=d_e|d_0|d_h|d_g
+GET /api/campaigns/{c}/states?temperature&pressure
+GET /api/campaigns/{c}/states/{m}/{charge}/{mult}?temperature&pressure
+GET /api/campaigns/{c}/trends?quantity=binding_per_atom|d_e|d_0|d_g|second_difference|gap
+GET /api/campaigns/{c}/benchmark?test=L1|L1M
+GET /api/campaigns/{c}/jobs/summary
+GET /api/structures/{id}.xyz
+GET /api/structures/{id}/modes
+GET /api/jobs/{id}
+GET /api/jobs/{id}/files/{job.inp|job.out|job.property.json|job.xyz|job_trj.xyz}
 ```
 Generate a typed TS client from FastAPI's OpenAPI schema
 (`openapi-typescript`) so the frontend and backend stay in sync.
@@ -875,8 +882,47 @@ Verdicts per state:
   electron, and the quartets are trapped tetrahedral H₄⁻ cores ~2.4 eV
   above H₂ molecules + 2 H + e⁻ (Phase 4).
 
-### Phase 6: API (1–2 days)
+### Phase 6: API (1–2 days) — ✅ done 2026-10-11
 - FastAPI endpoints from §4, an OpenAPI schema, and caching for `/grid`.
+- What was built (`api/`):
+  - `docker compose --profile serve up api` → http://localhost:8000/docs.
+    The image holds only the dependencies (uv, `api/uv.lock`); the API and
+    `hclust` sources are mounted, and uvicorn reloads on changes.
+  - `service.py`: one `Store` per process. `load()` reads the database
+    (~1.5 s for the baseline) and is cached until a cheap fingerprint
+    (job count, last job update, result count) changes; `evaluate()` at a
+    given T and p (~15 ms) sits in an LRU of 256 entries. Measured: first
+    grid 1.46 s, a new temperature 30 ms, a repeated one 9 ms.
+  - The analysis was split into `load()` (database → plain data, no session)
+    and `evaluate(data, T, p, geometry_level, energy)` for this. The same
+    code feeds `hclust analyze`.
+  - **Ground state of a species** (grid cell): the multiplicity with the
+    lowest intact energy at the geometry level (RI-MP2 first), minimum or
+    not. So H₁₀ shows its singlet (`not_a_minimum`), not the triplet that
+    happens to have a reference, and even anions show their unbound
+    doublet.
+  - State detail adds the full **channel table** (each binary split with the
+    spin-allowed limit it leads to, e.g. `H3 + H` → `H2 + H + H`), the
+    isomer ladder, the multiplicities, IE/detachment, HF HOMO/LUMO and
+    the geometry.
+  - `api/openapi.json` is committed for the web app's generated TypeScript
+    client; a test fails when it is out of date
+    (`python -m hclust_api.openapi` regenerates it).
+  - 10 API tests run a small campaign through the real runner with a fake
+    ORCA and read it back over HTTP.
+
+**Benchmark (D_e at the geometry level's own energies against CCSD(T) on
+the same structures):**
+
+| Level | States | MAE | Max error |
+|---|---|---|---|
+| ωB97X-D4/def2-TZVPPD | 34 | 0.084 eV | 0.64 eV (H₃⁻) |
+| RI-MP2/aug-cc-pVTZ | 33 | 0.037 eV | 0.37 eV (H₄⁻ quartet) |
+
+- The anions dominate both. ωB97X-D4 gives EA(H) = 0.20 eV (CCSD(T)
+  0.73 eV), yet binds H⁻·H₂ at its own geometry by +0.42 eV where
+  CCSD(T) at that geometry says −0.22 eV: delocalization error, as for
+  H₅⁺ in Phase 3. MP2 underbinds H⁻ by 0.25 eV.
 
 ### Phase 7: Web app (4–6 days)
 - Grid → detail → trends → conditions → benchmark/dashboard, in that order.

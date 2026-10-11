@@ -184,12 +184,12 @@ def analyze(
             d = {q: (v[0] if v else None) for q, v in a.d.items()}
             g = a.geometry
             typer.echo(
-                f"{a.state.to_state().label:<10} {a.verdict.value:<16} {ev(d.get('E')):>7} "
+                f"{a.state.label:<10} {a.verdict.value:<16} {ev(d.get('E')):>7} "
                 f"{ev(d.get('E0')):>7} {ev(d.get('G')):>7}  "
                 f"{a.d['E'][1] if a.d.get('E') else '':<20} {shape_class(g) if g else '':<6} "
                 f"{a.point_group or '':<7} "
                 f"{composition(g) if g else '':<14} "
-                f"{a.parent_job.level if a.parent_job else '':<4} {ev(a.spin_gap):>8}"
+                f"{a.reference.geometry_level if a.reference else '':<4} {ev(a.spin_gap):>8}"
                 + (" S2!" if a.spin_contaminated else "")
             )
         if check:

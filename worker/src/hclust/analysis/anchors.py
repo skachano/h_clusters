@@ -93,7 +93,7 @@ def check_anchors(analyses: list[StateAnalysis]) -> list[Check]:
 
     complexes = [ground.get((m, -1)) for m in (3, 5, 7, 9)]
     add("H_m- (odd m): weak H-(H2)_k complexes", "singlet ground state with an H- unit, 0 < D_e < 0.2 eV",
-        ", ".join(f"{a.state.to_state().label} {composition_of(a)} {_f(d(a), 'eV')}" if a else "missing"
+        ", ".join(f"{a.state.label} {composition_of(a)} {_f(d(a), 'eV')}" if a else "missing"
                   for a in complexes),
         all(a and a.state.mult == 1 and composition_of(a).endswith("·H") and 0 < d(a) < 0.2
             for a in complexes))
@@ -101,7 +101,7 @@ def check_anchors(analyses: list[StateAnalysis]) -> list[Check]:
     # every state is either unbound or a trapped (metastable) high-spin structure.
     even = [a for a in analyses if a.state.charge == -1 and a.state.m % 2 == 0]
     add("H_m- (even m): no bound anion", "every state unbound_electron or metastable",
-        ", ".join(f"{a.state.to_state().label} {a.verdict.value}" for a in even),
+        ", ".join(f"{a.state.label} {a.verdict.value}" for a in even),
         bool(even) and all(a.verdict in (Verdict.UNBOUND_ELECTRON, Verdict.METASTABLE) for a in even))
     return checks
 

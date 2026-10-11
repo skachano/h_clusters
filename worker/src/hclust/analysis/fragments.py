@@ -122,8 +122,14 @@ class Asymptotes:
 
     def channel_limit(self, species: Species, mult: int, q: str) -> Limit | None:
         """The lowest limit with total multiplicity `mult` reachable by falling apart."""
-        best = None
+        limits = [limit for _, limit in self.channel_limits(species, mult, q)]
+        return min(limits, key=lambda x: x.value) if limits else None
+
+    def channel_limits(self, species: Species, mult: int, q: str) -> list[tuple[str, Limit]]:
+        """Each binary channel ('H3 + H') with its lowest spin-allowed limit ('H2 + H + H')."""
+        out = []
         for first, second in channels(*species):
+            best = None
             for mult_1 in allowed_multiplicities(first[0] - first[1]):
                 for mult_2 in [2] if second is None else allowed_multiplicities(second[0] - second[1]):
                     if not couples(mult_1, mult_2, mult):
@@ -132,7 +138,10 @@ class Asymptotes:
                     b = Limit(0.0, (ELECTRON,)) if second is None else self.lowest(second, mult_2, q)
                     if a is not None and b is not None and (best is None or a.value + b.value < best.value):
                         best = a + b
-        return best
+            if best is not None:
+                split = species_label(*first) + " + " + (ELECTRON if second is None else species_label(*second))
+                out.append((split, best))
+        return out
 
     def lowest_with_electron(self, species: Species, mult: int, q: str = "E") -> Limit | None:
         """Lowest limit of `species` + e- with total multiplicity `mult` (ionization, detachment)."""
