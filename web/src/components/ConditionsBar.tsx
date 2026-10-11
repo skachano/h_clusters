@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { P_RANGE, QUANTITIES, T_RANGE, type ColorBy } from "../lib/conditions";
 import { useManifest, type Conditions, type Quantity } from "../api/client";
 import { nearestIndex } from "../api/static";
+import { useT, type Key } from "../i18n";
 
 const log = Math.log10;
 
@@ -60,38 +61,37 @@ export function ConditionsBar({ conditions, quantity, colorBy, update, children 
 }) {
   const thermal = quantity === "d_h" || quantity === "d_g";
   const grid = useManifest().data?.conditions;
+  const t = useT();
   return (
     <div className="controls">
       {children}
       {colorBy && (
         <Segmented<ColorBy>
-          label="Colour by" value={colorBy} onChange={(v) => update({ color: v })}
-          options={[{ value: "verdict", label: "Verdict" }, { value: "value", label: "Energy" }]}
+          label={t("cond.colourBy")} value={colorBy} onChange={(v) => update({ color: v })}
+          options={[{ value: "verdict", label: t("cond.byVerdict") }, { value: "value", label: t("cond.byEnergy") }]}
         />
       )}
       {quantity && (
         <Segmented<Quantity>
-          label="Dissociation energy" value={quantity} onChange={(v) => update({ q: v })}
-          options={QUANTITIES.map((q) => ({ value: q.value, label: q.label, title: q.hint }))}
+          label={t("cond.dissociation")} value={quantity} onChange={(v) => update({ q: v })}
+          options={QUANTITIES.map((q) => ({ value: q.value, label: q.label, title: t(`q.${q.value}` as Key) }))}
         />
       )}
       <LogSlider
-        id="temperature" label="Temperature" value={conditions.temperature} range={T_RANGE} unit="K"
+        id="temperature" label={t("cond.temperature")} value={conditions.temperature} range={T_RANGE} unit="K"
         format={(v) => (v >= 100 ? v.toFixed(0) : v.toFixed(1))} onChange={(v) => update({ T: v })}
         grid={grid?.temperatures}
       />
       <LogSlider
-        id="pressure" label="Pressure" value={conditions.pressure} range={P_RANGE} unit="atm"
+        id="pressure" label={t("cond.pressure")} value={conditions.pressure} range={P_RANGE} unit="atm"
         format={(v) => (v >= 0.01 && v < 1000 ? v.toPrecision(3) : v.toExponential(1))}
         onChange={(v) => update({ p: v })} grid={grid?.pressures}
       />
       {quantity && !thermal && (
-        <span className="hint">T and p change D_H and D_G only.</span>
+        <span className="hint">{t("cond.thermalOnly")}</span>
       )}
       {grid && (
-        <span className="hint">
-          Static snapshot: values precomputed at {grid.temperatures.length} temperatures × {grid.pressures.length} pressures.
-        </span>
+        <span className="hint">{t("cond.static", { nt: grid.temperatures.length, np: grid.pressures.length })}</span>
       )}
     </div>
   );

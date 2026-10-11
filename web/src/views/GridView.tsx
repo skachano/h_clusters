@@ -7,11 +7,12 @@ import { Thumbnail } from "../components/Thumbnail";
 import { focusPoint, useTooltip } from "../components/Tooltip";
 import { QUANTITIES, useConditions, type ColorBy } from "../lib/conditions";
 import { fmt, pretty, signed, species } from "../lib/format";
-import { VALUE_BINS, VERDICT_FILL, VERDICT_INK, VERDICT_LABEL, VERDICT_SHORT, valueStep } from "../lib/scales";
+import { VALUE_BINS, VERDICT_FILL, VERDICT_INK, valueStep } from "../lib/scales";
+import { useT, type T } from "../i18n";
+import { chargeLabel, multName, verdictLabel, verdictShort } from "../i18n/terms";
 
 const CHARGES = [-1, 0, 1];
 const MS = Array.from({ length: 10 }, (_, i) => i + 1);
-const ROW_LABEL: Record<number, string> = { [-1]: "anions", 0: "neutral", 1: "cations" };
 
 export function GridView() {
   const { campaign = "baseline" } = useParams();
@@ -19,6 +20,7 @@ export function GridView() {
   const grid = useGrid(campaign, conditions, quantity);
   const [asTable, setAsTable] = useState(false);
   const tip = useTooltip();
+  const t = useT();
   const qLabel = QUANTITIES.find((q) => q.value === quantity)?.label ?? quantity;
 
   const cells = new Map<string, GridCell>();
@@ -27,39 +29,37 @@ export function GridView() {
   return (
     <div className="stack">
       <div>
-        <h1>Which hydrogen clusters hold together?</h1>
+        <h1>{t("grid.title")}</h1>
         <p className="lede">
-          Each cell is the lowest-energy spin state of H<sub>m</sub><sup>n</sup> at CCSD(T)/aug-cc-pVTZ.
-          D is the energy needed to break it apart along its weakest spin-allowed channel:
-          positive means bound. Move the temperature to see who survives.
+          {t("grid.ledeBefore")}H<sub>m</sub><sup>n</sup>{t("grid.ledeAfter")}
         </p>
       </div>
       <ConditionsBar conditions={conditions} quantity={quantity} colorBy={colorBy} update={update}>
         <div className="control">
-          <span className="label">View</span>
-          <div className="segmented" role="group" aria-label="View">
-            <button type="button" aria-pressed={!asTable} onClick={() => setAsTable(false)}>Grid</button>
-            <button type="button" aria-pressed={asTable} onClick={() => setAsTable(true)}>Table</button>
+          <span className="label">{t("view.label")}</span>
+          <div className="segmented" role="group" aria-label={t("view.label")}>
+            <button type="button" aria-pressed={!asTable} onClick={() => setAsTable(false)}>{t("view.grid")}</button>
+            <button type="button" aria-pressed={asTable} onClick={() => setAsTable(true)}>{t("view.table")}</button>
           </div>
         </div>
       </ConditionsBar>
       <ScaleLegend colorBy={colorBy} quantityLabel={qLabel} />
 
-      {grid.isError && <p className="error">Could not load the grid: {String(grid.error)}</p>}
-      {grid.isPending && <p className="loading">Loading…</p>}
+      {grid.isError && <p className="error">{t("grid.error", { error: String(grid.error) })}</p>}
+      {grid.isPending && <p className="loading">{t("common.loading")}</p>}
       {grid.data && !asTable && (
         <div className={`card ${grid.isPlaceholderData ? "stale" : ""}`} style={{ overflowX: "auto", padding: 12 }}>
-          <div className="periodic" role="grid" aria-label="Species grid">
+          <div className="periodic" role="grid" aria-label={t("grid.aria")}>
             <div role="row" className="periodic-row">
               <div className="periodic-corner" />
               {MS.map((m) => <div key={m} role="columnheader" className="periodic-head num">m = {m}</div>)}
             </div>
             {CHARGES.map((charge) => (
               <div role="row" className="periodic-row" key={charge}>
-                <div role="rowheader" className="periodic-rowhead">{ROW_LABEL[charge]}</div>
+                <div role="rowheader" className="periodic-rowhead">{chargeLabel(t, charge)}</div>
                 {MS.map((m) => (
                   <Cell key={m} m={m} charge={charge} cell={cells.get(`${m},${charge}`)} colorBy={colorBy}
-                    quantity={quantity} quantityLabel={qLabel} campaign={campaign} search={search} tip={tip} />
+                    quantity={quantity} quantityLabel={qLabel} campaign={campaign} search={search} tip={tip} t={t} />
                 ))}
               </div>
             ))}
@@ -72,16 +72,16 @@ export function GridView() {
   );
 }
 
-function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, search, tip }: {
+function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, search, tip, t }: {
   m: number; charge: number; cell?: GridCell; colorBy: ColorBy; quantity: Quantity; quantityLabel: string;
-  campaign: string; search: string; tip: ReturnType<typeof useTooltip>;
+  campaign: string; search: string; tip: ReturnType<typeof useTooltip>; t: T;
 }) {
   if (!cell || !cell.ground) {
     const proton = m === 1 && charge === 1;
     return (
       <div role="gridcell" className="periodic-cell empty" style={{ background: "var(--none)" }}>
         <div className="cell-name">{species(m, charge)}</div>
-        <div className="cell-verdict">{proton ? "bare proton" : "not computed"}</div>
+        <div className="cell-verdict">{proton ? t("grid.bareProton") : t("grid.notComputed")}</div>
       </div>
     );
   }
@@ -91,12 +91,12 @@ function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, sea
   const ink = colorBy === "verdict" ? VERDICT_INK[g.verdict] : step.ink;
   const details = (
     <div>
-      <div className="tt-value">{pretty(g.label)} · {VERDICT_LABEL[g.verdict]}</div>
+      <div className="tt-value">{pretty(g.label)} · {verdictLabel(t, g.verdict)}</div>
       <div className="tt-label">{quantityLabel} {signed(cell.value, 3, "eV")}{g.channel ? ` → ${pretty(quantity === "d_g" ? g.channel_g ?? g.channel : g.channel)}` : ""}</div>
-      {g.composition && <div className="tt-label">units {g.composition}{g.point_group ? ` · ${g.point_group}` : ""}</div>}
+      {g.composition && <div className="tt-label">{t("grid.units", { units: g.composition })}{g.point_group ? ` · ${g.point_group}` : ""}</div>}
       {cell.states.length > 1 && (
         <div className="tt-label" style={{ marginTop: 4 }}>
-          {cell.states.map((s) => `${s.mult === 1 ? "singlet" : `2S+1 = ${s.mult}`}: ${VERDICT_SHORT[s.verdict]}`).join(" · ")}
+          {cell.states.map((s) => `${multName(t, s.mult)}: ${verdictShort(t, s.verdict)}`).join(" · ")}
         </div>
       )}
     </div>
@@ -107,7 +107,7 @@ function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, sea
       to={`/c/${campaign}/s/${m}/${charge}/${g.mult}${search ? `?${search}` : ""}`}
       className="periodic-cell"
       style={{ background: fill, color: ink }}
-      aria-label={`${g.label}: ${VERDICT_LABEL[g.verdict]}, ${quantityLabel} ${fmt(cell.value, 3, "eV")}`}
+      aria-label={`${g.label}: ${verdictLabel(t, g.verdict)}, ${quantityLabel} ${fmt(cell.value, 3, "eV")}`}
       onPointerMove={(e) => tip.show(e.clientX, e.clientY, details)}
       onPointerLeave={tip.hide}
       onFocus={(e) => tip.show(...focusPoint(e), details)}
@@ -115,23 +115,24 @@ function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, sea
     >
       <div className="cell-top">
         <span className="cell-name">{species(m, charge)}</span>
-        <span className="cell-mult num" title="multiplicity 2S+1">{g.mult}</span>
+        <span className="cell-mult num" title={t("grid.multTitle")}>{g.mult}</span>
       </div>
       <div className="cell-thumb">{cell.xyz ? <Thumbnail xyz={cell.xyz} bonds={cell.bonds} size={52} ink={ink} /> : <span className="cell-none">—</span>}</div>
-      <div className="cell-verdict">{VERDICT_SHORT[g.verdict]}</div>
+      <div className="cell-verdict">{verdictShort(t, g.verdict)}</div>
       <div className="cell-value num">{cell.value == null ? " " : signed(cell.value, cell.value !== 0 && Math.abs(cell.value) < 0.1 ? 3 : 2)}</div>
     </Link>
   );
 }
 
 function ScaleLegend({ colorBy, quantityLabel }: { colorBy: ColorBy; quantityLabel: string }) {
+  const t = useT();
   if (colorBy === "verdict") {
     return (
-      <div className="legend" aria-label="Colour key">
-        <span className="legend-item"><span className="swatch" style={{ background: "var(--none)", border: "1px solid var(--border)" }} />no stable structure / atom</span>
-        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-1)" }} />metastable (D_e &lt; 0)</span>
-        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-2)" }} />bound, not once ZPE is included</span>
-        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-3)" }} />bound with ZPE</span>
+      <div className="legend" aria-label={t("legend.aria")}>
+        <span className="legend-item"><span className="swatch" style={{ background: "var(--none)", border: "1px solid var(--border)" }} />{t("legend.none")}</span>
+        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-1)" }} />{t("legend.metastable")}</span>
+        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-2)" }} />{t("legend.bound")}</span>
+        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-3)" }} />{t("legend.boundZpe")}</span>
       </div>
     );
   }
@@ -148,34 +149,35 @@ function ScaleLegend({ colorBy, quantityLabel }: { colorBy: ColorBy; quantityLab
     { fill: "var(--div-pos-4)", label: `> ${bins[3]}` },
   ];
   return (
-    <div className="legend" aria-label="Colour key">
-      <span>{quantityLabel} (eV): falls apart</span>
+    <div className="legend" aria-label={t("legend.aria")}>
+      <span>{t("legend.fallsApart", { q: quantityLabel })}</span>
       {steps.map((s) => (
         <span className="legend-item" key={s.label}><span className="swatch" style={{ background: s.fill }} />{s.label}</span>
       ))}
-      <span>bound</span>
+      <span>{t("legend.boundEnd")}</span>
     </div>
   );
 }
 
 function GridTable({ cells, quantityLabel, campaign, search }: { cells: GridCell[]; quantityLabel: string; campaign: string; search: string }) {
+  const t = useT();
   return (
     <div className="card table-wrap">
       <table>
         <thead>
-          <tr><th>Species</th><th>Ground state</th><th>Verdict</th><th className="num">{quantityLabel} (eV)</th><th>Weakest channel</th><th>Units</th><th>Point group</th><th>Other states</th></tr>
+          <tr><th>{t("th.species")}</th><th>{t("grid.thGround")}</th><th>{t("th.verdict")}</th><th className="num">{quantityLabel} (eV)</th><th>{t("grid.thWeakest")}</th><th>{t("th.units")}</th><th>{t("th.pointGroup")}</th><th>{t("grid.thOther")}</th></tr>
         </thead>
         <tbody>
           {cells.map((c) => c.ground && (
             <tr key={`${c.m},${c.charge}`}>
               <td>{species(c.m, c.charge)}</td>
               <td><Link to={`/c/${campaign}/s/${c.m}/${c.charge}/${c.ground.mult}${search ? `?${search}` : ""}`}>{pretty(c.ground.label)}</Link></td>
-              <td>{VERDICT_LABEL[c.ground.verdict]}</td>
+              <td>{verdictLabel(t, c.ground.verdict)}</td>
               <td className="num">{signed(c.value, 3)}</td>
               <td>{c.ground.channel ? pretty(c.ground.channel) : "–"}</td>
               <td>{c.ground.composition ?? "–"}</td>
               <td>{c.ground.point_group ?? "–"}</td>
-              <td className="secondary">{c.states.filter((s) => s.mult !== c.ground!.mult).map((s) => `${s.mult}: ${VERDICT_SHORT[s.verdict]}`).join(", ")}</td>
+              <td className="secondary">{c.states.filter((s) => s.mult !== c.ground!.mult).map((s) => `${s.mult}: ${verdictShort(t, s.verdict)}`).join(", ")}</td>
             </tr>
           ))}
         </tbody>

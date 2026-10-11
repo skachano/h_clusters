@@ -10,11 +10,12 @@ export const P_RANGE = [1e-6, 1e3] as const; // atm
 
 export type ColorBy = "verdict" | "value";
 
-export const QUANTITIES: { value: Quantity; label: string; hint: string }[] = [
-  { value: "d_e", label: "D_e", hint: "electronic energy" },
-  { value: "d_0", label: "D₀", hint: "with zero-point energy" },
-  { value: "d_h", label: "D_H", hint: "enthalpy at T" },
-  { value: "d_g", label: "D_G", hint: "free energy at T and p" },
+/** Labels are symbols (the same in every language); hints are i18n keys `q.<value>`. */
+export const QUANTITIES: { value: Quantity; label: string }[] = [
+  { value: "d_e", label: "D_e" },
+  { value: "d_0", label: "D₀" },
+  { value: "d_h", label: "D_H" },
+  { value: "d_g", label: "D_G" },
 ];
 
 function number(params: URLSearchParams, key: string, fallback: number, [lo, hi]: readonly [number, number]) {

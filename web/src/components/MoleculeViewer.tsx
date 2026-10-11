@@ -7,6 +7,7 @@ import type { BondOrder } from "../api/client";
 import type { Halo } from "../lib/halos";
 import { bondStyle, inFrame, parseXyz, principalFrame, setBonds } from "../lib/geometry";
 import { useThemeVersion } from "../lib/theme";
+import { useT } from "../i18n";
 
 function cssVar(name: string, fallback: string) {
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -89,6 +90,7 @@ export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, halos, heigh
   const host = useRef<HTMLDivElement>(null);
   const viewer = useRef<GLViewer | null>(null);
   const themeVersion = useThemeVersion();
+  const t = useT();
 
   useEffect(() => {
     // Rebuilt on a theme change: repainting a live WebGL canvas in the new colours left
@@ -136,7 +138,7 @@ export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, halos, heigh
           start, end, radius: style.radius, opacity: Math.sqrt(style.opacity), color: ink,
           hoverable: true,
           hover_callback: () => {
-            const { text, spec } = cornerLabel(`H${b.i + 1}–H${b.j + 1}: bond order ${b.order.toFixed(2)}, ${d.toFixed(2)} Å`);
+            const { text, spec } = cornerLabel(t("hover.bond", { pair: `H${b.i + 1}–H${b.j + 1}`, order: b.order.toFixed(2), d: d.toFixed(2) }));
             hovered = v.addLabel(text, spec);
           },
           unhover_callback: () => {
@@ -182,7 +184,7 @@ export function MoleculeViewer({ xyz, mode, bondOrders, atomLabels, halos, heigh
     v.zoomTo();
     v.zoom(0.85 * smallZoom(xyz));
     v.render();
-  }, [xyz, mode, bondOrders, atomLabels, halos, themeVersion]);
+  }, [xyz, mode, bondOrders, atomLabels, halos, themeVersion, t]);
 
   return (
     <div

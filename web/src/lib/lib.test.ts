@@ -3,6 +3,7 @@ import { act, renderHook } from "@testing-library/react";
 import { useThemeVersion } from "./theme";
 import { niceExtent, ticks } from "../components/charts/frame";
 import { atomLabel, atomSummaries } from "./atoms";
+import { translate, type Key } from "../i18n";
 import { haloStyle, halos } from "./halos";
 import { pretty, signed, species } from "./format";
 import { bondStyle, bonds, parseXyz, project, setBonds } from "./geometry";
@@ -88,12 +89,13 @@ describe("atom summaries", () => {
     expect(a.map((x) => x.name)).toEqual(["H1", "H2", "H3"]);
     expect(a[1].bondSum).toBeCloseTo(1.01, 9);
   });
+  const t = (key: Key, vars?: Record<string, string | number>) => translate("en", key, vars);
   it("labels the radical atom with its spin and free valence", () => {
     const [h1, , h3] = atomSummaries(bonds);
-    expect(atomLabel(h3)).toBe("H3: charge +0.01, spin +0.99, Σ bond order 0.02, free valence 0.99");
-    expect(atomLabel(h1)).not.toContain("free valence");
+    expect(atomLabel(h3, t)).toBe("H3: charge +0.01, spin +0.99, Σ bond order 0.02, free valence 0.99");
+    expect(atomLabel(h1, t)).not.toContain("free valence");
     const closed = atomSummaries({ ...bonds, atoms: bonds.atoms.map((x) => ({ ...x, spin: null })) });
-    expect(atomLabel(closed[0])).toBe("H1: charge +0.00, Σ bond order 0.99");
+    expect(atomLabel(closed[0], t)).toBe("H1: charge +0.00, Σ bond order 0.99");
   });
 });
 

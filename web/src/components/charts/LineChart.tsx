@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useTooltip } from "../Tooltip";
 import { linear, niceExtent, tickLabel, ticks, useWidth } from "./frame";
+import { useT } from "../../i18n";
 
 export type Marker = "ring" | "dot" | "square";
 
@@ -36,6 +37,7 @@ export function LineChart({ series, xLabel, yLabel, unit, height = 320, zeroLine
   series: Series[]; xLabel: string; yLabel: string; unit: string; height?: number; zeroLine?: boolean;
   format: (v: number | null) => string;
 }) {
+  const t = useT();
   const ref = useRef<SVGSVGElement>(null);
   const [box, width] = useWidth<HTMLDivElement>();
   const [hoverX, setHoverX] = useState<number | null>(null);
@@ -115,7 +117,7 @@ export function LineChart({ series, xLabel, yLabel, unit, height = 320, zeroLine
       </div>
       <svg
         ref={ref} viewBox={`0 0 ${width} ${height}`} width="100%" role="img"
-        aria-label={`${yLabel} against ${xLabel}`}
+        aria-label={t("chart.against", { y: yLabel, x: xLabel })}
         onPointerMove={onMove} onPointerLeave={() => { setHoverX(null); tip.hide(); }}
         style={{ display: "block", touchAction: "none" }}
       >

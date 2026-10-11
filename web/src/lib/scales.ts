@@ -24,25 +24,7 @@ export const VERDICT_INK: Record<Verdict, string> = {
   atom: "var(--text-secondary)",
 };
 
-export const VERDICT_LABEL: Record<Verdict, string> = {
-  unbound_electron: "electron unbound",
-  not_a_minimum: "no minimum found",
-  dissociates: "falls apart",
-  metastable: "metastable",
-  bound: "bound (not with ZPE)",
-  bound_with_zpe: "bound with ZPE",
-  atom: "atom",
-};
-
-export const VERDICT_SHORT: Record<Verdict, string> = {
-  unbound_electron: "e⁻ unbound",
-  not_a_minimum: "no minimum",
-  dissociates: "falls apart",
-  metastable: "metastable",
-  bound: "bound",
-  bound_with_zpe: "bound + ZPE",
-  atom: "atom",
-};
+// Verdict, charge and spin-state names are translated: i18n/terms.ts.
 
 /** Diverging bins for a dissociation energy (eV): blue = bound, red = falls apart. */
 export const VALUE_BINS = [0.01, 0.05, 0.3, 1.5]; // |D| thresholds, eV
@@ -62,7 +44,6 @@ export const CHARGE_COLOR: Record<number, string> = {
   0: "var(--series-2)",
   1: "var(--series-3)",
 };
-export const CHARGE_LABEL: Record<number, string> = { [-1]: "anions", 0: "neutral", 1: "cations" };
 
 /** Marker shape per charge: a second channel besides colour (anion and neutral points coincide). */
 export const CHARGE_MARKER: Record<number, "ring" | "dot" | "square"> = { [-1]: "ring", 0: "dot", 1: "square" };

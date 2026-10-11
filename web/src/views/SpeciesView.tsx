@@ -9,11 +9,13 @@ import { RawFiles } from "../components/RawFiles";
 import { DivergingBars } from "../components/charts/DivergingBars";
 import { LevelDiagram } from "../components/charts/LevelDiagram";
 import { useConditions } from "../lib/conditions";
-import { fmt, multiplicityName, pretty, signed, species } from "../lib/format";
+import { fmt, pretty, signed, species } from "../lib/format";
+import { useT, type Key } from "../i18n";
+import { multName, shapeName, verdictLabel } from "../i18n/terms";
 import { atomLabel, atomSummaries } from "../lib/atoms";
 import { HALO_FULL, haloStyle, halos as haloList, type Highlight } from "../lib/halos";
 import { bondStyle, MIN_BOND_ORDER, parseXyz } from "../lib/geometry";
-import { VERDICT_FILL, VERDICT_INK, VERDICT_LABEL } from "../lib/scales";
+import { VERDICT_FILL, VERDICT_INK } from "../lib/scales";
 
 type ChannelQ = "d_e" | "d_0" | "d_g";
 
@@ -22,6 +24,7 @@ export function SpeciesView() {
   const campaign = params.campaign ?? "baseline";
   const [m, charge, mult] = [Number(params.m), Number(params.charge), Number(params.mult)];
   const { conditions, update, search } = useConditions();
+  const t = useT();
   const detail = useStateDetail(campaign, m, charge, mult, conditions);
   const s = detail.data;
   const back = `/c/${campaign}${search ? `?${search}` : ""}`;
@@ -29,29 +32,29 @@ export function SpeciesView() {
   return (
     <div className="stack">
       <div>
-        <Link to={back}>← Grid</Link>
+        <Link to={back}>{t("sp.back")}</Link>
         <div className="row" style={{ alignItems: "baseline", gap: 12, marginTop: 6 }}>
-          <h1>{species(m, charge)} <span className="secondary" style={{ fontWeight: 400 }}>{multiplicityName(mult)}</span></h1>
+          <h1>{species(m, charge)} <span className="secondary" style={{ fontWeight: 400 }}>{multName(t, mult)}</span></h1>
           {s && (
             <span className="badge" style={{ background: VERDICT_FILL[s.verdict], color: VERDICT_INK[s.verdict], border: "1px solid var(--border)" }}>
-              {VERDICT_LABEL[s.verdict]}
+              {verdictLabel(t, s.verdict)}
             </span>
           )}
         </div>
         {s && s.multiplicities.length > 1 && (
-          <nav className="nav" aria-label="Spin states" style={{ marginTop: 8 }}>
+          <nav className="nav" aria-label={t("sp.spinStates")} style={{ marginTop: 8 }}>
             {s.multiplicities.map((x) => (
               <Link key={x.mult} className={x.mult === mult ? "active" : ""}
                 to={`/c/${campaign}/s/${m}/${charge}/${x.mult}${search ? `?${search}` : ""}`}>
-                2S+1 = {x.mult} · {VERDICT_LABEL[x.verdict]}
+                2S+1 = {x.mult} · {verdictLabel(t, x.verdict)}
               </Link>
             ))}
           </nav>
         )}
       </div>
       <ConditionsBar conditions={conditions} update={update} />
-      {detail.isError && <p className="error">Could not load this state: {String(detail.error)}</p>}
-      {detail.isPending && <p className="loading">Loading…</p>}
+      {detail.isError && <p className="error">{t("sp.error", { error: String(detail.error) })}</p>}
+      {detail.isPending && <p className="loading">{t("common.loading")}</p>}
       {s && <Detail s={s} stale={detail.isPlaceholderData} />}
     </div>
   );
@@ -75,7 +78,8 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
   const [bondView, setBondView] = useState<"order" | "distance">("order");
   const byOrder = bondView === "order" && bonds.data != null;
   const atoms = useMemo(() => (bonds.data ? atomSummaries(bonds.data) : null), [bonds.data]);
-  const atomLabels = useMemo(() => atoms?.map(atomLabel) ?? null, [atoms]);
+  const t = useT();
+  const atomLabels = useMemo(() => atoms?.map((a) => atomLabel(a, t)) ?? null, [atoms, t]);
   const openShell = atoms?.some((a) => a.spin != null) ?? false;
   const [highlight, setHighlight] = useState<Highlight>("none");
   const shownHighlight: Highlight = highlight === "spin" && !openShell ? "none" : highlight;
@@ -91,41 +95,44 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
       <div className="cols-2">
         <div className="card stack" style={{ gap: 10 }}>
           <div className="row" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
-            <h2>Structure</h2>
+            <h2>{t("sp.structure")}</h2>
             <span className="secondary">
-              {isomer?.point_group} · {isomer?.shape} · units {isomer?.composition} · optimized at {isomer?.geometry_level === "L1M" ? "RI-MP2" : "ωB97X-D4"}
+              {t("sp.structureMeta", {
+                pg: isomer?.point_group ?? "–", shape: shapeName(t, isomer?.shape), units: isomer?.composition ?? "–",
+                level: isomer?.geometry_level === "L1M" ? "RI-MP2" : "ωB97X-D4",
+              })}
             </span>
           </div>
           {shownXyz && (
             <MoleculeViewer xyz={shownXyz} mode={mode} bondOrders={byOrder ? bonds.data!.loewdin : null}
-              atomLabels={atomLabels} halos={halos} label={`3D structure of ${pretty(s.label)}`} />
+              atomLabels={atomLabels} halos={halos} label={t("sp.view3d", { name: pretty(s.label) })} />
           )}
           {bonds.data && (
             <div className="row" style={{ justifyContent: "space-between", alignItems: "end", flexWrap: "wrap", gap: 10 }}>
-              <Segmented label="Bonds" value={bondView} onChange={setBondView} options={[
-                { value: "order", label: "by bond order", title: "Löwdin bond order sets thickness and opacity" },
-                { value: "distance", label: "by distance", title: `H–H shorter than 1.15 Å` },
+              <Segmented label={t("sp.bonds")} value={bondView} onChange={setBondView} options={[
+                { value: "order", label: t("sp.byOrder"), title: t("sp.byOrderTitle") },
+                { value: "distance", label: t("sp.byDistance"), title: t("sp.byDistanceTitle") },
               ]} />
               {byOrder && <BondLegend animating={mode != null} />}
             </div>
           )}
           {atoms && (
             <div className="row" style={{ justifyContent: "space-between", alignItems: "end", flexWrap: "wrap", gap: 10 }}>
-              <Segmented label="Highlight atoms" value={shownHighlight} onChange={setHighlight} options={[
-                { value: "none", label: "none" },
-                { value: "charge", label: "charge", title: "Löwdin atomic charge" },
-                ...(openShell ? [{ value: "spin" as const, label: "spin", title: "Löwdin spin population: where the unpaired electrons sit" }] : []),
+              <Segmented label={t("sp.highlight")} value={shownHighlight} onChange={setHighlight} options={[
+                { value: "none", label: t("common.none") },
+                { value: "charge", label: t("sp.charge"), title: t("sp.chargeTitle") },
+                ...(openShell ? [{ value: "spin" as const, label: t("sp.spin"), title: t("sp.spinTitle") }] : []),
               ]} />
               {shownHighlight !== "none" && <HaloLegend kind={shownHighlight} animating={mode != null} />}
             </div>
           )}
           {modes.data && (
             <div className="control">
-              <label htmlFor="mode">Animate a normal mode (cm⁻¹, at {modes.data.level === "L1M" ? "RI-MP2" : "ωB97X-D4"})</label>
+              <label htmlFor="mode">{t("sp.mode", { level: modes.data.level === "L1M" ? "RI-MP2" : "ωB97X-D4" })}</label>
               <select id="mode" value={modeIndex ?? ""} onChange={(e) => setModeIndex(e.target.value === "" ? null : Number(e.target.value))}>
-                <option value="">none</option>
+                <option value="">{t("common.none")}</option>
                 {modes.data.frequencies.map((f, i) => (
-                  <option key={i} value={i}>{f < 0 ? `${Math.abs(f).toFixed(0)}i (imaginary)` : f.toFixed(0)}</option>
+                  <option key={i} value={i}>{f < 0 ? t("sp.imaginary", { f: Math.abs(f).toFixed(0) }) : f.toFixed(0)}</option>
                 ))}
               </select>
             </div>
@@ -144,12 +151,13 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
       <div className="cols-2">
         <Channels s={s} />
         <div className="card stack" style={{ gap: 10 }}>
-          <h2>Isomers and spin states</h2>
+          <h2>{t("sp.isomersAndSpins")}</h2>
           <div className="row" style={{ gap: 24 }}>
-            <div style={{ flex: "1 1 260px" }}>
-              <h3>Isomers</h3>
-              <table>
-                <thead><tr><th className="num">ΔE (eV)</th><th>Units</th><th>Point group</th><th>Geometry</th><th><span className="sr-only">View</span></th></tr></thead>
+            <div style={{ flex: "1 1 340px", minWidth: 0 }}>
+              <h3>{t("sp.isomers")}</h3>
+              {/* one line per cell: in a narrow column Japanese would break between every character */}
+              <div className="table-wrap"><table style={{ whiteSpace: "nowrap" }}>
+                <thead><tr><th className="num">ΔE (eV)</th><th>{t("th.units")}</th><th>{t("th.pointGroup")}</th><th>{t("sp.geometry")}</th><th><span className="sr-only">{t("view.label")}</span></th></tr></thead>
                 <tbody>
                   {distinctIsomers(s.isomers).map(({ isomer: i, count }) => {
                     const selected = i.structure_id === (isomer?.structure_id ?? null);
@@ -160,30 +168,30 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
                         <td>{i.point_group}</td>
                         <td>{i.geometry_level === "L1M" ? "RI-MP2" : "ωB97X-D4"}</td>
                         <td>
-                          {selected ? <span className="muted">shown</span> : (
-                            <button type="button" className="link-button" onClick={() => setStructureId(i.structure_id)}>view</button>
+                          {selected ? <span className="muted">{t("sp.shown")}</span> : (
+                            <button type="button" className="link-button" onClick={() => setStructureId(i.structure_id)}>{t("sp.viewIsomer")}</button>
                           )}
                         </td>
                       </tr>
                     );
                   })}
                 </tbody>
-              </table>
-              <p className="hint">CCSD(T) energy above the best structure; ×n: the same structure reached n times.</p>
+              </table></div>
+              <p className="hint">{t("sp.isomerHint")}</p>
             </div>
-            <div style={{ flex: "1 1 220px" }}>
-              <h3>Spin states (eV)</h3>
+            <div style={{ flex: "1 1 200px" }}>
+              <h3>{t("sp.spins")} <span className="unit">(eV)</span></h3>
               {s.multiplicities.some((x) => x.spin_gap != null) ? (
                 <LevelDiagram
-                  ariaLabel="Spin-state energies"
+                  ariaLabel={t("sp.spinsAria")}
                   unit="eV"
                   levels={s.multiplicities.filter((x) => x.spin_gap != null).map((x) => ({
                     key: String(x.mult), label: `2S+1 = ${x.mult}`, value: x.spin_gap as number, selected: x.mult === s.mult,
                   }))}
                 />
-              ) : <p className="muted">Only this spin state has a reference energy.</p>}
+              ) : <p className="muted">{t("sp.onlyThisSpin")}</p>}
               {s.multiplicities.filter((x) => x.spin_gap == null).map((x) => (
-                <p className="hint" key={x.mult}>2S+1 = {x.mult}: {VERDICT_LABEL[x.verdict]} (no energy to compare)</p>
+                <p className="hint" key={x.mult}>2S+1 = {x.mult}: {t("sp.noEnergy", { verdict: verdictLabel(t, x.verdict) })}</p>
               ))}
             </div>
           </div>
@@ -209,42 +217,44 @@ function distinctIsomers(isomers: Isomer[]): { isomer: Isomer; count: number }[]
 
 function Channels({ s }: { s: StateDetail }) {
   const [q, setQ] = useState<ChannelQ>("d_e");
+  const t = useT();
   const bars = s.channels.map((c) => ({ key: c.split, label: c.split, sublabel: c.limit !== c.split ? c.limit : undefined, value: c[q] ?? null }));
   const weakest = [...bars].filter((b) => b.value != null).sort((a, b) => (a.value as number) - (b.value as number))[0];
   return (
     <div className="card stack" style={{ gap: 10 }}>
       <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
-          <h2>Ways to fall apart</h2>
-          <p className="hint">Energy each spin-allowed channel costs; the weakest one decides. → shows where it ends up.</p>
+          <h2>{t("sp.channels")}</h2>
+          <p className="hint">{t("sp.channelsHint")}</p>
         </div>
-        <Segmented<ChannelQ> label="Energy" value={q} onChange={setQ}
+        <Segmented<ChannelQ> label={t("sp.energy")} value={q} onChange={setQ}
           options={[{ value: "d_e", label: "D_e" }, { value: "d_0", label: "D₀" }, { value: "d_g", label: "D_G" }]} />
       </div>
-      {bars.length ? <DivergingBars bars={bars} unit="eV" highlight={weakest?.key} /> : <p className="muted">No channels: an atom.</p>}
+      {bars.length ? <DivergingBars bars={bars} unit="eV" highlight={weakest?.key} /> : <p className="muted">{t("sp.noChannels")}</p>}
     </div>
   );
 }
 
 function Properties({ s }: { s: StateDetail }) {
+  const t = useT();
   const rows: [string, string][] = [
-    ["D_e (weakest channel)", `${signed(s.d_e, 3, "eV")}${s.channel ? ` → ${pretty(s.channel)}` : ""}`],
-    ["D₀ (with zero-point energy)", signed(s.d_0, 3, "eV")],
-    [`D_H at ${s.temperature.toFixed(0)} K`, signed(s.d_h, 3, "eV")],
-    [`D_G at ${s.temperature.toFixed(0)} K, ${s.pressure.toPrecision(3)} atm`, `${signed(s.d_g, 3, "eV")}${s.channel_g && s.channel_g !== s.channel ? ` → ${pretty(s.channel_g)}` : ""}`],
-    ...(s.charge === -1 ? [["Detachment (adiabatic)", signed(s.detachment, 3, "eV")] as [string, string]] : []),
-    ...(s.charge === 0 ? [["Ionization (adiabatic)", signed(s.ionization, 3, "eV")] as [string, string]] : []),
+    [t("sp.pDe"), `${signed(s.d_e, 3, "eV")}${s.channel ? ` → ${pretty(s.channel)}` : ""}`],
+    [t("sp.pD0"), signed(s.d_0, 3, "eV")],
+    [t("sp.pDh", { T: s.temperature.toFixed(0) }), signed(s.d_h, 3, "eV")],
+    [t("sp.pDg", { T: s.temperature.toFixed(0), p: s.pressure.toPrecision(3) }), `${signed(s.d_g, 3, "eV")}${s.channel_g && s.channel_g !== s.channel ? ` → ${pretty(s.channel_g)}` : ""}`],
+    ...(s.charge === -1 ? [[t("sp.pDetach"), signed(s.detachment, 3, "eV")] as [string, string]] : []),
+    ...(s.charge === 0 ? [[t("sp.pIonize"), signed(s.ionization, 3, "eV")] as [string, string]] : []),
     ["HOMO / LUMO (HF)", `${fmt(s.homo, 2)} / ${fmt(s.lumo, 2)} eV`],
-    ["⟨S²⟩", s.s2 == null ? "–" : `${s.s2.toFixed(3)}${s.spin_contaminated ? " (spin-contaminated)" : ""}`],
-    ["Point group · shape", `${s.point_group ?? "–"} · ${s.shape ?? "–"}`],
-    ["Radius of gyration", fmt(s.radius_of_gyration, 2, "Å")],
-    ["Energy, CCSD(T)/aVTZ", fmt(s.energy, 6, "Eh")],
-    ["Zero-point energy", fmt(s.zpe == null ? null : s.zpe * 27.211386, 3, "eV")],
+    ["⟨S²⟩", s.s2 == null ? "–" : `${s.s2.toFixed(3)}${s.spin_contaminated ? t("sp.pContaminated") : ""}`],
+    [t("sp.pShape"), `${s.point_group ?? "–"} · ${shapeName(t, s.shape)}`],
+    [t("sp.pRg"), fmt(s.radius_of_gyration, 2, "Å")],
+    [t("sp.pEnergy"), fmt(s.energy, 6, "Eh")],
+    [t("sp.pZpe"), fmt(s.zpe == null ? null : s.zpe * 27.211386, 3, "eV")],
   ];
   const ref = s.isomers[0];
   return (
     <div className="card stack" style={{ gap: 10 }}>
-      <h2>Properties</h2>
+      <h2>{t("sp.properties")}</h2>
       <table>
         <tbody>
           {rows.map(([k, v]) => (
@@ -254,7 +264,7 @@ function Properties({ s }: { s: StateDetail }) {
       </table>
       {ref && (
         <p className="hint">
-          Raw ORCA files of the CCSD(T) job: <RawFiles jobId={ref.ref_job_id} names={["job.inp", "job.out"]} record />
+          {t("sp.raw")}<RawFiles jobId={ref.ref_job_id} names={["job.inp", "job.out"]} record />
         </p>
       )}
     </div>
@@ -262,27 +272,29 @@ function Properties({ s }: { s: StateDetail }) {
 }
 
 function NoStructure({ s }: { s: StateDetail }) {
-  const why = useMemo(() => ({
-    unbound_electron: "The anion cannot hold its extra electron: at every level its highest occupied orbital lies above zero, so the electron sits in the most diffuse basis functions. There is no structure to show.",
-    not_a_minimum: "Every structure found still had imaginary frequencies after three displacements: no true minimum.",
-    dissociates: "Every optimization fell apart into fragments more than 3.5 Å apart.",
-    atom: "A single atom: nothing to fall apart into.",
-  } as Record<string, string>)[s.verdict] ?? "No reference energy.", [s.verdict]);
+  const t = useT();
+  const key = `sp.why.${s.verdict}`;
+  const why = t((key in WHY ? key : "sp.why.other") as Key);
   return (
     <div className="card">
-      <h2>No stable structure</h2>
+      <h2>{t("sp.noStructure")}</h2>
       <p className="lede">{why}</p>
     </div>
   );
 }
 
+const WHY = Object.fromEntries(
+  ["unbound_electron", "not_a_minimum", "dissociates", "atom"].map((v) => [`sp.why.${v}`, true]),
+);
+
 
 function BondLegend({ animating }: { animating: boolean }) {
-  if (animating) return <span className="secondary">Bond orders return when the vibration stops.</span>;
+  const t = useT();
+  if (animating) return <span className="secondary">{t("sp.bondPause")}</span>;
   const samples = [0.25, 0.5, 0.75, 1];
   return (
-    <figure className="row" style={{ gap: 8, alignItems: "center", margin: 0 }} aria-label="Bond order legend">
-      <figcaption className="secondary">Löwdin bond order</figcaption>
+    <figure className="row" style={{ gap: 8, alignItems: "center", margin: 0 }} aria-label={t("sp.bondLegendAria")}>
+      <figcaption className="secondary">{t("sp.bondLegend")}</figcaption>
       {samples.map((o) => {
         const st = bondStyle(o)!;
         return (
@@ -295,12 +307,13 @@ function BondLegend({ animating }: { animating: boolean }) {
           </span>
         );
       })}
-      <span className="secondary">· below {MIN_BOND_ORDER} not drawn</span>
+      <span className="secondary">{t("sp.notDrawn", { x: MIN_BOND_ORDER })}</span>
     </figure>
   );
 }
 
 function BondTable({ bonds, xyz }: { bonds: BondsOut; xyz: string }) {
+  const t = useT();
   const atoms = parseXyz(xyz);
   const mayer = new Map(bonds.mayer.map((b) => [`${b.i}-${b.j}`, b.order]));
   const rows = [...bonds.loewdin]
@@ -310,15 +323,15 @@ function BondTable({ bonds, xyz }: { bonds: BondsOut; xyz: string }) {
     Math.hypot(atoms[i].x - atoms[j].x, atoms[i].y - atoms[j].y, atoms[i].z - atoms[j].z);
   return (
     <details className="card">
-      <summary><h2 style={{ display: "inline" }}>Bond orders</h2> <span className="secondary">({rows.length} {rows.length === 1 ? "contact" : "contacts"} ≥ {MIN_BOND_ORDER}, {bonds.method})</span></summary>
-      <p className="secondary">
-        How many electron pairs each H–H contact shares (Wiberg index in the Löwdin basis, spin density
-        included): 1 for H₂, 0.5 for the one-electron bond of H₂⁺, 4/9 ≈ 0.44 on each side of H₃⁺ (two
-        electrons over three bonds), and near 0 for van der Waals contacts. Mayer orders, from the same
-        calculation, are noisier with this diffuse basis set and can dip below zero.
-      </p>
+      <summary>
+        <h2 style={{ display: "inline" }}>{t("sp.bondOrders")}</h2>{" "}
+        <span className="secondary">
+          ({t(rows.length === 1 ? "sp.contacts.one" : "sp.contacts.other", { n: rows.length, x: MIN_BOND_ORDER, method: bonds.method })})
+        </span>
+      </summary>
+      <p className="secondary">{t("sp.bondsAbout")}</p>
       <table>
-        <thead><tr><th>Atoms</th><th className="num">Distance (Å)</th><th className="num">Löwdin</th><th className="num">Mayer</th></tr></thead>
+        <thead><tr><th>{t("sp.atoms")}</th><th className="num">{t("sp.distance")}</th><th className="num">Löwdin</th><th className="num">Mayer</th></tr></thead>
         <tbody>
           {rows.map((b) => (
             <tr key={`${b.i}-${b.j}`}>
@@ -336,20 +349,17 @@ function BondTable({ bonds, xyz }: { bonds: BondsOut; xyz: string }) {
 
 
 function AtomTable({ atoms, method }: { atoms: ReturnType<typeof atomSummaries>; method: string }) {
+  const t = useT();
   const open = atoms.some((a) => a.spin != null);
   return (
     <details className="card">
-      <summary><h2 style={{ display: "inline" }}>Atoms</h2> <span className="secondary">({atoms.length}, {method})</span></summary>
-      <p className="secondary">
-        Löwdin charge{open ? " and spin population (unpaired electron density)" : ""} on each atom, the sum of its
-        bond orders, and Mayer's free valence: bonding capacity the atom has left, about 1 on an atom carrying an
-        unpaired electron. Hover an atom in the 3D view for the same numbers.
-      </p>
+      <summary><h2 style={{ display: "inline" }}>{t("sp.atoms")}</h2> <span className="secondary">({atoms.length}, {method})</span></summary>
+      <p className="secondary">{t(open ? "sp.atomsAbout.open" : "sp.atomsAbout.closed")}</p>
       <table>
         <thead>
           <tr>
-            <th>Atom</th><th className="num">Charge</th>{open && <th className="num">Spin</th>}
-            <th className="num">Σ bond order</th><th className="num">Free valence</th>
+            <th>{t("sp.atom")}</th><th className="num">{t("sp.chargeCol")}</th>{open && <th className="num">{t("sp.spinCol")}</th>}
+            <th className="num">{t("sp.bondSum")}</th><th className="num">{t("sp.freeValence")}</th>
           </tr>
         </thead>
         <tbody>
@@ -370,12 +380,13 @@ function AtomTable({ atoms, method }: { atoms: ReturnType<typeof atomSummaries>;
 
 
 function HaloLegend({ kind, animating }: { kind: Exclude<Highlight, "none">; animating: boolean }) {
-  if (animating) return <span className="secondary">Halos return when the vibration stops.</span>;
+  const t = useT();
+  if (animating) return <span className="secondary">{t("sp.haloPause")}</span>;
   const full = HALO_FULL[kind];
   const samples = [-full, -full / 2, full / 2, full];
-  const name = kind === "charge" ? "Löwdin charge" : "Spin population";
+  const name = kind === "charge" ? t("sp.haloCharge") : t("sp.haloSpin");
   return (
-    <figure className="row" style={{ gap: 8, alignItems: "center", margin: 0 }} aria-label={`${name} legend`}>
+    <figure className="row" style={{ gap: 8, alignItems: "center", margin: 0 }} aria-label={t("sp.haloLegendAria", { name })}>
       <figcaption className="secondary">{name}</figcaption>
       {samples.map((v) => {
         const st = haloStyle(v, kind)!;
@@ -389,7 +400,9 @@ function HaloLegend({ kind, animating }: { kind: Exclude<Highlight, "none">; ani
           </span>
         );
       })}
-      <span className="secondary">· fixed scale for every species; |{kind}| &lt; {(0.02 * full).toFixed(2)} not drawn</span>
+      <span className="secondary">
+        {t("sp.haloScale", { kind: kind === "charge" ? t("sp.charge") : t("sp.spin"), x: (0.02 * full).toFixed(2) })}
+      </span>
     </figure>
   );
 }

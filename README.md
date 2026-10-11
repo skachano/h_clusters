@@ -29,7 +29,7 @@ wiki (English and Japanese) is in [wiki/](wiki/).
 |---|---|
 | `worker/` (Python) | `hclust`: campaign specs, content-addressed ORCA jobs in SQLite, a stage DAG (xTB/GOAT search → DFT → MP2 → CCSD(T)) with retries and resume; analysis (fragmentation channels, verdicts, thermochemistry, point groups, our own VPT2); extension studies |
 | `api/` (FastAPI) | read-only HTTP API over the results database |
-| `web/` (React, TypeScript) | grid of species, species pages with a 3D viewer (normal modes, bond orders, charge and spin halos), trends, benchmark, jobs, extension studies |
+| `web/` (React, TypeScript) | grid of species, species pages with a 3D viewer (normal modes, bond orders, charge and spin halos), trends, benchmark, jobs, extension studies; English and Japanese |
 | `wiki/` (MkDocs) | the theory behind it, for learning |
 
 Everything runs in Docker containers (`compose.yaml`).

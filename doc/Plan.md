@@ -1148,6 +1148,15 @@ the same structures):**
     with Node on the runner (the "Docker for code" rule is about this machine).
   - **To publish:** create the GitHub repository, push, set Pages → Source:
     GitHub Actions, then run `scripts/publish-data.sh`.
+- **Japanese UI** (2026-10-12): an EN/JA switch in the header, remembered per
+  browser (first visit: the browser's language), `<html lang>` follows it.
+  `web/src/i18n/`: `en.ts` is the source of every key, `ja.ts` must have the
+  same keys (tsc) and the same `{placeholders}` (a test); no i18n library.
+  Terms follow the wiki's Japanese pages (アニオン, 束縛, 零点エネルギー,
+  解離, チャネル, 点群, 多重度), prose in the である style. Formulas, numbers,
+  method names, literature references and text inside computed reports stay
+  as they are. Japanese wraps between any characters, so narrow tables keep
+  their cells on one line.
 
 ---
 

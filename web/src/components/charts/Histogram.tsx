@@ -2,16 +2,18 @@
 import { focusPoint, useTooltip } from "../Tooltip";
 import { duration } from "../../lib/format";
 import { linear, ticks } from "./frame";
+import { useT } from "../../i18n";
 
 export function Histogram({ edges, counts, height = 120, label }: {
   edges: number[]; counts: number[]; height?: number; label: string;
 }) {
+  const t = useT();
   const tip = useTooltip();
   const width = 300;
   const m = { top: 8, right: 8, bottom: 28, left: 34 };
   const first = counts.findIndex((c) => c > 0);
   const last = counts.length - 1 - [...counts].reverse().findIndex((c) => c > 0);
-  if (first < 0) return <p className="muted">No runs.</p>;
+  if (first < 0) return <p className="muted">{t("chart.noRuns")}</p>;
   const lo = Math.max(0, first - 1);
   const hi = Math.min(counts.length - 1, last + 1);
   const shown = counts.slice(lo, hi + 1);
@@ -23,7 +25,7 @@ export function Histogram({ edges, counts, height = 120, label }: {
 
   const describe = (i: number) => (
     <div>
-      <div className="tt-value">{shown[i]} runs</div>
+      <div className="tt-value">{t("chart.runs", { n: shown[i] })}</div>
       <div className="tt-label">{duration(edges[lo + i])} – {duration(edges[lo + i + 1])}</div>
     </div>
   );

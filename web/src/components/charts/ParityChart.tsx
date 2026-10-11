@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { focusPoint, useTooltip } from "../Tooltip";
 import { linear, niceExtent, tickLabel, ticks } from "./frame";
+import { useT } from "../../i18n";
 
 export interface ParityPoint {
   key: string;
@@ -16,6 +17,7 @@ export function ParityChart({ points, groups, xLabel, yLabel, unit, size = 380 }
   points: ParityPoint[]; groups: { key: number; label: string; color: string }[];
   xLabel: string; yLabel: string; unit: string; size?: number;
 }) {
+  const tr = useT();
   const tip = useTooltip();
   const m = { top: 12, right: 12, bottom: 44, left: 52 };
   const { s, t } = useMemo(() => {
@@ -31,7 +33,7 @@ export function ParityChart({ points, groups, xLabel, yLabel, unit, size = 380 }
       <div className="tt-value">{p.label}</div>
       <div className="tt-label">{xLabel}: {p.x.toFixed(3)} {unit}</div>
       <div className="tt-label">{yLabel}: {p.y.toFixed(3)} {unit}</div>
-      <div className="tt-label">error: {(p.y - p.x >= 0 ? "+" : "−") + Math.abs(p.y - p.x).toFixed(3)} {unit}</div>
+      <div className="tt-label">{tr("chart.error")}: {(p.y - p.x >= 0 ? "+" : "−") + Math.abs(p.y - p.x).toFixed(3)} {unit}</div>
     </div>
   );
 
@@ -44,10 +46,10 @@ export function ParityChart({ points, groups, xLabel, yLabel, unit, size = 380 }
             {g.label}
           </span>
         ))}
-        <span className="legend-item"><span className="line-key" style={{ background: "var(--axis)" }} />perfect agreement</span>
+        <span className="legend-item"><span className="line-key" style={{ background: "var(--axis)" }} />{tr("chart.diagonal")}</span>
       </div>
       <svg viewBox={`0 0 ${size} ${size}`} width="100%" style={{ maxWidth: size, display: "block" }} role="img"
-        aria-label={`${yLabel} against ${xLabel}`}>
+        aria-label={tr("chart.against", { y: yLabel, x: xLabel })}>
         {t.map((v) => (
           <g key={v}>
             <line x1={m.left} x2={size - m.right} y1={y(v)} y2={y(v)} stroke="var(--grid)" />
@@ -61,7 +63,7 @@ export function ParityChart({ points, groups, xLabel, yLabel, unit, size = 380 }
         <text transform={`translate(12 ${(m.top + size - m.bottom) / 2}) rotate(-90)`} textAnchor="middle" fontSize={12} fill="var(--text-secondary)">{yLabel} ({unit})</text>
         {points.map((p) => (
           <g
-            key={p.key} tabIndex={0} role="img" aria-label={`${p.label}: ${p.x.toFixed(3)} vs ${p.y.toFixed(3)} ${unit}`}
+            key={p.key} tabIndex={0} role="img" aria-label={`${p.label}: ${tr("chart.vs", { x: p.x.toFixed(3), y: p.y.toFixed(3) })} ${unit}`}
             onPointerMove={(e) => tip.show(e.clientX, e.clientY, describe(p))}
             onPointerLeave={tip.hide}
             onFocus={(e) => tip.show(...focusPoint(e), describe(p))}

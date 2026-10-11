@@ -2,6 +2,7 @@
 // the bar ends. Used for the fragmentation channels of one state; the weakest is marked.
 import { linear, niceExtent, tickLabel, ticks } from "./frame";
 import { pretty, signed } from "../../lib/format";
+import { useT } from "../../i18n";
 
 export interface Bar {
   key: string;
@@ -11,6 +12,7 @@ export interface Bar {
 }
 
 export function DivergingBars({ bars, unit, highlight }: { bars: Bar[]; unit: string; highlight?: string }) {
+  const t = useT();
   const rowH = 30;
   const labelW = 170;
   const width = 640;
@@ -22,7 +24,7 @@ export function DivergingBars({ bars, unit, highlight }: { bars: Bar[]; unit: st
   const barH = 14;
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} width="100%" role="img" aria-label="Dissociation energy per channel" style={{ display: "block" }}>
+    <svg viewBox={`0 0 ${width} ${height}`} width="100%" role="img" aria-label={t("chart.channels")} style={{ display: "block" }}>
       {ticks(domain[0], domain[1], 4).map((t) => (
         <g key={t}>
           <line x1={x(t)} x2={x(t)} y1={m.top} y2={height - m.bottom} stroke={t === 0 ? "var(--axis)" : "var(--grid)"} />

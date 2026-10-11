@@ -6,6 +6,7 @@ import type { GridOut, StateDetail } from "../api/client";
 import { GridView } from "./GridView";
 import { SpeciesView } from "./SpeciesView";
 import { Thumbnail } from "../components/Thumbnail";
+import { LangProvider, type Lang } from "../i18n";
 
 vi.mock("3dmol", () => ({
   createViewer: () => ({
@@ -73,16 +74,18 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function renderAt(path: string) {
+function renderAt(path: string, lang: Lang = "en") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={[path]}>
-        <Routes>
-          <Route path="/c/:campaign" element={<GridView />} />
-          <Route path="/c/:campaign/s/:m/:charge/:mult" element={<SpeciesView />} />
-        </Routes>
-      </MemoryRouter>
+      <LangProvider lang={lang}>
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route path="/c/:campaign" element={<GridView />} />
+            <Route path="/c/:campaign/s/:m/:charge/:mult" element={<SpeciesView />} />
+          </Routes>
+        </MemoryRouter>
+      </LangProvider>
     </QueryClientProvider>,
   );
 }
@@ -107,6 +110,24 @@ describe("GridView", () => {
     expect(url).toContain("temperature=1000");
     expect(url).toContain("pressure=0.5");
     expect(screen.getByText(/D_G \(eV\): falls apart/)).toBeInTheDocument(); // value legend
+  });
+});
+
+describe("in Japanese", () => {
+  it("the grid speaks Japanese, formulas and numbers unchanged", async () => {
+    renderAt("/c/mini", "ja");
+    const cell = await screen.findByRole("gridcell", { name: /^H3\+ \(1\): 零点エネルギー込みで束縛/ });
+    expect(within(cell).getByText("+4.60")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("どの水素クラスターがまとまっていられるか");
+    expect(screen.getByRole("rowheader", { name: "アニオン" })).toBeInTheDocument();
+    expect(screen.getAllByText("裸の陽子")).toHaveLength(1);
+  });
+  it("the species page too", async () => {
+    renderAt("/c/mini/s/3/1/1", "ja");
+    expect(await screen.findByText("分解の経路")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("H₃⁺ 一重項");
+    expect(screen.getByText("D3h · 平面")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "結合次数" })).toBeInTheDocument();
   });
 });
 

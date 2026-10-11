@@ -141,6 +141,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; }
 h1 { font-size: 20px; }
 h2 { font-size: 16px; }
 h3 { font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+h3 .unit { text-transform: none; letter-spacing: 0; } /* eV, not EV */
 button, select, input { font: inherit; color: inherit; }
 code, .mono { font-family: var(--mono); font-size: 12.5px; }
 .num { font-variant-numeric: tabular-nums; }
