@@ -1,6 +1,7 @@
 // T, p and the plotted quantity live in the URL, so every view and every link agrees.
 import { useSearchParams } from "react-router-dom";
-import type { Conditions, Quantity } from "../api/client";
+import { useManifest, type Conditions, type Quantity } from "../api/client";
+import { nearestIndex, type Manifest } from "../api/static";
 
 export const DEFAULT_T = 298.15;
 export const DEFAULT_P = 1;
@@ -21,12 +22,22 @@ function number(params: URLSearchParams, key: string, fallback: number, [lo, hi]
   return params.has(key) && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : fallback;
 }
 
+/** Static site: the nearest exported condition, so labels show what the data was computed at. */
+export function snapConditions(c: Conditions, grid: Manifest["conditions"] | undefined): Conditions {
+  if (!grid) return c;
+  return {
+    temperature: grid.temperatures[nearestIndex(grid.temperatures, c.temperature)],
+    pressure: grid.pressures[nearestIndex(grid.pressures, c.pressure)],
+  };
+}
+
 export function useConditions() {
   const [params, setParams] = useSearchParams();
-  const conditions: Conditions = {
+  const grid = useManifest().data?.conditions;
+  const conditions: Conditions = snapConditions({
     temperature: number(params, "T", DEFAULT_T, T_RANGE),
     pressure: number(params, "p", DEFAULT_P, P_RANGE),
-  };
+  }, grid);
   const q = params.get("q");
   const quantity: Quantity = QUANTITIES.some((x) => x.value === q) ? (q as Quantity) : "d_e";
   const colorBy: ColorBy = params.get("color") === "value" ? "value" : "verdict";

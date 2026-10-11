@@ -1,13 +1,16 @@
 // Temperature and pressure (log sliders), and the plotted quantity: one row above the content.
 import { useEffect, useState } from "react";
 import { P_RANGE, QUANTITIES, T_RANGE, type ColorBy } from "../lib/conditions";
-import type { Conditions, Quantity } from "../api/client";
+import { useManifest, type Conditions, type Quantity } from "../api/client";
+import { nearestIndex } from "../api/static";
 
 const log = Math.log10;
 
-function LogSlider({ id, label, value, range, unit, format, onChange }: {
+function LogSlider({ id, label, value, range, unit, format, onChange, grid }: {
   id: string; label: string; value: number; range: readonly [number, number]; unit: string;
   format: (v: number) => string; onChange: (v: number) => void;
+  /** Static site: the slider steps through these exported values only. */
+  grid?: number[];
 }) {
   // Local state while dragging; the URL (and the request) follows after a short pause.
   const [local, setLocal] = useState(value);
@@ -24,7 +27,11 @@ function LogSlider({ id, label, value, range, unit, format, onChange }: {
       </label>
       <input
         id={id} type="range" min={log(range[0])} max={log(range[1])} step={0.01}
-        value={log(local)} onChange={(e) => setLocal(Number((10 ** Number(e.target.value)).toPrecision(4)))}
+        value={log(local)}
+        onChange={(e) => {
+          const v = 10 ** Number(e.target.value);
+          setLocal(grid ? grid[nearestIndex(grid, v)] : Number(v.toPrecision(4)));
+        }}
       />
     </div>
   );
@@ -52,6 +59,7 @@ export function ConditionsBar({ conditions, quantity, colorBy, update, children 
   update: (changes: Record<string, string | number | null>) => void; children?: React.ReactNode;
 }) {
   const thermal = quantity === "d_h" || quantity === "d_g";
+  const grid = useManifest().data?.conditions;
   return (
     <div className="controls">
       {children}
@@ -70,14 +78,20 @@ export function ConditionsBar({ conditions, quantity, colorBy, update, children 
       <LogSlider
         id="temperature" label="Temperature" value={conditions.temperature} range={T_RANGE} unit="K"
         format={(v) => (v >= 100 ? v.toFixed(0) : v.toFixed(1))} onChange={(v) => update({ T: v })}
+        grid={grid?.temperatures}
       />
       <LogSlider
         id="pressure" label="Pressure" value={conditions.pressure} range={P_RANGE} unit="atm"
         format={(v) => (v >= 0.01 && v < 1000 ? v.toPrecision(3) : v.toExponential(1))}
-        onChange={(v) => update({ p: v })}
+        onChange={(v) => update({ p: v })} grid={grid?.pressures}
       />
       {quantity && !thermal && (
         <span className="hint">T and p change D_H and D_G only.</span>
+      )}
+      {grid && (
+        <span className="hint">
+          Static snapshot: values precomputed at {grid.temperatures.length} temperatures × {grid.pressures.length} pressures.
+        </span>
       )}
     </div>
   );

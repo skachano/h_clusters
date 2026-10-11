@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 // Plan §6: one smoke test of grid → detail against the real API and database.
+test.skip(!!process.env.E2E_STATIC, "live stack only");
+
 test("grid → species detail", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/c\/baseline/);

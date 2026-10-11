@@ -2,6 +2,7 @@
 import createClient from "openapi-fetch";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { components, paths } from "./schema";
+import { loadManifest, STATIC, staticFetch } from "./static";
 
 export type Schemas = components["schemas"];
 export type GridOut = Schemas["GridOut"];
@@ -18,12 +19,23 @@ export type Quantity = GridOut["quantity"];
 export type TrendQuantity = TrendsOut["quantity"];
 export type Verdict = StateBrief["verdict"];
 
-// Same origin: the dev server (Vite) and nginx both proxy /api to the API service.
+// Same origin: the dev server (Vite) and nginx both proxy /api to the API service; the
+// static build (GitHub Pages) answers from exported files instead (static.ts).
 // fetch is looked up per request (not captured once), so tests can replace it.
 export const api = createClient<paths>({
   baseUrl: globalThis.location?.origin ?? "",
-  fetch: (request) => globalThis.fetch(request),
+  fetch: (request) => (STATIC ? staticFetch(request) : globalThis.fetch(request)),
 });
+
+/** fetch() for API paths outside the typed client (e.g. the .xyz text). */
+export const fetchApi = (path: string) => {
+  const request = new Request(new URL(path, globalThis.location?.origin ?? "http://localhost"));
+  return STATIC ? staticFetch(request) : globalThis.fetch(request);
+};
+
+/** The static build's manifest (conditions grid, export date); null in the live app. */
+export const useManifest = () =>
+  useQuery({ queryKey: ["manifest"], enabled: STATIC, staleTime: Infinity, queryFn: loadManifest });
 
 async function unwrap<T>(request: Promise<{ data?: T; error?: unknown; response: Response }>): Promise<T> {
   const { data, error, response } = await request;
@@ -123,4 +135,12 @@ export const useStudy = (campaign: string, name: string) =>
       unwrap(api.GET("/api/campaigns/{campaign}/studies/{name}", { params: { path: { campaign, name } } })),
   });
 
-export const jobFileUrl = (jobId: number, name: string) => `/api/jobs/${jobId}/files/${name}`;
+/**
+ * Link to a raw ORCA file. The static site has no per-file links: they all point to the
+ * release archive (null when the build was not given one), see rawFilePath.
+ */
+export const jobFileUrl = (jobId: number, name: string): string | null =>
+  STATIC ? (import.meta.env.VITE_OUTPUTS_URL || null) : `/api/jobs/${jobId}/files/${name}`;
+
+/** Where a raw file sits inside the static site's archive. */
+export const rawFilePath = (jobId: number, name: string) => `outputs/${jobId}/${name}`;

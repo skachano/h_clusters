@@ -1,6 +1,7 @@
 // View 5b: the operational side of HTC — job states, cost per stage, failures.
 import { useParams } from "react-router-dom";
-import { jobFileUrl, useJobsSummary } from "../api/client";
+import { useJobsSummary } from "../api/client";
+import { RawFiles } from "../components/RawFiles";
 import { Histogram } from "../components/charts/Histogram";
 import { duration, pretty } from "../lib/format";
 
@@ -77,7 +78,7 @@ export function JobsView() {
                       <td>{f.error_kind ?? "–"}</td>
                       <td className="num">{f.attempts}</td>
                       <td className="secondary">{f.error}</td>
-                      <td><a href={jobFileUrl(f.job_id, "job.out")} target="_blank" rel="noreferrer">output</a></td>
+                      <td><RawFiles jobId={f.job_id} names={["job.out"]} /></td>
                     </tr>
                   ))}
                 </tbody>

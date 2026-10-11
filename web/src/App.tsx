@@ -79,6 +79,13 @@ function Shell() {
           <Route path="jobs" element={<JobsView />} />
         </Routes>
       </main>
+      <footer className="site-footer secondary">
+        Computed with ORCA 6.1.1 (F. Neese, <i>WIREs Comput. Mol. Sci.</i> 2025, 15, e70019,{" "}
+        <a href="https://doi.org/10.1002/wcms.70019">doi:10.1002/wcms.70019</a>) · 3D view: 3Dmol.js (N. Rego,
+        D. Koes, <i>Bioinformatics</i> 2015, 31, 1322,{" "}
+        <a href="https://doi.org/10.1093/bioinformatics/btu829">doi:10.1093/bioinformatics/btu829</a>) · code
+        under the MIT licence
+      </footer>
     </div>
   );
 }

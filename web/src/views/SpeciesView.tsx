@@ -2,9 +2,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { jobFileUrl, useBonds, useModes, useStateDetail, type BondsOut, type StateDetail } from "../api/client";
+import { fetchApi, useBonds, useModes, useStateDetail, type BondsOut, type StateDetail } from "../api/client";
 import { ConditionsBar, Segmented } from "../components/ConditionsBar";
 import { MoleculeViewer } from "../components/MoleculeViewer";
+import { RawFiles } from "../components/RawFiles";
 import { DivergingBars } from "../components/charts/DivergingBars";
 import { LevelDiagram } from "../components/charts/LevelDiagram";
 import { useConditions } from "../lib/conditions";
@@ -63,7 +64,7 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
   const xyz = useQuery({
     queryKey: ["xyz", structureId],
     enabled: structureId != null && structureId !== s.structure_id,
-    queryFn: async () => (await fetch(`/api/structures/${structureId}.xyz`)).text(),
+    queryFn: async () => (await fetchApi(`/api/structures/${structureId}.xyz`)).text(),
   });
   const shownXyz = structureId === s.structure_id ? s.xyz : xyz.data;
   const modes = useModes(structureId);
@@ -253,10 +254,7 @@ function Properties({ s }: { s: StateDetail }) {
       </table>
       {ref && (
         <p className="hint">
-          Raw ORCA files of the CCSD(T) job:{" "}
-          <a href={jobFileUrl(ref.ref_job_id, "job.inp")} target="_blank" rel="noreferrer">input</a> ·{" "}
-          <a href={jobFileUrl(ref.ref_job_id, "job.out")} target="_blank" rel="noreferrer">output</a> ·{" "}
-          <a href={`/api/jobs/${ref.ref_job_id}`} target="_blank" rel="noreferrer">job record</a>
+          Raw ORCA files of the CCSD(T) job: <RawFiles jobId={ref.ref_job_id} names={["job.inp", "job.out"]} record />
         </p>
       )}
     </div>

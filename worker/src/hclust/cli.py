@@ -200,6 +200,16 @@ def analyze(
         store(session, name, analyses)
 
 
+@app.command()
+def citations() -> None:
+    """ORCA's suggested citations, gathered from every kept output, as Markdown on stdout."""
+    from hclust.citations import collect, render
+    from hclust.engines.orca import default_jobs_root
+
+    with Session(get_engine()) as session:
+        typer.echo(render(collect(session, default_jobs_root())))
+
+
 STUDIES = ("vertical", "counterpoise", "anharmonic", "solvent", "field", "basis", "bonds")
 
 

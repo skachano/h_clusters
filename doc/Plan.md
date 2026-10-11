@@ -1069,7 +1069,7 @@ the same structures):**
 - Not done (still open): multiplicities `all_upto: 3`, framework port,
   bigger m, per-atom/per-bond energy decomposition (LED/EDA).
 
-### Phase 9: Static site on GitHub Pages (2–3 days) — planned
+### Phase 9: Static site on GitHub Pages (2–3 days) — ✅ built 2026-10-11, not yet published
 - **Goal:** publish the web app as a read-only snapshot. Pages serves static
   files only, so FastAPI does not run there: the app reads JSON exported from
   the API, at a precomputed grid of conditions. Raw ORCA files go to a GitHub
@@ -1128,6 +1128,26 @@ the same structures):**
 - **Not included:** live recomputation at arbitrary T and p (would need the
   thermochemistry ported to TypeScript), per-file raw-output links (the
   archive is one download), the wiki (could be published alongside later).
+- **As built** (the plan above held, with these differences):
+  - Export of the baseline: 14,441 files, **62.7 MB** in 2.5 min
+    (`site-data.tar.gz` 7.6 MB). More than estimated: every grid and species
+    response embeds that condition's D_G, so all four grid quantities and all
+    six trends are exported at all 210 conditions. Only the chosen campaigns
+    are exported (`--campaign`, default baseline); `campaigns.json` is the one
+    file filtered from the API's answer.
+  - Raw outputs: only the 132 jobs the site links to (CCSD(T) references of
+    every isomer, failures), 264 files, **4.9 MB** as `.tar.xz` (ORCA text
+    compresses ~50×), laid out as `outputs/<job id>/job.inp|job.out`.
+  - `docker compose --profile static up web-static` builds the static app under
+    `/h_clusters/` with the exported data (vite preview, port 4173), and
+    `e2e/static.spec.ts` (E2E_STATIC=1) checks it: grid → H₅⁺ page, deep link,
+    20 K snapping to 18.2 K, the D_G sign flip, studies and benchmark pages,
+    and no missing data file.
+  - `scripts/publish-data.sh [--dry-run]` exports, packs and creates the
+    `data-<UTC date>` release, then triggers the workflow. The workflow builds
+    with Node on the runner (the "Docker for code" rule is about this machine).
+  - **To publish:** create the GitHub repository, push, set Pages → Source:
+    GitHub Actions, then run `scripts/publish-data.sh`.
 
 ---
 

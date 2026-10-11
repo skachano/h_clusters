@@ -21,7 +21,8 @@ from hclust.species import State
 ORCA_DIR = Path(os.environ.get("ORCA_DIR", "/opt/orca"))
 BASENAME = "job"
 # Kept after a run; everything else (scratch, .gbw, densities) is deleted to save space.
-KEEP_SUFFIXES = (".inp", ".out", ".property.json", ".property.txt", ".xyz", ".hess", ".engrad", ".opt")
+KEEP_SUFFIXES = (".inp", ".out", ".property.json", ".property.txt", ".xyz", ".hess", ".engrad", ".opt",
+                 ".bibtex")  # ORCA's citations for the run (README, "Citing")
 # GOAT's per-worker outputs and per-iteration ensembles are deleted too.
 DISCARD_MARKERS = (".goat.", ".globaliter.")
 # xTB ranks H clusters wrongly, so keep a wide energy window of GOAT structures.

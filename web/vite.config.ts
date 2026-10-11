@@ -6,6 +6,8 @@ import react from "@vitejs/plugin-react";
 const apiTarget = process.env.API_PROXY ?? "http://localhost:8000";
 
 export default defineConfig({
+  // The GitHub Pages build is served under /<repo>/ (VITE_BASE); everything else at the root.
+  base: process.env.VITE_BASE ?? "/",
   plugins: [react()],
   server: {
     host: true,
@@ -13,6 +15,7 @@ export default defineConfig({
     allowedHosts: ["web"], // the compose service name, used by the e2e container
     proxy: { "/api": { target: apiTarget, changeOrigin: true } },
   },
+  preview: { allowedHosts: ["web-static"] }, // the static build's compose service (e2e)
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test-setup.ts"],

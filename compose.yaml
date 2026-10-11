@@ -66,6 +66,27 @@ services:
       - "${WEB_BIND:-127.0.0.1}:${WEB_PROD_PORT:-8080}:80"
     depends_on: [api]
 
+  # The GitHub Pages build (doc/Plan.md, Phase 9) served as Pages would, under /<repo>/, with
+  # the exported data from data/site/data: http://localhost:4173/h_clusters/
+  #   docker compose --profile serve run --rm --no-deps api python -m hclust_api.export --out /data/site/data
+  #   docker compose --profile static up web-static
+  web-static:
+    image: hclust-web:dev
+    profiles: [static]
+    environment:
+      VITE_STATIC: "1"
+      VITE_BASE: /h_clusters/
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - ./data/site/data:/site-data:ro
+    ports:
+      - "${WEB_BIND:-127.0.0.1}:${WEB_STATIC_PORT:-4173}:4173"
+    command: >-
+      sh -c "npx tsc -b && npx vite build --outDir /tmp/site/h_clusters --emptyOutDir
+      && cp -r /site-data /tmp/site/h_clusters/data
+      && npx vite preview --outDir /tmp/site/h_clusters --host --port 4173 --strictPort"
+
   # Browser smoke test (Plan §6) against the running serve stack:
   #   docker compose --profile serve up -d && docker compose --profile test run --rm e2e
   e2e:
@@ -77,6 +98,9 @@ services:
       - ./web:/app
     working_dir: /app
     command: npx playwright test
+    # The static build instead: docker compose --profile static up -d web-static, then
+    #   docker compose --profile test run --rm -e E2E_STATIC=1 \
+    #     -e E2E_BASE_URL=http://web-static:4173/h_clusters/ e2e
 
   # Learning wiki (wiki/). Live preview: docker compose --profile docs up docs
   docs:
