@@ -47,12 +47,15 @@ def test_random_clusters_are_connected_reproducible_and_distinct(m):
 
 
 def test_fragments_and_composition():
-    h2_pair = Geometry.hydrogens([[0, 0, 0], [0, 0, 0.74], [0, 3, 0], [0, 3, 0.74]])
+    h2_pair = Geometry.hydrogens([[0, 0, 0], [0, 0, 0.74], [0, 4, 0], [0, 4, 0.74]])
     assert fragments(h2_pair) == [[0, 1], [2, 3]]
     assert is_dissociated(h2_pair)
-    assert not is_dissociated(h2_pair, cutoff=3.5)
+    assert not is_dissociated(h2_pair, cutoff=4.5)
+    # A van der Waals H2 dimer (3 A contact) is a complex, not dissociated.
+    vdw = Geometry.hydrogens([[0, 0, 0], [0, 0, 0.74], [0, 3, 0], [0, 3, 0.74]])
+    assert not is_dissociated(vdw)
     assert composition(h2_pair) == "H2·H2"
-    assert composition(Geometry.hydrogens([[0, 0, 0], [0, 0, 0.74], [0, 0, 3]])) == "H2·H"
+    assert composition(Geometry.hydrogens([[0, 0, 0], [0, 0, 0.74], [0, 0, 4]])) == "H2·H"
 
 
 def test_same_structure_ignores_permutation_rotation_translation():

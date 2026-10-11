@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 
-from sqlalchemy import JSON, Column, UniqueConstraint, event
+from sqlalchemy import JSON, Column, UniqueConstraint, event, inspect, text
 from sqlalchemy.engine import Engine
 from sqlmodel import Field, SQLModel, create_engine
 
@@ -117,6 +117,7 @@ class JobResult(SQLModel, table=True):
     symmetry_number: int | None = None
     opt_converged: bool | None = None
     orca_version: str | None = None
+    unbound: bool | None = None  # anion without its extra electron (Level.anion_unbound)
 
 
 class Candidate(SQLModel, table=True):
@@ -134,6 +135,8 @@ class Candidate(SQLModel, table=True):
     source: str  # where the search started: "seed:random", "seed:templates", "goat", ...
     composition: str  # bonded units, e.g. "H3·H2"
     dissociated: bool
+    unbound: bool | None = None  # anion without its extra electron: never selected
+    n_imag: int | None = None  # from the source job's frequencies, if it computed them
     duplicate_of: int | None = Field(default=None, foreign_key="candidate.id")
     rank: int | None = None  # among unique, intact structures; 0 = lowest energy
     selected: bool = False
@@ -156,4 +159,17 @@ def get_engine(path: Path | None = None) -> Engine:
         cur.close()
 
     SQLModel.metadata.create_all(engine)
+    _add_missing_columns(engine)
     return engine
+
+
+def _add_missing_columns(engine: Engine) -> None:
+    """Minimal migration: new nullable columns are added to existing tables."""
+    inspector = inspect(engine)
+    with engine.begin() as conn:
+        for table in SQLModel.metadata.tables.values():
+            existing = {c["name"] for c in inspector.get_columns(table.name)}
+            for column in table.columns:
+                if column.name not in existing:
+                    kind = column.type.compile(engine.dialect)
+                    conn.execute(text(f'ALTER TABLE "{table.name}" ADD COLUMN "{column.name}" {kind}'))

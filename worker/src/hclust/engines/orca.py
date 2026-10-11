@@ -3,6 +3,7 @@
 import hashlib
 import os
 import re
+import shutil
 import signal
 import subprocess
 import threading
@@ -78,10 +79,10 @@ class OrcaJob:
         if state.mult > 1 and level.kind != "xtb":
             words.append("UKS" if level.kind == "dft" and not fallback else "UHF")
         if task.optimizes:
-            words.append("TightOpt")
+            words.append(level.opt_keyword)
             if not level.analytic_gradient and not fallback:
                 words.append("NumGrad")
-        if task.has_freq:
+        if task.has_freq and "NumFreq" not in self.extra_keywords:
             words.append("Freq" if level.analytic_hessian or fallback else "NumFreq")
         words.append("TightSCF")
         words.extend(self.extra_keywords)
@@ -93,10 +94,16 @@ class OrcaJob:
             f"! {self.keywords()}\n"
             f"%maxcore {self.maxcore_mb}\n"
             f"{GOAT_BLOCK if self.effective_task is Task.GOAT else ''}"
+            f"{self._geom_block()}"
             f"* xyz {self.state.charge} {self.state.mult}\n"
             f"{self.geometry.atom_block()}\n"
             "*\n"
         )
+
+    def _geom_block(self) -> str:
+        if self.effective_task.optimizes and self.level.opt_max_iter:
+            return f"%geom\n  MaxIter {self.level.opt_max_iter}\nend\n"
+        return ""
 
     @property
     def hash(self) -> str:
@@ -120,6 +127,12 @@ def orca_version() -> str:
 
 def default_jobs_root() -> Path:
     return Path(os.environ.get("HCLUST_DATA", "data")) / "jobs"
+
+
+def default_scratch_root() -> Path | None:
+    """Where ORCA runs (big temporary files); None runs it directly in the job directory."""
+    scratch = os.environ.get("HCLUST_SCRATCH")
+    return Path(scratch) if scratch else None
 
 
 # ORCA processes currently running (from any thread), so that they can be killed on shutdown.
@@ -153,8 +166,15 @@ def _kill_group(proc: subprocess.Popen) -> None:
     proc.wait()
 
 
-def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 3600) -> Result:
-    """Run `job` unless an identical job already terminated normally; return its parsed result."""
+def run_orca(
+    job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 3600,
+    scratch_root: Path | None = None,
+) -> Result:
+    """Run `job` unless an identical job already terminated normally; return its parsed result.
+
+    With a scratch root, ORCA runs in <scratch>/<hash> and only the kept files are copied
+    to the job directory afterwards.
+    """
     workdir = (jobs_root or default_jobs_root()) / job.hash
     out = workdir / f"{BASENAME}.out"
     is_opt = job.effective_task.optimizes
@@ -168,14 +188,28 @@ def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 360
     workdir.mkdir(parents=True, exist_ok=True)
     for stale in workdir.iterdir():
         stale.unlink()
-    (workdir / f"{BASENAME}.inp").write_text(job.render())
+    scratch_root = scratch_root or default_scratch_root()
+    rundir = scratch_root / job.hash if scratch_root else workdir
+    if rundir != workdir:
+        shutil.rmtree(rundir, ignore_errors=True)
+        rundir.mkdir(parents=True)
+    try:
+        return _run_in(job, rundir, workdir, timeout_s, is_opt, is_goat)
+    finally:
+        if rundir != workdir:
+            shutil.rmtree(rundir, ignore_errors=True)
 
-    with out.open("w") as fh:
+
+def _run_in(
+    job: OrcaJob, rundir: Path, workdir: Path, timeout_s: float, is_opt: bool, is_goat: bool
+) -> Result:
+    (rundir / f"{BASENAME}.inp").write_text(job.render())
+    with (rundir / f"{BASENAME}.out").open("w") as fh:
         # ORCA must be started by its absolute path to find its sub-programs. Its own
         # session makes the whole process tree killable at once.
         proc = subprocess.Popen(
             [ORCA_DIR / "orca", f"{BASENAME}.inp"],
-            cwd=workdir, stdout=fh, stderr=subprocess.STDOUT, start_new_session=True,
+            cwd=rundir, stdout=fh, stderr=subprocess.STDOUT, start_new_session=True,
         )
         with _running_lock:
             _running.add(proc)
@@ -185,7 +219,7 @@ def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 360
             proc.wait(timeout=timeout_s)
         except subprocess.TimeoutExpired:
             _kill_group(proc)
-            _cleanup(workdir)
+            _collect(rundir, workdir)
             return Result(
                 status="failed", error=f"timeout after {timeout_s:.0f} s",
                 error_kind="timeout", workdir=workdir,
@@ -196,14 +230,19 @@ def run_orca(job: OrcaJob, jobs_root: Path | None = None, timeout_s: float = 360
 
     subprocess.run(
         [ORCA_DIR / "orca_2json", BASENAME, "-property"],
-        cwd=workdir, capture_output=True, timeout=120,
+        cwd=rundir, capture_output=True, timeout=120,
     )
-    _cleanup(workdir)
+    _collect(rundir, workdir)
     return parse_orca(workdir, BASENAME, is_opt, is_goat)
 
 
-def _cleanup(workdir: Path) -> None:
-    for path in workdir.iterdir():
+def _collect(rundir: Path, workdir: Path) -> None:
+    """Keep the useful outputs in the job directory; delete scratch, .gbw, densities, ..."""
+    for path in rundir.iterdir():
         discard = any(marker in path.name for marker in DISCARD_MARKERS)
-        if path.is_file() and (discard or not path.name.endswith(KEEP_SUFFIXES)):
+        if not path.is_file():
+            continue
+        if discard or not path.name.endswith(KEEP_SUFFIXES):
             path.unlink()
+        elif rundir != workdir:
+            shutil.move(path, workdir / path.name)

@@ -13,6 +13,8 @@ from hclust.units import BOHR_TO_ANGSTROM
 NORMAL_TERMINATION = "ORCA TERMINATED NORMALLY"
 OPT_CONVERGED = "THE OPTIMIZATION HAS CONVERGED"
 SCF_NOT_CONVERGED = "SCF NOT CONVERGED"
+# The coupled-perturbed SCF of an analytic Hessian failed (the optimization itself is done).
+CPSCF_FAILED = ("CP-SCF Solver", "error termination in SCF RESPONSE")
 
 _VERSION = re.compile(r"Program Version (\S+)")
 _S2 = re.compile(r"Expectation value of <S\*\*2>\s*:\s*(-?\d+\.\d+)")
@@ -30,8 +32,16 @@ def parse_orca(
     out = out_path.read_text(errors="replace") if out_path.exists() else ""
 
     if NORMAL_TERMINATION not in out:
-        kind = "scf" if SCF_NOT_CONVERGED in out else "other"
-        return Result(status="failed", error=_error_message(out), error_kind=kind, workdir=workdir)
+        if SCF_NOT_CONVERGED in out:
+            kind = "scf"
+        elif any(marker in out for marker in CPSCF_FAILED):
+            kind = "cpscf"
+        else:
+            kind = "other"
+        return Result(
+            status="failed", error=_error_message(out), error_kind=kind,
+            geometry=_last_geometry(workdir / f"{basename}.property.json"), workdir=workdir,
+        )
 
     props = json.loads((workdir / f"{basename}.property.json").read_text())
     last = props["Geometries"][-1]
@@ -64,6 +74,14 @@ def parse_orca(
         result.point_group, sym = pg[-1]
         result.symmetry_number = int(sym)
     return result
+
+
+def _last_geometry(path: Path) -> Geometry | None:
+    """The last geometry a failed run wrote, if any (a restart point)."""
+    try:
+        return _geometry(json.loads(path.read_text())["Geometries"][-1])
+    except (OSError, ValueError, KeyError, IndexError):
+        return None
 
 
 def _geometry(entry: dict) -> Geometry:

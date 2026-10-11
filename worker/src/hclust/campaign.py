@@ -53,6 +53,8 @@ class SelectSpec(_Spec):
     max_per_state: int = Field(8, ge=1)
     dedup_energy_kcal: float = 0.1
     dedup_distance: float = 0.05  # RMS of sorted-distance fingerprints, Angstrom
+    # Only promote true minima (requires a source stage with frequencies).
+    minima_only: bool = False
 
 
 class StageSpec(_Spec):
@@ -100,6 +102,8 @@ class Resources(_Spec):
     workers: int = Field(16, ge=1)
     maxcore_mb: int = 600
     timeout_min: float = 120
+    # Total estimated scratch of running jobs stays below this (see Level.scratch_gb_m10).
+    scratch_budget_gb: float = 150
 
 
 class CampaignSpec(_Spec):
@@ -109,7 +113,7 @@ class CampaignSpec(_Spec):
     stages: list[StageSpec]
     resources: Resources = Resources()
     # Structures whose pieces are all farther apart than this (Angstrom) have dissociated.
-    dissociation_cutoff: float = 2.5
+    dissociation_cutoff: float = 3.5
 
     @model_validator(mode="after")
     def _check_dag(self) -> "CampaignSpec":

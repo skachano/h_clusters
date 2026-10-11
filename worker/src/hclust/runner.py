@@ -9,6 +9,7 @@ a parse.
 
 import time
 from collections.abc import Callable
+from pathlib import Path
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 
 import numpy as np
@@ -18,7 +19,7 @@ from hclust.campaign import CampaignSpec, StageSpec
 from hclust.db import (
     TERMINAL, Attempt, Campaign, Candidate, Job, JobResult, JobStatus, StateRow, Structure, _now,
 )
-from hclust.engines.orca import OrcaJob, Task, allow_runs, kill_all, run_orca
+from hclust.engines.orca import OrcaJob, Task, allow_runs, default_jobs_root, kill_all, run_orca
 from hclust.geometry import Geometry
 from hclust.levels import LEVELS
 from hclust.results import Result
@@ -114,6 +115,138 @@ def _job(
     return job
 
 
+def requeue_failed(
+    session: Session, spec: CampaignSpec, stage: str | None = None, reopen: bool = False,
+    jobs_root: Path | None = None,
+) -> tuple[int, int]:
+    """Give failed jobs a fresh set of attempts. Returns (requeued, skipped).
+
+    Without `reopen`, a job is skipped when a select stage fed by it already ran for its
+    state (that selection would not see the new result). With `reopen`, those selections
+    are cleared and run again once the requeued jobs finish. `reopen` also requeues
+    'dissociated' optimizations whose last geometry is intact under the campaign's
+    current dissociation cutoff, restarting from that geometry.
+    """
+    campaign = session.exec(select(Campaign).where(Campaign.name == spec.name)).one()
+    statuses = [JobStatus.FAILED] + ([JobStatus.DISSOCIATED] if reopen else [])
+    jobs = session.exec(
+        select(Job).where(Job.campaign_id == campaign.id, Job.status.in_(statuses))
+    ).all()
+    requeued = skipped = 0
+    for job in jobs:
+        if stage and job.stage != stage:
+            continue
+        start_id = job.input_structure_id
+        if job.status == JobStatus.DISSOCIATED:
+            last = _last_xyz(job, jobs_root)
+            if last is None or is_dissociated(last, spec.dissociation_cutoff):
+                continue
+            start_id = _structure(session, job.state_id, f"{job.stage}:requeue", last, job.id).id
+        downstream = _downstream_selects(spec, job.stage)
+        if reopen:
+            reselect(session, spec, downstream, state_ids={job.state_id}, commit=False)
+        elif _has_candidates(session, campaign.id, downstream, {job.state_id}):
+            skipped += 1
+            continue
+        job.status, job.attempts, job.modifiers = JobStatus.PENDING, 0, []
+        job.start_structure_id, job.error, job.error_kind = start_id, None, None
+        job.updated_at = _now()
+        session.add(job)
+        requeued += 1
+    session.commit()
+    return requeued, skipped
+
+
+def reselect(
+    session: Session, spec: CampaignSpec, stages: set[str] | None = None,
+    state_ids: set[int] | None = None, commit: bool = True,
+) -> int:
+    """Forget the decisions of select stages so that they run again on the next `run`.
+
+    Jobs already created from earlier selections are kept (they are valid calculations);
+    the new selection only adds the jobs that are missing.
+    """
+    campaign = session.exec(select(Campaign).where(Campaign.name == spec.name)).one()
+    stages = stages if stages is not None else {s.name for s in spec.stages if s.is_select}
+    conditions = [Candidate.campaign_id == campaign.id, Candidate.stage.in_(stages)]
+    if state_ids is not None:
+        conditions.append(Candidate.state_id.in_(state_ids))
+    rows = session.exec(select(Candidate).where(*conditions)).all()
+    for row in rows:  # drop self-references first so that the rows can be deleted
+        row.duplicate_of = None
+        session.add(row)
+    session.flush()
+    for row in rows:
+        session.delete(row)
+    if commit:
+        session.commit()
+    return len(rows)
+
+
+def _downstream_selects(spec: CampaignSpec, stage: str) -> set[str]:
+    return {s.name for s in spec.stages if s.is_select and stage in spec.upstream(s.from_[0])}
+
+
+def _has_candidates(session: Session, campaign_id: int, stages: set[str], state_ids: set[int]) -> bool:
+    return session.exec(
+        select(Candidate).where(
+            Candidate.campaign_id == campaign_id, Candidate.stage.in_(stages),
+            Candidate.state_id.in_(state_ids),
+        )
+    ).first() is not None
+
+
+def relabel_dissociated(session: Session, spec: CampaignSpec, jobs_root: Path | None = None) -> int:
+    """Mark failed jobs whose last geometry has fallen apart as 'dissociated'. Returns the count.
+
+    Repairs jobs recorded before every kind of failure was checked for dissociation.
+    """
+    campaign = session.exec(select(Campaign).where(Campaign.name == spec.name)).one()
+    jobs = session.exec(
+        select(Job).where(Job.campaign_id == campaign.id, Job.status == JobStatus.FAILED)
+    ).all()
+    n = 0
+    for job in jobs:
+        last = _last_xyz(job, jobs_root)
+        if last is not None and is_dissociated(last, spec.dissociation_cutoff):
+            job.status, job.updated_at = JobStatus.DISSOCIATED, _now()
+            session.add(job)
+            n += 1
+    session.commit()
+    return n
+
+
+def flag_unbound(session: Session, spec: CampaignSpec) -> int:
+    """Set the 'unbound' flag of stored results and selection records (e.g. after the rule or
+    a level's threshold changed). Past selections are not redone. Returns how many are unbound.
+    """
+    campaign = session.exec(select(Campaign).where(Campaign.name == spec.name)).one()
+    rows = session.exec(
+        select(Job, JobResult, StateRow)
+        .join(JobResult, JobResult.job_id == Job.id)
+        .join(StateRow, StateRow.id == Job.state_id)
+        .where(Job.campaign_id == campaign.id)
+    ).all()
+    unbound = {}
+    for job, result, state in rows:
+        result.unbound = unbound[job.id] = LEVELS[job.level].anion_unbound(result.homo, state.charge)
+        session.add(result)
+    for candidate in session.exec(select(Candidate).where(Candidate.campaign_id == campaign.id)):
+        candidate.unbound = unbound.get(candidate.job_id)
+        session.add(candidate)
+    session.commit()
+    return sum(bool(u) for u in unbound.values())
+
+
+def _last_xyz(job: Job, jobs_root: Path | None) -> Geometry | None:
+    """The last geometry ORCA wrote for this job (job.xyz holds the current optimizer step)."""
+    path = (jobs_root or default_jobs_root()) / (job.hash or "") / "job.xyz"
+    try:
+        return Geometry.read(path)
+    except (OSError, ValueError, IndexError):
+        return None
+
+
 # --------------------------------------------------------------------------- running
 
 
@@ -128,6 +261,7 @@ class Runner:
         self.workers = workers or spec.resources.workers
         self.log = log
         self.campaign = plan(session, spec)
+        self._m = {row.id: row.m for row in session.exec(select(StateRow)).all()}
 
     def run(self) -> dict[str, int]:
         """Run until no job is pending or running; return job counts by status."""
@@ -135,17 +269,25 @@ class Runner:
         self._expand()
         allow_runs()
         in_flight: dict[Future, int] = {}
+        scratch: dict[Future, float] = {}
         with ThreadPoolExecutor(self.workers) as pool:
             try:
                 while True:
-                    while len(in_flight) < self.workers and (job := self._next_pending()):
-                        in_flight[self._submit(pool, job)] = job.id
+                    while len(in_flight) < self.workers and (
+                        job := self._next_pending(
+                            sum(scratch.values()), busy=bool(in_flight),
+                            running_hashes={self.session.get(Job, i).hash for i in in_flight.values()},
+                        )
+                    ):
+                        future = self._submit(pool, job)
+                        in_flight[future], scratch[future] = job.id, self.scratch_gb(job)
                     if not in_flight:
                         break
                     finished, _ = wait(in_flight, return_when=FIRST_COMPLETED)
                     for future in finished:
                         result, elapsed = future.result()
                         job_id = in_flight.pop(future)
+                        scratch.pop(future)
                         self._record(self.session.get(Job, job_id), result, elapsed)
             except KeyboardInterrupt:
                 kill_all()
@@ -180,12 +322,31 @@ class Runner:
             self.session.add(job)
         self.session.commit()
 
-    def _next_pending(self) -> Job | None:
-        return self.session.exec(
+    def scratch_gb(self, job: Job) -> float:
+        """Estimated scratch disk of a job: the level's figure at m = 10, scaled by (m/10)^4."""
+        return LEVELS[job.level].scratch_gb_m10 * (self._m[job.state_id] / 10) ** 4
+
+    def _next_pending(
+        self, scratch_in_use: float = 0.0, busy: bool = False, running_hashes: set[str] = frozenset(),
+    ) -> Job | None:
+        """The oldest pending job that fits in the scratch budget (anything fits on an idle pool).
+
+        A job identical to a running one (same hash, e.g. the same single atom from two seed
+        generators) waits: it would share the run directory, and later it is a cache hit.
+        """
+        pending = self.session.exec(
             select(Job)
             .where(Job.campaign_id == self.campaign.id, Job.status == JobStatus.PENDING)
             .order_by(Job.id)
-        ).first()
+        ).all()
+        budget = self.spec.resources.scratch_budget_gb
+        for job in pending:
+            if busy and scratch_in_use + self.scratch_gb(job) > budget:
+                continue
+            if running_hashes and self.orca_job(job).hash in running_hashes:
+                continue
+            return job
+        return None
 
     def _submit(self, pool: ThreadPoolExecutor, job: Job) -> Future:
         orca_job = self.orca_job(job)
@@ -222,7 +383,7 @@ class Runner:
         elif result.ok:
             job.status = JobStatus.DONE
             self._store_result(job, result)
-        elif result.error_kind == "opt" and self._dissociated(result.geometry):
+        elif self._dissociated(result.geometry):  # e.g. the Hessian failed on fragments
             job.status = JobStatus.DISSOCIATED
         else:
             job.status = JobStatus.FAILED
@@ -247,6 +408,8 @@ class Runner:
             return "displace" if result.n_imag else None
         if result.error_kind == "scf" and job.attempts <= len(SCF_LADDER):
             return "scf"
+        if result.error_kind == "cpscf" and "NumFreq" not in job.modifiers:
+            return "numfreq"  # the analytic Hessian failed: differentiate gradients instead
         if result.error_kind == "opt" and result.geometry is not None:
             return "restart"
         return None
@@ -255,6 +418,10 @@ class Runner:
         if action == "scf":
             job.modifiers = list(SCF_LADDER[job.attempts - 1])
             return
+        if action == "numfreq":
+            job.modifiers = [*job.modifiers, "NumFreq"]
+            if result.geometry is None:
+                return
         geometry = result.geometry
         if action == "displace":
             geometry = displace_along_imaginary_mode(result, sign=(-1) ** (job.attempts + 1))
@@ -279,6 +446,9 @@ class Runner:
             thermo=result.thermo, n_imag=result.n_imag,
             point_group=result.point_group, symmetry_number=result.symmetry_number,
             opt_converged=result.opt_converged, orca_version=result.orca_version,
+            unbound=LEVELS[job.level].anion_unbound(
+                result.homo, self.session.get(StateRow, job.state_id).charge
+            ),
         ))
         self.session.flush()
         self._spawn_children(job)
@@ -360,14 +530,18 @@ class Runner:
                 structure_id=result.final_structure_id, energy=result.energy,
                 source=self.session.get(Structure, job.input_structure_id).origin,
                 composition=composition(geometry), dissociated=self._dissociated(geometry),
+                unbound=result.unbound, n_imag=result.n_imag,
             )
             self.session.add(candidate)
             candidates.append((candidate, geometry))
         self.session.flush()
 
         unique: list[tuple[Candidate, Geometry]] = []
+        single_atom = self._m[state_id] == 1
         for candidate, geometry in sorted(candidates, key=lambda c: c[0].energy):
-            if candidate.dissociated:
+            if candidate.dissociated or candidate.unbound:
+                continue
+            if params.minima_only and not (single_atom or candidate.n_imag == 0):
                 continue
             twin = next((
                 u for u, g in unique
@@ -388,10 +562,12 @@ class Runner:
 
         label = self.session.get(StateRow, state_id).to_state().label
         n_dissociated = sum(c.dissociated for c, _ in candidates)
+        n_unbound = sum(bool(c.unbound) for c, _ in candidates)
         n_selected = sum(c.selected for c, _ in unique)
         self.log(
             f"select {label:<10} {stage.name}: {len(candidates)} structures, "
-            f"{n_dissociated} dissociated, {len(unique)} unique, {n_selected} promoted"
+            f"{n_dissociated} dissociated, {n_unbound} unbound, {len(unique)} unique, "
+            f"{n_selected} promoted"
         )
 
     def _log_outcome(self, job: Job, result: Result, elapsed: float, action: str | None) -> None:
@@ -412,8 +588,12 @@ class Runner:
 
 
 def _timed(execute: Execute, job: OrcaJob, timeout_s: float) -> tuple[Result, float]:
+    """Run one job; an unexpected exception fails that job instead of the whole campaign."""
     start = time.monotonic()
-    result = execute(job, timeout_s)
+    try:
+        result = execute(job, timeout_s)
+    except Exception as exc:  # KeyboardInterrupt is not an Exception and still propagates
+        result = Result(status="failed", error=f"{type(exc).__name__}: {exc}", error_kind="other")
     return result, time.monotonic() - start
 
 

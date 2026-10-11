@@ -16,9 +16,9 @@ def fixed_version(monkeypatch):
 
 
 def test_render_closed_shell_dft_optfreq():
-    job = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], Task.OPTFREQ)
+    job = OrcaJob(State(2, 0, 1), H2, LEVELS["L1V"], Task.OPTFREQ)
     assert job.render() == (
-        "# hclust H2 (1) L1 optfreq\n"
+        "# hclust H2 (1) L1V optfreq\n"
         "! wB97M-V def2-TZVPPD TightOpt NumFreq TightSCF\n"
         "%maxcore 600\n"
         "* xyz 0 1\n"
@@ -67,7 +67,7 @@ def test_hash_is_stable_and_sensitive():
 def test_retry_keywords_are_appended_and_change_the_hash():
     plain = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"])
     slow = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], extra_keywords=("SlowConv",))
-    assert slow.keywords() == "wB97M-V def2-TZVPPD TightSCF SlowConv"
+    assert slow.keywords() == "wB97X-D4 def2-TZVPPD TightSCF SlowConv"
     assert slow.hash != plain.hash
 
 
@@ -81,3 +81,29 @@ def test_goat_input():
     h2 = OrcaJob(State(2, 1, 2), H2, LEVELS["XTB"], Task.GOAT)
     assert h2.effective_task is Task.OPT
     assert h2.keywords() == "XTB TightOpt TightSCF"
+
+
+def test_analytic_and_numerical_frequencies():
+    assert "Freq" in OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], Task.FREQ).keywords().split()
+    assert "NumFreq" in OrcaJob(State(2, 0, 1), H2, LEVELS["L1M"], Task.FREQ).keywords().split()
+    assert OrcaJob(State(2, 0, 1), H2, LEVELS["L1M"]).keywords() == (
+        "RI-MP2 RIJK aug-cc-pVTZ aug-cc-pVTZ/C aug-cc-pVTZ/JK TightSCF"
+    )
+
+
+def test_screening_level_uses_loose_opt_with_more_cycles():
+    h3 = Geometry.hydrogens([[0, 0, 0], [0.9, 0, 0], [0.45, 0.8, 0]])
+    text = OrcaJob(State(3, 1, 1), h3, LEVELS["L0"], Task.OPT).render()
+    assert "! r2SCAN-3c Opt TightSCF\n" in text
+    assert "%geom\n  MaxIter 150\nend\n" in text
+    # L1 keeps TightOpt but also gets more cycles; L2 and single points have no %geom.
+    l1 = OrcaJob(State(3, 1, 1), h3, LEVELS["L1"], Task.OPT).render()
+    assert "TightOpt" in l1 and "MaxIter 150" in l1
+    assert "%geom" not in OrcaJob(State(3, 1, 1), h3, LEVELS["L2"], Task.OPT).render()
+    assert "%geom" not in OrcaJob(State(3, 1, 1), h3, LEVELS["L0"]).render()
+
+
+def test_numfreq_modifier_replaces_the_analytic_hessian():
+    job = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], Task.OPTFREQ, extra_keywords=("NumFreq",))
+    assert job.keywords().split().count("NumFreq") == 1
+    assert "Freq" not in job.keywords().split()

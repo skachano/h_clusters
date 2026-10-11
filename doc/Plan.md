@@ -88,8 +88,8 @@ trusting them, which is a core HTC habit.
 |---|---|---|---|
 | L0′ | GFN2-xTB (standalone `xtb`, or ORCA `! GOAT-EXPLORE XTB`) | Candidate *geometry* generator only; its energies are not used for ranking (see Phase 0 findings) | ms–s |
 | L0 | r²SCAN-3c (ORCA) | Pre-optimization and screening of all candidates | s |
-| L1 | DFT: ωB97M-V/def2-TZVPPD (alt. ωB97X-D4, r²SCAN-3c) | Geometry optimization + frequencies for every candidate | s–min |
-| L1M | (U)MP2/aug-cc-pVTZ | Second geometry optimization + frequencies, free of DFT self-interaction and delocalization error (added in Phase 3: DFT has no C₂v H₅⁺ minimum) | min |
+| L1 | DFT: ωB97X-D4/def2-TZVPPD, analytic Hessian (was ωB97M-V, now `L1V`; swapped in Phase 4 for cost) | Geometry optimization + frequencies for every promoted candidate | s–min |
+| L1M | (U)RI-MP2+RIJK/aug-cc-pVTZ | Second geometry level, free of DFT self-interaction and delocalization error (added in Phase 3: DFT has no C₂v H₅⁺ minimum). Optimize all promoted candidates; numerical frequencies only for the best 3 | min–h |
 | L1′ | B3LYP/def2-TZVPPD (no dispersion) | Didactic: shows self-interaction and dispersion failures | s–min |
 | L2 | (U)CCSD(T)/aug-cc-pVTZ single points on L1 *and* L1M geometries | Reference energetics; the lower of the two picks the structure | s–min |
 | L3 | (U)CCSD(T)/aug-cc-pVTZ optimization (numerical gradients) + frequencies, for the final low-lying structures only | Check that the L1 geometries/minima hold | min–h |
@@ -203,8 +203,13 @@ For each state, computed from the best structure at each level:
   - **Parallelism is at the job level**: many concurrent single-core ORCA
     jobs (`%pal nprocs 1`), not MPI. This is the HTC way for small jobs, and
     it avoids matching the container's OpenMPI to the one ORCA was built
-    against. Default pool size: 16 workers on a 20-core machine. Memory:
-    `%maxcore` ≈ 600 MB per job (15 GB RAM).
+    against. The pool size is set by the campaign. The baseline uses 12
+    workers × `%maxcore 500`, because only ~8 of the 15 GB of RAM are free.
+  - **Scratch:** ORCA runs in `/var/tmp/hclust/<hash>` (`HCLUST_SCRATCH`, on
+    the root filesystem with ~237 GB free). Only the kept outputs are moved
+    to `data/jobs/<hash>/`. The scheduler keeps the estimated scratch of
+    running jobs under `scratch_budget_gb`. Each level declares its scratch
+    use at m = 10, scaled by (m/10)⁴; CCSD(T)/aVTZ on H₁₀ needs ~12 GB.
 - **`api`**: FastAPI + SQLModel. Mounts `./data` read-only.
 - **`web`**: Node 22 for development (`vite dev`). Production build is
   served by nginx, which also proxies `/api` to the `api` service.
@@ -556,14 +561,214 @@ Each phase has a concrete **done when** criterion.
   restart. Optimizations started from random geometries often exceed
   ORCA's default cycle limit, and the restart rule recovers them.
 
-### Phase 4: Full baseline campaign (1 day, plus compute time)
+### Phase 4: Full baseline campaign (1 day, plus compute time) — ✅ done 2026-10-11
 - Run L0 → select → L1 and L1M (+freq) → L2 for all 29 species × baseline
   multiplicities.
-- Rough budget: ~57 states × ~30 candidates × L0, then ~57 × 8 × L1, then L2
-  on the minima. That is a few thousand jobs, hours of wall time on 16
-  workers.
+- `campaigns/baseline.yaml` has 56 states and 1,293 initial L0 jobs
+  (templates + 20 random seeds per state). The pipeline is:
+  1. `pre` (L0) → `promote` (15 kcal/mol, ≤ 8 per state)
+  2. DFT branch: `dft` (L1 optfreq) → `dft_best` (minima only, 5 kcal/mol,
+     ≤ 3) → `dft_ref` (L2)
+  3. MP2 branch: `mp2` (L1M opt) → `mp2_best` (5 kcal/mol, ≤ 3) →
+     `mp2_freq` (L1M optfreq) → `mp2_ref` (L2 on minima)
+- Launch: `docker compose run -d --name hc-baseline worker python -m hclust run /campaigns/baseline.yaml`.
+  Follow it with `docker logs -f hc-baseline` and `… python -m hclust status baseline`.
 - **Done when** every state has a terminal status, and failures are
   explained or fixed.
+
+**Pilot (H₁₀, one core) and the decisions it forced:**
+
+| Step | Time |
+|---|---|
+| r²SCAN-3c gradient | 3 s (closed shell), 15 s (open shell) |
+| ωB97M-V gradient | 100 s; numerical frequencies ≈ 60 gradients ≈ **2.1 h** per structure |
+| ωB97X-D4 gradient | 48 s; analytic Hessian 231 s, so opt + freq ≈ **16 min** |
+| MP2/aVTZ gradient (conventional) | 200 s closed shell, **880 s** open shell; numerical frequencies 4–15 h |
+| RI-MP2+RIJK/aVTZ gradient | 38 s (no analytic RI-MP2 Hessian in ORCA 6.1) |
+| CCSD(T)/aVTZ | **13 min, 12 GB scratch disk**. The default run died with "Failed to add matrix" when `/home` ran out of space. `KC_AOX` needs as much disk and cannot be combined with RI transformation. |
+
+What the plan as written would have cost: ~800 CPU-hours (2–3 days on 16
+cores), and CCSD(T) for H₉/H₁₀ could not run at all with 14 GB free.
+
+Decisions:
+- L1 = ωB97X-D4. Like ωB97M-V it gives D₂d H₅⁺, and it reproduces the
+  Phase 1 anchors.
+- L1M = RI-MP2+RIJK. It keeps the C₂v H₅⁺, which is now an ORCA regression
+  test. Note that MP2/**aVDZ** already collapses H₅⁺ to D₂d, so the
+  triple-ζ basis is required.
+- MP2 frequencies only after a second selection (≤ 3 per state).
+- Scratch on `/var/tmp`, with a disk budget in the scheduler.
+- Estimate: ~120 CPU-hours ≈ 10–14 h on 12 workers.
+
+**Incidents:** the first launch crashed within minutes. Two *identical*
+jobs ran at the same time: for m = 1 the `chain` and `random` seeds give the
+same atom, so the hash and therefore the scratch directory were the same,
+and one job deleted the directory under the other. The scheduler now holds
+back a job whose hash is already running (it then becomes a cache hit). Any
+exception inside a job now fails only that job, not the orchestrator. The
+restart recovered the 12 interrupted jobs.
+
+**Second incident, about 1.5 h in:** 5 H₇⁺/H₇⁻ L0 pre-optimizations failed
+after 3 × 50 `TightOpt` cycles. They were not stuck: they were still
+descending (ΔE ≈ 3–7·10⁻⁵ Eh, steps up to 0.14 Å) as H₂ units slid across a
+flat surface.
+- Fix: L0 now uses `Opt` with `%geom MaxIter 150`. It is only a screening
+  level; L1 and L1M re-optimize tightly. Other levels keep their inputs and
+  hashes.
+- New command `python -m hclust retry-failed <campaign> [--stage]` gives
+  failed jobs fresh attempts. It skips jobs whose state's selection already
+  ran: 1 H₇⁻ start stays failed.
+- The orchestrator was stopped with `docker stop` (12 running jobs went
+  back to the queue), and the failures were requeued and resumed. Jobs that
+  were already done keep their `TightOpt` results; the job hash records
+  which settings each one used.
+
+**First pass finished** after ~13 h: 1,322 done, 333 dissociated, 27 failed.
+
+Failure causes:
+- 14 ωB97X-D4 frequency jobs: the CP-SCF solver of the analytic Hessian
+  did not converge, mostly on open-shell states. These are now classified as
+  `cpscf` and retried with `NumFreq` from the optimized geometry, which the
+  parser now recovers from failed runs.
+- 12 ωB97X-D4/RI-MP2 optimizations ran out of 3 × 50 cycles on floppy m ≥ 7
+  clusters. L1 and L1M now get `MaxIter 150`.
+
+Review of the "dissociated" structures showed that the **2.5 Å cutoff was
+wrong**:
+- Converged MP2 structures with contacts of 2.5–3.3 Å are real complexes:
+  H⁻·H₂ (2.84 Å), H₃⁺(H₂)₃, and H₂·H / (H₂)₂ van der Waals pairs (~3.3 Å).
+  They were discarded before reaching CCSD(T).
+- Fragments that really flew apart are ≥ 5 Å apart (e.g. the DFT anions).
+- The cutoff is now **3.5 Å**, as §2.1 originally suggested. Whether a
+  complex is *bound* is an energetic question for Phase 5.
+
+Repair:
+1. `python -m hclust reselect` cleared all 1,232 selection records.
+2. `retry-failed --reopen` requeued 267 jobs: the 27 failures, plus 240
+   "dissociated" optimizations whose last geometry is intact at 3.5 Å, which
+   restart from that geometry.
+3. The relaunched campaign redoes every selection as its inputs finish.
+
+Jobs created from the old selections are kept. They are valid calculations,
+so some states end up with more than the nominal 8/3 structures.
+
+**Second pass finished** after ~27 h more (it was stopped once with
+`docker stop` and resumed with `docker start hc-baseline`; 2 jobs were
+requeued and nothing else was lost):
+
+| | Jobs |
+|---|---|
+| Done | 1,963 |
+| Dissociated | 143 |
+| Failed | 12 |
+| Total | 2,118 (462 needed a retry) |
+
+- 148 CCSD(T) reference energies (`dft_ref` 60, `mp2_ref` 88) for 56 states.
+- ~181 CPU-hours of ORCA in total, against the 120 estimated. My 4–8 h
+  estimate for the rerun was wrong: at 3.5 Å many neutral and anion states
+  promote 8 structures instead of 0–3, which added ~360 jobs, mostly at
+  m ≥ 8.
+
+  | Stage | Jobs | CPU-hours |
+  |---|---|---|
+  | `pre` (r²SCAN-3c) | 1,284 | 26 |
+  | `dft` (ωB97X-D4 opt+freq) | 277 | 56 |
+  | `mp2` (RI-MP2 opt) | 277 | 42 |
+  | `mp2_freq` (RI-MP2 opt+NumFreq) | 120 | 43 |
+  | `dft_ref` + `mp2_ref` (CCSD(T)) | 145 | 13 |
+
+**Failure review (second pass):**
+- **25 "failures" were dissociations.** 24 ωB97X-D4 CP-SCF failures (neutral
+  H₃, high-spin H₄–H₈, triplet H₃⁻) and 1 SCF failure (H₁₀⁻ → 5 H₂) had a
+  last geometry in pieces. The runner correctly did not retry them, but it
+  labelled a job `dissociated` only after a failed *optimization*.
+  - Fix: any terminal failure whose last geometry is fragmented is now
+    `dissociated`.
+  - `python -m hclust relabel <campaign>` repairs existing rows.
+- **The 12 remaining failures are unbound anions, not optimizer trouble.**
+  They are RI-MP2 optimizations of H₇⁻–H₁₀⁻ (doublets, triplets, quartets)
+  that ran 3 × 150 cycles.
+  - In every one the HOMO lies at **+0.9 to +1.15 eV**, while bound anions
+    (H⁻ and the H⁻-containing odd-m singlets) lie at −1.4 eV.
+  - Such an anion cannot hold its extra electron. A free electron in a
+    finite basis set settles in the most diffuse functions (a
+    pseudo-continuum state near +1 eV in aug-cc-pVTZ), and that state shifts
+    unevenly as the H₂ units move. The energy climbed by up to +23 kcal/mol
+    over a trajectory, almost all of it in the HF part, with S² = 0.750
+    throughout and forces of ~10⁻⁵ next to 0.02–0.16 Å steps.
+  - Chemistry: a hydrogen anion holds the electron only as H⁻ (two paired
+    electrons). (H₂)ₙ⁻ doublets and quartets have no H⁻, and odd-m triplets
+    would need an unpaired electron next to it.
+  - They are left failed: no further optimization can converge a structure
+    that does not exist.
+
+**Unbound-anion flag.** The problem is wider than the failures: most
+*converged* anion results in those states sit at +1 eV too, so their
+geometries and CCSD(T) energies are basis-set artefacts.
+- `Level.unbound_homo_ev`: an anion whose HOMO lies above **+0.5 eV** is
+  `unbound`. It applies to ωB97X-D4, ωB97M-V, RI-MP2 and the HF reference of
+  CCSD(T).
+
+  | Level | Bound anions (HOMO) | Unbound anions (HOMO) |
+  |---|---|---|
+  | r²SCAN-3c (no flag) | H⁻ at **+6.4 eV** | — |
+  | ωB97X-D4 | ≤ +0.13 eV | ≥ +0.89 eV |
+  | RI-MP2, HF reference of CCSD(T) | ≤ −0.74 eV | ≥ +0.92 eV |
+
+  r²SCAN-3c cannot tell (self-interaction error, no diffuse functions), so
+  its results are never flagged and the screening stage passes everything
+  on.
+- `result.unbound` and `candidate.unbound` columns. Selections skip unbound
+  structures like dissociated ones, the selection log counts them, and
+  `structures` marks them `e⁻`. `relabel` fills in the flag for stored
+  results: **126 baseline results are unbound**.
+- Selections made before the flag existed were not redone: 33 unbound
+  structures had been promoted, so some MP2 frequency and CCSD(T) time went
+  into them. Their results carry the flag.
+
+| Anion states | Verdict from the HOMO |
+|---|---|
+| H⁻, odd-m singlets H₃⁻–H₉⁻ (all contain H⁻) | bound at every level |
+| H⁻ triplet, H₂⁻ (both spins), even-m doublets H₄⁻–H₁₀⁻, H₇⁻ and H₉⁻ triplets | unbound at every level |
+| even-m quartets, H₃⁻ and H₅⁻ triplets | mixed: some structures bound (see below) |
+
+The H₃⁻ triplet is bound at ωB97X-D4 but unbound at RI-MP2. The final
+verdict for every anion comes from the CCSD(T) electron affinity (Phase 5).
+
+**Trapped tetrahedral H₄⁻ (quartet).** The bound quartets near −3.5 eV are
+all one unit: a regular H₄ tetrahedron (1.76 Å at MP2, 1.85 Å at ωB97X-D4,
+charge −0.25 on each atom, S² ≈ 3.77). H₆⁻–H₁₀⁻ quartets add 1–3 H₂
+molecules at ~1.8 Å.
+- Five electrons in four 1s orbitals: a₁² t₂³, three parallel spins that
+  cannot pair into H–H bonds. It is a true minimum (no imaginary
+  frequencies at ωB97X-D4 or MP2), and the electron is bound (vertical
+  detachment ≈ 3.5 eV).
+- CCSD(T) energies against fragment limits:
+
+  | Compared with | H₄⁻ | H₆⁻ | H₈⁻ | H₁₀⁻ |
+  |---|---|---|---|---|
+  | H⁻ + 3 H (+ H₂ molecules) | −1.53 eV | −1.59 | −1.67 | −1.73 |
+  | H₂ molecules + 2 H + free e⁻ | **+2.45 eV** | +2.38 | +2.31 | +2.25 |
+  | neutral triplet + free e⁻ | +2.45 eV | +2.40 | +2.33 | +2.28 |
+
+- So it is **metastable**: ~2.4 eV (≈55 kcal/mol) above the open, spin-allowed
+  channel H₂ + H + H + e⁻, and kinetically trapped. Each attached H₂ lowers
+  the gap by only ~0.07 eV.
+- At ωB97X-D4 it was often the lowest *bound* structure of its state, so
+  `dft_best` sent it to CCSD(T) (H₈⁻, H₁₀⁻ quartets). That is a correct
+  result but not the state's ground arrangement; the Phase 5 verdict
+  (`metastable`) must come from fragment limits, not from the flag.
+- Not yet analysed: an H₃ triangle with an attached H₂ in the H₅⁻ triplet
+  (HOMO −2.1 eV, 35 kcal/mol above the state's lowest CCSD(T) energy)
+  looks like the same kind of trapped structure.
+
+**Lessons:**
+- A failure label is a claim. Check it (here: the last geometry and the
+  HOMO) before retrying, and fix the classifier, not just the rows.
+- For anions, check that the extra electron is bound before trusting a
+  geometry. The HOMO sign is a cheap first test at levels with diffuse
+  functions and little self-interaction error; the energy comparison is the
+  real one.
 
 ### Phase 5: Analysis library (2 days)
 - Point groups, thermo (RRHO/qRRHO at any T, p, cross-checked against

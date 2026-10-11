@@ -75,3 +75,9 @@ def test_goat_ensemble(orca_fixture):
     assert r.energy == pytest.approx(-1.9493849110)
     # GFN2-xTB's "global minimum" for H5+ is a chain, not the H3+.H2 complex.
     assert r.geometry.distances()[-1] == pytest.approx(3.963, abs=1e-3)
+
+
+def test_cpscf_failure_is_classified_and_keeps_the_last_geometry(orca_fixture):
+    r = parse_orca(orca_fixture("cpscf_fail_wb97xd4"), is_opt=True)
+    assert not r.ok and r.error_kind == "cpscf"
+    assert len(r.geometry) == 3  # the optimized structure, a restart point for NumFreq

@@ -311,6 +311,35 @@ def test_optimization_that_falls_apart_is_dissociated_not_retried(session):
     assert candidates(session) == []  # nothing intact to select
 
 
+def test_hessian_failure_on_fragments_is_dissociated_not_retried(session):
+    def script(job, n):
+        if job.effective_task.has_freq:
+            return Result(status="failed", error_kind="cpscf", error="CP-SCF", geometry=APART)
+        return landscape([(TRIANGLE, -1.3)])(job, n)
+
+    run(session, search_spec(n_random=1), FakeOrca(script))
+    opt = next(j for j in jobs(session) if j.stage == "opt")
+    assert opt.status == "dissociated" and opt.attempts == 1
+
+
+def test_relabel_marks_failed_jobs_with_fragmented_geometry(session, tmp_path):
+    from hclust.runner import relabel_dissociated
+
+    def script(job, n):
+        return Result(status="failed", error="boom", error_kind="other")
+
+    spec = search_spec(n_random=2)
+    run(session, spec, FakeOrca(script))
+    apart, intact = [j for j in jobs(session) if j.stage == "pre"]
+    for job, geometry in ((apart, APART), (intact, TRIANGLE)):
+        (tmp_path / job.hash).mkdir()
+        (tmp_path / job.hash / "job.xyz").write_text(geometry.to_xyz())
+
+    assert relabel_dissociated(session, spec, jobs_root=tmp_path) == 1
+    session.refresh(apart), session.refresh(intact)
+    assert (apart.status, intact.status) == ("dissociated", "failed")
+
+
 def test_dissociated_saddle_point_is_not_displaced(session):
     def script(job, n):
         if job.effective_task.has_freq:
@@ -338,3 +367,224 @@ def test_stage_added_to_a_finished_campaign_runs_only_new_work(session):
     run(session, extended, fake)
     assert [c.level.name for c in fake.calls] == ["L1M", "L2"]
     assert len(jobs(session)) == before + 2
+
+
+def test_select_minima_only_skips_saddle_points(session):
+    spec = CampaignSpec.model_validate({
+        "name": "minima", "species": {"states": [[3, 1, 1]]},
+        "seeds": [{"generator": "random", "params": {"count": 2}}],
+        "stages": [
+            {"name": "opt", "level": "L1", "task": "optfreq"},
+            {"name": "pick", "select": {"minima_only": True}, "from": "opt"},
+            {"name": "ref", "level": "L2", "task": "sp", "from": "pick"},
+        ],
+    })
+    def script(job, n):
+        if job.level.name == "L1":
+            # The first structure is a minimum; the other stays a saddle point through retries.
+            geometry, freqs = (TRIANGLE, [1000.0, 1000.0, 2000.0]) if n == 1 else (LINE, [-300.0, 500.0, 900.0, 1000.0])
+            r = ok(job, freqs=freqs)
+            r.geometry, r.energy = geometry, -1.3 if geometry is LINE else -1.2
+            return r
+        return ok(job)
+
+    run(session, spec, FakeOrca(script))
+    by_composition = {c.n_imag: c for c in candidates(session)}
+    assert by_composition[1].selected is False and by_composition[1].rank is None
+    assert by_composition[0].selected is True
+
+
+def test_scratch_budget_limits_concurrent_heavy_jobs(session):
+    import threading
+    import time as _time
+
+    spec = CampaignSpec.model_validate({
+        "name": "disk", "species": {"states": [[10, 0, 1]]},
+        "seeds": [{"generator": "random", "params": {"count": 4}}],
+        "stages": [{"name": "ref", "level": "L2", "task": "sp"}],
+        "resources": {"scratch_budget_gb": 30},  # 12.5 GB each at m = 10: two fit
+    })
+    lock, running, peak = threading.Lock(), [0], [0]
+
+    def script(job, n):
+        with lock:
+            running[0] += 1
+            peak[0] = max(peak[0], running[0])
+        _time.sleep(0.05)
+        with lock:
+            running[0] -= 1
+        return ok(job)
+
+    run(session, spec, FakeOrca(script), workers=4)
+    assert peak[0] == 2
+
+
+def test_identical_jobs_never_run_concurrently(session):
+    import threading
+    import time as _time
+
+    # For m = 1 the chain and random generators give the same atom: identical ORCA inputs.
+    spec = CampaignSpec.model_validate({
+        "name": "twins", "species": {"states": [[1, 0, 2], [1, -1, 1]]},
+        "seeds": [{"generator": "chain"}, {"generator": "random", "params": {"count": 1}}],
+        "stages": [{"name": "pre", "level": "L0", "task": "opt"}],
+    })
+    lock, running, overlap = threading.Lock(), set(), []
+
+    def script(job, n):
+        with lock:
+            if job.hash in running:
+                overlap.append(job.hash)
+            running.add(job.hash)
+        _time.sleep(0.05)
+        with lock:
+            running.discard(job.hash)
+        return ok(job)
+
+    counts = run(session, spec, FakeOrca(script), workers=4)
+    assert overlap == [] and counts["done"] == 4
+
+
+def test_exception_in_a_job_fails_only_that_job(session):
+    def script(job, n):
+        if len(job.geometry) == 2:
+            raise FileNotFoundError("scratch vanished")
+        return ok(job)
+
+    counts = run(session, make_spec(m=(1, 2)), FakeOrca(script))
+    failed = [j for j in jobs(session) if j.status == "failed"]
+    assert len(failed) == 1 and failed[0].error == "FileNotFoundError: scratch vanished"
+    assert counts["done"] == 3  # the H atom's three stages still ran
+
+
+def test_requeue_failed_respects_finished_selections(session):
+    from hclust.runner import requeue_failed
+
+    spec = CampaignSpec.model_validate({
+        "name": "requeue", "species": {"states": [[3, 1, 1], [2, 0, 1]]},
+        "seeds": [{"generator": "random", "params": {"count": 2}}],
+        "stages": [
+            {"name": "pre", "level": "L0", "task": "opt"},
+            {"name": "promote", "select": {}, "from": "pre"},
+        ],
+    })
+
+    def script(job, n):
+        if len(job.geometry) == 3 and n == 1:  # one H3+ start fails for good
+            return Result(status="failed", error="boom", error_kind="other")
+        if len(job.geometry) == 2:  # every H2 start fails: H2 never gets a selection
+            return Result(status="failed", error="boom", error_kind="other")
+        return landscape([(TRIANGLE, -1.3)])(job, n)
+
+    run(session, spec, FakeOrca(script))
+    assert requeue_failed(session, spec) == (2, 1)  # 2 H2 requeued, the H3+ one skipped
+    counts = run(session, spec, FakeOrca(lambda job, n: ok(job)))
+    assert counts["failed"] == 1 and counts["done"] == 3  # H3+: 1 done; H2: 2 done on retry
+
+
+def test_cpscf_failure_retries_with_numerical_frequencies(session):
+    def script(job, n):
+        if job.level.name == "L1" and "NumFreq" not in job.extra_keywords:
+            return Result(status="failed", error_kind="cpscf", error="CP-SCF", geometry=TRIANGLE)
+        return ok(job)
+
+    fake = FakeOrca(script)
+    run(session, make_spec(m=(3, 3), charges=(1,)), fake)
+    opt = next(j for j in jobs(session) if j.stage == "opt")
+    assert opt.status == "done" and opt.modifiers == ["NumFreq"] and opt.attempts == 2
+    retry = [c for c in fake.calls if c.level.name == "L1"][1]
+    assert retry.geometry.distances()[0] == pytest.approx(0.87, abs=1e-3)  # restarted from the last geometry
+
+
+def test_reselect_after_changing_the_cutoff(session):
+    from hclust.runner import reselect
+
+    apart = Geometry.hydrogens([[0, 0, 0], [0.87, 0, 0], [0.435, 0.753, 3.2]])  # 2.5 < gap < 3.5
+    tight = search_spec(n_random=2).model_dump(by_alias=True) | {"dissociation_cutoff": 2.5}
+    run(session, CampaignSpec.model_validate(tight), FakeOrca(landscape([(apart, -1.3)])))
+    assert all(c.dissociated for c in candidates(session))
+    assert not any(j.stage == "opt" for j in jobs(session))
+
+    loose = CampaignSpec.model_validate(tight | {"dissociation_cutoff": 3.5})
+    assert reselect(session, loose) == 2
+    fake = FakeOrca()
+    run(session, loose, fake)
+    assert not any(c.dissociated for c in candidates(session))
+    assert [c.level.name for c in fake.calls] == ["L1"]  # the two duplicates promote one structure
+
+
+def test_reopen_requeues_failures_and_intact_dissociated_jobs(session, tmp_path):
+    from hclust.runner import requeue_failed
+
+    spec = search_spec(n_random=3)
+    near = Geometry.hydrogens([[0, 0, 0], [0.87, 0, 0], [0.435, 0.753, 3.0]])
+
+    def script(job, n):
+        if n == 1:
+            return Result(status="failed", error="boom", error_kind="other")
+        if n == 2:  # drifted 3.0 A apart: 'dissociated' only under the old 2.5 A cutoff
+            return Result(status="failed", error_kind="opt", error="not converged", geometry=near)
+        return landscape([(TRIANGLE, -1.3)])(job, n)
+
+    tight = CampaignSpec.model_validate(spec.model_dump(by_alias=True) | {"dissociation_cutoff": 2.5})
+    run(session, tight, FakeOrca(script))
+    assert sorted(j.status for j in jobs(session) if j.stage == "pre") == ["dissociated", "done", "failed"]
+    diss = next(j for j in jobs(session) if j.status == "dissociated")
+    (tmp_path / diss.hash).mkdir()
+    (tmp_path / diss.hash / "job.xyz").write_text(near.to_xyz())
+
+    assert requeue_failed(session, spec, reopen=True, jobs_root=tmp_path) == (2, 0)
+    assert candidates(session) == []  # the promote selection was reopened
+    run(session, spec, FakeOrca(landscape([(TRIANGLE, -1.3)])))
+    assert all(j.status == "done" for j in jobs(session))
+    restarted = session.get(Structure, diss.start_structure_id)
+    assert restarted.origin == "pre:requeue"
+
+
+def test_anion_unbound_uses_the_levels_homo_threshold():
+    from hclust.levels import LEVELS
+    from hclust.units import HARTREE_TO_EV
+
+    above, below = 1.0 / HARTREE_TO_EV, -1.4 / HARTREE_TO_EV
+    assert LEVELS["L1M"].anion_unbound(above, -1) is True
+    assert LEVELS["L1M"].anion_unbound(below, -1) is False
+    assert LEVELS["L1M"].anion_unbound(above, 0) is None  # only anions
+    assert LEVELS["L0"].anion_unbound(above, -1) is None  # L0 cannot tell
+
+
+def test_unbound_anions_are_flagged_and_never_selected(session):
+    from hclust.runner import flag_unbound
+    from hclust.structures import same_structure
+    from hclust.units import HARTREE_TO_EV
+
+    spec = CampaignSpec.model_validate({
+        "name": "anion", "species": {"states": [[3, -1, 1]]},
+        "seeds": [{"generator": "random", "params": {"count": 2}, "into": "pre"}],
+        "stages": [
+            {"name": "pre", "level": "L0", "task": "opt"},
+            {"name": "promote", "select": {}, "from": "pre"},
+            {"name": "opt", "level": "L1", "task": "optfreq", "from": "promote"},
+            {"name": "best", "select": {}, "from": "opt"},
+            {"name": "ref", "level": "L2", "task": "sp", "from": "best"},
+        ],
+    })
+    l0 = landscape([(TRIANGLE, -1.30), (LINE, -1.31)])
+
+    def script(job, n):
+        if job.level.name != "L1":
+            return l0(job, n)
+        line = same_structure(job.geometry, LINE)
+        r = ok(job, energy=-1.31 if line else -1.30)
+        r.homo = (1.0 if line else -1.4) / HARTREE_TO_EV  # the lower-energy line is unbound
+        return r
+
+    run(session, spec, FakeOrca(script))
+    best = {c.unbound: c for c in candidates(session) if c.stage == "best"}
+    assert not best[True].selected and best[False].selected
+    assert [j.stage for j in jobs(session)].count("ref") == 1
+
+    for result in session.exec(select(JobResult)).all():
+        result.unbound = None
+    assert flag_unbound(session, spec) == 1
+    flags = [r.unbound for r in session.exec(select(JobResult)).all()]
+    assert sorted(f for f in flags if f is not None) == [False, True]

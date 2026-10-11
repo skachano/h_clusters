@@ -6,12 +6,15 @@ services:
     profiles: [compute]
     environment:
       HOME: /tmp
+      HCLUST_SCRATCH: /scratch
     volumes:
       # ORCA's licence forbids redistribution: mount it, never bake it in.
       - ${ORCA_DIR:-/opt/orca}:/opt/orca:ro
       - ./data:/data
       - ./worker:/app
       - ./campaigns:/campaigns:ro
+      # ORCA runs here; CCSD(T) on H9/H10 needs ~12 GB per job (doc/Plan.md, Phase 4).
+      - ${SCRATCH_DIR:-/var/tmp/hclust}:/scratch
     working_dir: /app
 
   # Learning wiki (wiki/). Live preview: docker compose --profile docs up docs
@@ -21,6 +24,6 @@ services:
     image: hclust-docs:dev
     profiles: [docs]
     ports:
-      - "127.0.0.1:${DOCS_PORT:-8001}:8000"
+      - "${DOCS_BIND:-127.0.0.1}:${DOCS_PORT:-8001}:8000"
     volumes:
       - ./wiki:/docs

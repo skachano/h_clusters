@@ -11,7 +11,7 @@ from hclust.geometry import Geometry
 # Imaginary frequencies smaller than this are numerical noise (doc/Plan.md, 2.2).
 IMAG_FREQ_TOLERANCE_CM = 20.0
 
-ErrorKind = Literal["scf", "opt", "timeout", "other"]
+ErrorKind = Literal["scf", "cpscf", "opt", "timeout", "other"]
 
 
 @dataclass

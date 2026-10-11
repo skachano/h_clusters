@@ -14,8 +14,11 @@ H2_BOND = 0.74
 H3_PLUS_BOND = 0.87
 # Contacts shorter than this are chemical bonds when naming units ("H3+H2").
 BOND_CUTOFF = 1.15
-# A structure whose pieces are all farther apart than this has fallen apart.
-DISSOCIATION_CUTOFF = 2.5
+# A structure whose pieces are all farther apart than this has fallen apart. Ion-molecule
+# and van der Waals complexes (H-.H2, H3+(H2)n, H2.H2) have contacts of 2.5-3.3 A, so a
+# tighter cutoff discards real complexes (Plan, Phase 4); whether they are *bound* is an
+# energetic question for the analysis.
+DISSOCIATION_CUTOFF = 3.5
 
 
 # --------------------------------------------------------------------------- templates

@@ -1,0 +1,32 @@
+# Phase 4 baseline: every H_m^n, m = 1..10, n = -1, 0, +1, two lowest spin states.
+# Search: templates + 20 random seeds -> r2SCAN-3c -> dedup/promote.
+# Two geometry levels (Plan, Phase 3/4): wB97X-D4 (analytic frequencies, every promoted
+# structure) and RI-MP2/aVTZ (optimize all, numerical frequencies for the best 3 only).
+# CCSD(T)/aVTZ single points on the minima of both; the lower one picks the structure.
+name: baseline
+species:
+  m: [1, 10]
+  charges: [-1, 0, 1]
+  n_mult: 2
+seeds:
+  - { generator: templates }
+  - { generator: random, params: { count: 20, seed: 1 } }
+stages:
+  - { name: pre, level: L0, task: opt }
+  - { name: promote, select: { energy_window_kcal: 15, max_per_state: 8 }, from: pre }
+
+  - { name: dft, level: L1, task: optfreq, from: promote }
+  - { name: dft_best, select: { energy_window_kcal: 5, max_per_state: 3, minima_only: true }, from: dft }
+  - { name: dft_ref, level: L2, task: sp, from: dft_best }
+
+  - { name: mp2, level: L1M, task: opt, from: promote }
+  - { name: mp2_best, select: { energy_window_kcal: 5, max_per_state: 3 }, from: mp2 }
+  - { name: mp2_freq, level: L1M, task: optfreq, from: mp2_best }
+  - { name: mp2_ref, level: L2, task: sp, from: mp2_freq, when: minimum }
+# Ion-molecule and van der Waals complexes have contacts of 2.5-3.3 A (Plan, Phase 4).
+dissociation_cutoff: 3.5
+resources:
+  workers: 12          # ~8 GB of RAM free: 12 x 500 MB + overhead
+  maxcore_mb: 500
+  timeout_min: 360     # open-shell RI-MP2 numerical frequencies for H10 can take hours
+  scratch_budget_gb: 150

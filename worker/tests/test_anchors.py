@@ -1,6 +1,6 @@
 """Regression against exactly known H, H-, H2, H2+ and H3+ results (doc/Plan.md, 1.2).
 
-L1 (wB97M-V) optimizes and computes frequencies; L2 (CCSD(T)/aug-cc-pVTZ) computes
+L1 (wB97X-D4) optimizes and computes frequencies; L2 (CCSD(T)/aug-cc-pVTZ) computes
 single points at the L1 geometries. Results are cached in $HCLUST_DATA/jobs, so a
 rerun only parses.
 """
@@ -127,3 +127,12 @@ def test_l2_h2_plus_dissociation_energy():
 def test_l2_h3_plus_proton_detachment_energy():
     de = l2("H2").energy - l2("H3+").energy  # H3+ -> H2 + H+
     assert ev(de) == pytest.approx(ev(E_H2 - E_H3_PLUS), abs=ENERGY_TOL_EV)
+
+
+def test_l1m_keeps_the_c2v_h5_plus_minimum():
+    """Phase 3: DFT collapses H5+ to the proton-shared D2d form; (RI-)MP2/aVTZ must not."""
+    from hclust.structures import composition, h3_core
+
+    result = run_orca(OrcaJob(State(5, 1, 1), h3_core(5)[0], LEVELS["L1M"], Task.OPTFREQ))
+    assert result.ok and result.n_imag == 0
+    assert composition(result.geometry) == "H3·H2"

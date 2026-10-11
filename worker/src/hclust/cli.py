@@ -14,7 +14,10 @@ from hclust.db import Campaign, Candidate, Job, JobResult, JobStatus, StateRow, 
 from hclust.geometry import Geometry
 from hclust.structures import composition
 from hclust.units import HARTREE_TO_KCAL
-from hclust.runner import Runner, plan as plan_campaign
+from hclust.runner import (
+    Runner, flag_unbound, plan as plan_campaign, relabel_dissociated, requeue_failed,
+    reselect as reselect_campaign,
+)
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
@@ -55,6 +58,42 @@ def run(
             sys.exit(130)
         typer.echo(f"finished: {counts}")
         _print_status(session, spec.name)
+
+
+@app.command("retry-failed")
+def retry_failed(
+    campaign: CampaignFile,
+    stage: Annotated[str | None, typer.Option(help="only this stage")] = None,
+    reopen: Annotated[bool, typer.Option(help="also reopen finished selections; requeue intact 'dissociated' jobs")] = False,
+) -> None:
+    """Put failed jobs back in the queue (by default unless their state's selection already ran)."""
+    spec = CampaignSpec.load(campaign)
+    with Session(get_engine()) as session:
+        requeued, skipped = requeue_failed(session, spec, stage, reopen=reopen)
+    typer.echo(f"requeued {requeued} job(s); skipped {skipped} whose selection already ran")
+
+
+@app.command()
+def relabel(campaign: CampaignFile) -> None:
+    """Mark failed jobs whose last geometry has fallen apart as 'dissociated', and flag
+    results of anions that do not hold their extra electron as 'unbound'."""
+    spec = CampaignSpec.load(campaign)
+    with Session(get_engine()) as session:
+        n = relabel_dissociated(session, spec)
+        n_unbound = flag_unbound(session, spec)
+    typer.echo(f"relabelled {n} failed job(s) as dissociated; {n_unbound} result(s) are unbound anions")
+
+
+@app.command()
+def reselect(
+    campaign: CampaignFile,
+    stage: Annotated[list[str] | None, typer.Option(help="select stage(s); default: all")] = None,
+) -> None:
+    """Forget select-stage decisions so they run again (e.g. after changing selection rules)."""
+    spec = CampaignSpec.load(campaign)
+    with Session(get_engine()) as session:
+        n = reselect_campaign(session, spec, set(stage) if stage else None)
+    typer.echo(f"cleared {n} selection record(s); they are redone on the next run")
 
 
 @app.command()
@@ -103,7 +142,8 @@ def structures(
                 )
                 typer.echo(
                     f"  {job.id:>5} {(result.energy - e_min) * HARTREE_TO_KCAL:8.2f} "
-                    f"{'' if result.n_imag is None else result.n_imag:>4} {composition(geometry):<12} "
+                    f"{'' if result.n_imag is None else result.n_imag:>4} "
+                    f"{composition(geometry) + (' e⁻' if result.unbound else ''):<12} "
                     f"{shortest:<22} {_source(session, job, sources):<15} {kids}"
                 )
 
