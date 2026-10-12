@@ -73,7 +73,9 @@ See [quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md).
 - The plan reports binding energies both as ΔE and ΔE₀ = ΔE + ΔZPE, and the
   stability verdict has a separate top category, `bound_with_zpe`, for
   clusters with $D_{0,\min} > 0$ (`doc/Plan.md` §2.2).
-- A VPT2 (anharmonic) spot-check on H₅⁺ is an optional extension (Phase 8).
+- Phase 8 goes beyond the harmonic ZPE: VPT2 for H₂, H₃⁺ and H₅⁺, and
+  [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md) for the
+  neutral clusters, where the harmonic $D_0 < 0$ turns out to be wrong.
 
 ## References
 

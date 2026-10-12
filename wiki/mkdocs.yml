@@ -59,10 +59,12 @@ plugins:
             Potential energy surface: ポテンシャルエネルギー曲面
             Spin and multiplicity: スピンと多重度
             Units: 単位
+            Chemical and van der Waals bonds: 化学結合とファンデルワールス結合
             Hartree–Fock: ハートリー–フォック法
             Density functional theory: 密度汎関数理論
             MP2: MP2
             Coupled cluster: 結合クラスター法
+            Diffusion Monte Carlo: 拡散モンテカルロ法
             Semi-empirical tight binding (GFN2-xTB): 半経験的タイトバインディング (GFN2-xTB)
             Basis sets: 基底関数系
             Resolution of the identity (RI): 恒等分解 (RI)
@@ -134,6 +136,7 @@ nav:
       - Schrödinger equation: foundations/schrodinger-equation.md
       - Born–Oppenheimer approximation: foundations/born-oppenheimer.md
       - Potential energy surface: foundations/potential-energy-surface.md
+      - Chemical and van der Waals bonds: foundations/chemical-and-van-der-waals-bonds.md
       - Spin and multiplicity: foundations/spin-and-multiplicity.md
       - Units: foundations/units.md
   - Methods:
@@ -142,6 +145,7 @@ nav:
       - Density functional theory: methods/dft.md
       - MP2: methods/mp2.md
       - Coupled cluster: methods/coupled-cluster.md
+      - Diffusion Monte Carlo: methods/diffusion-monte-carlo.md
       - Semi-empirical tight binding (GFN2-xTB): methods/xtb.md
       - Basis sets: methods/basis-sets.md
       - Resolution of the identity (RI): methods/resolution-of-identity.md

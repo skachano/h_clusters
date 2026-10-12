@@ -9,8 +9,10 @@ minimum of the potential energy surface, with vibrations added as small
 harmonic wiggles. Nuclei are quantum particles too, and hydrogen nuclei are
 light enough for that to matter: they spread out, tunnel through barriers,
 and for floppy clusters don't sit in any single minimum at all. These
-effects are the hardest part of hydrogen cluster physics, and mostly outside
-what this project's methods compute.
+effects are the hardest part of hydrogen cluster physics. The campaign
+itself treats them harmonically; two Phase 8 studies go beyond that (VPT2
+for the cations, [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md)
+for the weak clusters).
 
 ## Idea
 
@@ -48,14 +50,26 @@ isn't a minimum. The question "which structure is H₅⁺?" has no classical ans
 
 | Method | Idea | Cost |
 |---|---|---|
-| Harmonic (this project) | parabola at each minimum | 1 Hessian |
-| VPT2 | perturbative anharmonic corrections around a minimum | cubic and quartic derivatives |
+| Harmonic (the campaign) | parabola at each minimum | 1 Hessian |
+| VPT2 (Phase 8) | perturbative anharmonic corrections around a minimum | cubic and quartic derivatives |
 | Vibrational CI, MCTDH | solve the nuclear Schrödinger equation on a fitted PES | needs a global PES |
-| Diffusion Monte Carlo | exact nuclear ground state by random walks | many PES evaluations |
+| [Diffusion Monte Carlo](../methods/diffusion-monte-carlo.md) (Phase 8) | exact nuclear ground state by random walks | many PES evaluations |
 | Path-integral MD | each nucleus as a ring of beads, quantum statistics at temperature T | many PES evaluations per step |
 
 All except VPT2 need the PES at very many geometries, usually through a
-fitted analytic surface.
+fitted analytic surface. The DMC study builds one from pair potentials fitted
+to CCSD(T) scans: cheap to evaluate a billion times.
+
+### What the harmonic picture gets wrong here
+
+The campaign's harmonic ZPE makes every neutral cluster beyond H₂ unbound
+($D_0 < 0$ by 8–55 meV). Diffusion Monte Carlo on a CCSD(T) potential finds
+the opposite: (H₂)ₖ is bound by 0.2–0.9 meV and a lone H atom stays with two
+or more H₂ by about 0.1 meV; only H₂·H is at the threshold of binding. The
+harmonic approximation treats the soft intermolecular motions as stiff
+parabolas and overestimates their zero-point energy several-fold. For the
+cations, where the binding is much larger, VPT2 changes $D_0$ of
+H₅⁺ → H₃⁺ + H₂ only from 0.244 to 0.280 eV.
 
 ### Nuclear spin
 
@@ -63,7 +77,8 @@ Protons have spin ½ too. Exchanging two protons must change the sign of the tot
 wavefunction, which couples nuclear spin to rotation: H₂ comes as *para*
 (nuclear spins paired, even rotational levels) and *ortho* (parallel, odd
 levels). At low temperatures this changes rotational energies and entropies.
-The project's thermochemistry ignores it.
+The project's thermochemistry ignores it; the DMC study assumes para-H₂,
+whose $j = 0$ ground state is spherical.
 
 ## Where this appears in h_clusters
 
@@ -72,8 +87,9 @@ The project's thermochemistry ignores it.
 - The plan names the risk: "Harmonic ZPE is unreliable for floppy H₂ units"
   (`doc/Plan.md` §7), and the physics caveat in §1.2: clusters that are minima
   in the harmonic picture can be unbound once ZPE is included.
-- Optional extensions (Phase 8): a VPT2 spot-check on H₅⁺, or a discussion of
-  path-integral approaches.
+- Phase 8 studies: VPT2 on H₂, H₃⁺ and H₅⁺ (`studies/anharmonic.py`), and
+  diffusion Monte Carlo of the neutral clusters (`studies/dmc.py`; see
+  [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md)).
 - Reporting both ΔE and ΔE₀, and the separate `bound_with_zpe` verdict, keep
   the harmonic ZPE's influence visible rather than hidden in one number.
 
