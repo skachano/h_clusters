@@ -1177,6 +1177,36 @@ the same structures):**
     (H₆⁺ (2) = H₂·H₂⁺·H₂, the textbook picture). Scores have a gap only
     between the neutral clusters (≤ 0.44) and all ions (3.3–10.8), so there
     is no natural cutoff for "one delocalised unit".
+- **Barriers (2026-10-12).** `studies/barriers.py`: does any channel of
+  H₅⁺ or H₆⁺ (2) below 1 eV climb above its products on the way out?
+  - Method: for each channel, the two best atom assignments (fragment
+    reference structures aligned onto their atoms by permutation + Kabsch,
+    the neutral one pulled out to 4 Å closest contact; end points fixed, not
+    relaxed). CI-NEB at L1M (RI-MP2 RIJK aVTZ, 10 images). Where the path
+    has an interior maximum: OptTS + NumFreq from the climbing image, which
+    counts only with n_imag = 1 and if no sorted interatomic distance moved
+    more than 0.25 Å (one search slid 0.36 eV down to another saddle).
+    CCSD(T)/aVTZ single points on all 108 images and on each TS. No IRC.
+  - Check: the H₅⁺ proton hop C₂ᵥ → C₂ᵥ through D₂d gives 0.0057 eV
+    (0.13 kcal/mol, as the basis study), 545i cm⁻¹, −0.037 eV with ZPE.
+  - H₅⁺ → H₃⁺ + H₂ (D_e 0.370), H₆⁺ → H₄⁺ + H₂ (0.427) and → H₃⁺ + H₃
+    (0.663): the better assignment rises to the products with no maximum,
+    so the threshold is D_e. (The other assignments of the H₆⁺ channels
+    climb to 0.69/0.80 eV; their TS searches left the path or did not
+    converge.)
+  - H₆⁺ → H₅⁺ + H (D_e 0.295, D₀ 0.238 eV): both assignments cross a
+    saddle, 263i and 1023i cm⁻¹, at 0.329 and 0.311 eV, i.e. 34 and 16 meV
+    above the products. With harmonic ZPE (TS without its imaginary mode) the
+    lower one is at 0.192 eV, 46 meV below D₀. So a small electronic
+    barrier that ZPE removes, and smaller than the method resolves: MP2 and
+    CCSD(T) differ by up to 0.1 eV along the paths (0.19 vs 0.29 eV at the
+    4 Å end), and the geometries are MP2's.
+  - Found on the way, and fixed: ORCA writes no property geometries for NEB
+    (the parser now reads the path files); the hop's end point had swapped
+    the atoms within each H₂, which sent the path through the planar D₂ₕ
+    saddle (24 meV) instead.
+  - Web: Extensions card "Barriers on the way out". Wiki: transition
+    states and barriers.
 - Not done (still open): multiplicities `all_upto: 3`, framework port,
   bigger m, per-atom/per-bond energy decomposition (LED/EDA).
 

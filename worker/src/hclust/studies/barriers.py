@@ -28,7 +28,7 @@ from itertools import combinations, permutations
 import numpy as np
 from sqlmodel import Session
 
-from hclust.analysis.units import FragmentationTree, Key, key_label
+from hclust.analysis.units import Channel, FragmentationTree, Key, key_label
 from hclust.analysis.verdicts import StateAnalysis
 from hclust.analysis.vpt2 import HARTREE_TO_CM
 from hclust.engines.orca import OrcaJob, Task
@@ -227,6 +227,26 @@ def zpe(frequencies) -> float | None:
     return 0.5 * sum(f for f in frequencies if f > 0) / HARTREE_TO_CM
 
 
+def d_zero(channel: Channel, by_key: dict, cluster: StateAnalysis) -> float | None:
+    """The channel's D_0 (Eh): D_e plus the products' harmonic ZPE minus the cluster's."""
+    def zpe_of(x: StateAnalysis | None) -> float | None:
+        return x.best.thermo.zpe if x is not None and x.best is not None and x.best.thermo else None
+    zpes = [zpe_of(by_key.get(k)) for k in channel.parts]
+    if zpe_of(cluster) is None or None in zpes:
+        return None
+    return channel.cost + sum(zpes) - zpe_of(cluster)
+
+
+def on_path(start: Geometry, ts: Geometry, tolerance: float = 0.25) -> bool:
+    """Whether a TS search stayed near the image it started from: no sorted interatomic
+    distance moved by more than `tolerance` (Angstrom). A search can slide off to a saddle of
+    another rearrangement, which says nothing about the path's own maximum."""
+    def distances(x):
+        r = np.linalg.norm(x[:, None] - x[None], axis=-1)
+        return np.sort(r[np.triu_indices(len(x), 1)])
+    return bool(np.abs(distances(start.coords) - distances(ts.coords)).max() <= tolerance)
+
+
 def run(session: Session, campaign: str, analyses: list[StateAnalysis], workers: int,
         log: Callable[[str], None]) -> list[dict]:
     study = f"{STUDY}@{campaign}"
@@ -251,20 +271,25 @@ def run(session: Session, campaign: str, analyses: list[StateAnalysis], workers:
             ts_jobs[f"{p.key}|ts"] = OrcaJob(p.state, r.geometry or r.path[top], mp2, Task.TS, maxcore_mb=1000)
             state_of[f"{p.key}|ts"] = p.state
     ts = run_jobs(session, study, ts_jobs, workers=workers, log=log)
+    stayed = {key: r.ok and on_path(ts_jobs[key].geometry, r.geometry) for key, r in ts.items()}
     for key, r in ts.items():
-        if r.ok and r.n_imag == 1:
+        if stayed[key] and r.n_imag == 1:
             singles[f"{key}|L2"] = OrcaJob(state_of[key], r.geometry, ccsdt, Task.SP, maxcore_mb=1500)
     sp = run_jobs(session, study, singles, workers=workers, log=log)
 
     by_label = {a.state.label: a for a in analyses}
+    by_key = {(x.state.m, x.state.charge, x.state.mult): x for x in analyses}
     tree = FragmentationTree([x.best for x in analyses if x.best is not None])
     rows = []
     for p in paths:
         a, r = by_label[p.cluster], neb[p.key]
-        d_e = None if p.channel == "proton hop" else next(
-            (c.cost for c in tree.channels((a.state.m, a.state.charge, a.state.mult)) if c.label == p.channel), None)
+        channel = None if p.channel == "proton hop" else next(
+            (c for c in tree.channels((a.state.m, a.state.charge, a.state.mult)) if c.label == p.channel), None)
+        d_e = None if channel is None else channel.cost
+        d_0 = None if channel is None else d_zero(channel, by_key, a)
         row = {"state": p.cluster, "channel": p.channel, "atoms": p.groups,
-               "d_e_ev": None if d_e is None else round(d_e * HARTREE_TO_EV, 4)}
+               "d_e_ev": None if d_e is None else round(d_e * HARTREE_TO_EV, 4),
+               "d_0_ev": None if d_0 is None else round(d_0 * HARTREE_TO_EV, 4)}
         if not r.path:
             rows.append(row | {"barrier_verdict": "failed", "neb_converged": False})
             continue
@@ -280,7 +305,7 @@ def run(session: Session, campaign: str, analyses: list[StateAnalysis], workers:
         }
         t = ts.get(f"{p.key}|ts")
         t_cc = sp.get(f"{p.key}|ts|L2")
-        if bumps.get(p.key) and t is not None and t.ok and t.n_imag == 1 and t_cc is not None and t_cc.ok and cc[0] is not None:
+        if bumps.get(p.key) and stayed.get(f"{p.key}|ts") and t.n_imag == 1 and t_cc is not None and t_cc.ok and cc[0] is not None:
             barrier = t_cc.energy - cc[0]
             z_ts, z_start = zpe(t.frequencies), zpe(a.reference.frequencies)
             row |= {
@@ -289,12 +314,15 @@ def run(session: Session, campaign: str, analyses: list[StateAnalysis], workers:
                 "barrier_0_ev": None if None in (z_ts, z_start) else round((barrier + z_ts - z_start) * HARTREE_TO_EV, 4),
                 "above_products_ev": None if d_e is None else round((barrier - d_e) * HARTREE_TO_EV, 4),
             }
+            if d_0 is not None and z_ts is not None and z_start is not None:
+                row["above_products_0_ev"] = round((barrier + z_ts - z_start - d_0) * HARTREE_TO_EV, 4)
             if d_e is None:
                 row["barrier_verdict"] = "isomerization"
             else:
                 row["barrier_verdict"] = "above" if barrier > d_e else "submerged"
         elif bumps.get(p.key):
-            row["barrier_verdict"] = "unconfirmed"  # a maximum on the path, no TS confirmed
+            # a maximum on the path, no TS confirmed: the search failed, or found another saddle
+            row["barrier_verdict"] = "elsewhere" if t is not None and t.ok and not stayed[f"{p.key}|ts"] else "unconfirmed"
             if t is not None:
                 row["ts_imag_cm"] = None if t.frequencies is None else round(float(min(t.frequencies)), 1)
                 row["ts_n_imag"] = t.n_imag

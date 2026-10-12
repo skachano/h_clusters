@@ -87,21 +87,46 @@ because the bottleneck moves with energy.
 | Rearranging core | [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H (an [H₃⁺](app:s/3/1/1) triangle must form) | yes | NEB → TS → IRC |
 | Spin change | high-spin cations to low-spin products | — | MECP |
 
-For [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H no barrier is expected, because the reverse reaction
+For [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H no barrier was expected, because the reverse reaction
 resembles [H₂⁺](app:s/2/1/2) + [H₂](app:s/2/0/1) → [H₃⁺](app:s/3/1/1) + H, which has none
 ([fragmentation](fragmentation.md#products-versus-process-rearrangement-and-barriers)).
-That expectation is exactly what an NEB calculation would test.
+The NEB calculation finds a small one instead:
+
+- Both ways of assigning the atoms cross a saddle point (one imaginary mode,
+  263i and 1023i cm⁻¹) 34 and 16 meV above the products in CCSD(T) energy.
+- With harmonic zero-point energy the lower saddle falls 46 meV *below* the
+  products ($D_0$ = 0.238 eV), so the threshold stays $D_0$.
+- 16 meV is also below what the method can resolve here: the geometries are
+  MP2's, and along the path MP2 and CCSD(T) differ by up to 0.1 eV (0.19
+  against 0.29 eV at the end).
+
+The other channels below 1 eV, [H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1),
+[H₆⁺](app:s/6/1/2) → H₄⁺ + [H₂](app:s/2/0/1) and → [H₃⁺](app:s/3/1/1) + H₃, rise to the products without a
+maximum. The check, the [H₅⁺](app:s/5/1/1) proton hop through the D₂d saddle, gives
+0.0057 eV (0.13 kcal/mol) with one imaginary mode at 545i cm⁻¹, and −0.037 eV
+with zero-point energy: the zero-point level lies above the barrier.
 
 ## Where this appears in h_clusters
 
-- Not computed yet. The fragmentation tree and the units use product
-  energies ($D_e$) only: `worker/src/hclust/analysis/units.py`.
+- The barriers study, `worker/src/hclust/studies/barriers.py`: for each
+  channel of [H₅⁺](app:s/5/1/1) and [H₆⁺](app:s/6/1/2) (doublet) below 1 eV, the two best ways of
+  assigning the atoms. A CI-NEB at RI-MP2 (level L1M, 10 images) runs from
+  the cluster minimum to the fragments pulled 4 Å apart. The end is not
+  relaxed into a product complex, because ORCA keeps NEB end points fixed.
+  Where the path has a maximum, `OptTS` from a numerical Hessian follows,
+  and the saddle counts only with one imaginary mode and if it stayed near
+  its starting image (no distance changed by more than 0.25 Å). CCSD(T)
+  single points on every image give the energies. There is no IRC yet. Run
+  with `python -m hclust study barriers`; the report is
+  `data/studies/barriers@baseline.json`.
+- The fragmentation tree and the units still use product energies ($D_e$)
+  only: `worker/src/hclust/analysis/units.py`.
 - ORCA has everything the workflow needs: `NEB-TS` (CI-NEB followed by a TS
   optimization), `ZOOM-NEB`, `OptTS`, `IRC`, relaxed scans (`%geom Scan`)
   and `SurfCrossOpt` for MECPs. The geometry levels L1 (ωB97X-D4) and L1M
-  (RI-MP2) have analytic gradients; CCSD(T) single points would give the
+  (RI-MP2) have analytic gradients; CCSD(T) single points give the
   energies, as for every other energy in the project.
-- Plan: `doc/Plan.md`, Phase 8 (not yet scheduled).
+- Plan: `doc/Plan.md`, Phase 8, barriers.
 - Web app: the [Extensions](app:studies) page, "Barriers on the way out".
 
 ## References

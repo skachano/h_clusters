@@ -69,3 +69,10 @@ def test_proton_hop_end_is_the_mirror_minimum():
 def test_zpe_skips_the_imaginary_mode():
     assert barriers.zpe([-500.0, 1000.0, 3000.0]) == pytest.approx(2000.0 / 219474.6313632)
     assert barriers.zpe(None) is None
+
+
+def test_ts_must_stay_near_its_starting_image():
+    moved = Geometry(H5.symbols, H5.coords + 0.05)
+    assert barriers.on_path(H5, moved)  # a rigid shift changes no distance
+    stretched = Geometry(H5.symbols, H5.coords * [1.0, 1.0, 1.5])
+    assert not barriers.on_path(H5, stretched)

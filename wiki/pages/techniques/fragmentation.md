@@ -103,8 +103,10 @@ experiments measure exactly these thresholds.
   nothing has to rearrange, so the threshold equals $D_0$.
 - **Possibly a barrier:** splits that need rearrangement. For [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H
   none is expected: the reverse resembles [H₂⁺](app:s/2/1/2) + [H₂](app:s/2/0/1) → [H₃⁺](app:s/3/1/1) + H, the barrierless
-  ion–molecule reaction that forms [H₃⁺](app:s/3/1/1) in interstellar clouds. That is an
-  expectation, not a calculation.
+  ion–molecule reaction that forms [H₃⁺](app:s/3/1/1) in interstellar clouds. The NEB
+  calculation finds a saddle 16 meV above the products in CCSD(T) energy,
+  which harmonic zero-point energy puts 46 meV below them, so the threshold
+  is still $D_0$ ([transition states and barriers](transition-states.md#example-which-channels-would-need-what)).
 
 **Thresholds are not the whole story either.** Just above threshold the
 cheapest channel dominates; at higher energies, a channel whose transition
@@ -145,8 +147,8 @@ finished too.
   §1.2: [H₅⁺](app:s/5/1/1), [H₇⁺](app:s/7/1/1), [H₉⁺](app:s/9/1/1) (an [H₃⁺](app:s/3/1/1) core plus [H₂](app:s/2/0/1) units) should be more stable than
   their even neighbours.
 - The fragmentation tree and the units built on it (`analysis/units.py`)
-  use $D_e$ and so assume every channel is barrierless; no dissociation
-  path has been computed yet.
+  use $D_e$ and so assume every channel is barrierless. The barriers study
+  checks this for [H₅⁺](app:s/5/1/1) and [H₆⁺](app:s/6/1/2) only.
 - The *structural* check that a single optimized structure hasn't fallen
   apart is separate: the 3.5 Å contact cutoff in
   [structure search](structure-search.md#how-this-project-does-it).
