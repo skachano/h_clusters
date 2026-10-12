@@ -14,23 +14,31 @@ hooks:
 
 theme:
   name: material
+  # main.html: ?theme= from the web app, and app links that carry the wiki's theme back.
+  custom_dir: overrides
   features:
     - navigation.indexes
     - navigation.sections
     - navigation.footer
     - search.highlight
     - content.code.copy
+  # Automatic, dark, light: the web app's three settings, in the order its toggle cycles.
+  # The icon shows the current setting; the name says what a click switches to.
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
+    - media: "(prefers-color-scheme)"
       toggle:
-        icon: material/weather-night
-        name: Dark mode
+        icon: material/brightness-auto
+        name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
         icon: material/weather-sunny
-        name: Light mode
+        name: Switch to automatic mode
 
 plugins:
   - search

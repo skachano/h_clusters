@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{#- The theme follows the reader between the wiki and the web app, which keep separate settings
+    (and in development run on different origins): links carry it as ?theme=auto|dark|light. -#}
+{% block extrahead %}
+  {{ super() }}
+  <script>
+    (function () {
+      // The palette options of mkdocs.yml, by the theme name the app uses.
+      var palettes = [
+        {%- for option in config.theme.palette %}
+        { theme: {{ ("auto" if option.media == "(prefers-color-scheme)" else option.media.split(": ")[1].rstrip(")")) | tojson }},
+          color: { media: {{ option.media | tojson }}, scheme: {{ option.scheme | d("default", true) | tojson }},
+                   primary: {{ option.primary | d("indigo", true) | tojson }}, accent: {{ option.accent | d("indigo", true) | tojson }} } },
+        {%- endfor %}
+      ];
+
+      // From the app: store the theme where Material's palette script, which runs next, reads it.
+      var url = new URL(location.href);
+      var asked = url.searchParams.get("theme");
+      var index = palettes.findIndex(function (p) { return p.theme === asked; });
+      if (index >= 0) __md_set("__palette", { index: index, color: palettes[index].color });
+      if (asked !== null) {
+        url.searchParams.delete("theme");
+        history.replaceState(history.state, "", url);
+      }
+
+      // To the app: links marked by hooks/app_links.py carry the current theme (no choice: auto).
+      function current() {
+        var stored = __md_get("__palette");
+        return (stored && palettes[stored.index] || palettes[0]).theme;
+      }
+      function update() {
+        var theme = current();
+        document.querySelectorAll("a[data-app-link]").forEach(function (a) {
+          var base = a.dataset.appLink || (a.dataset.appLink = a.getAttribute("href"));
+          var query = base.split("#").pop().indexOf("?") >= 0 ? "&" : "?";
+          a.setAttribute("href", base + query + "theme=" + theme);
+        });
+      }
+      document.addEventListener("DOMContentLoaded", update);
+      // Material stores the new palette in its own change handler; read it after that.
+      document.addEventListener("change", function (e) {
+        if (e.target.name === "__palette") setTimeout(update);
+      });
+    })();
+  </script>
+{% endblock %}

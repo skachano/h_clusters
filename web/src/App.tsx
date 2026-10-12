@@ -1,7 +1,8 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useCampaigns } from "./api/client";
 import { useLang, type Lang } from "./i18n";
+import { useTheme } from "./lib/themeChoice";
 import { wikiUrl } from "./lib/wiki";
 
 // Each language named in itself, so a reader who cannot read the current one finds theirs.
@@ -18,45 +19,23 @@ import { TrendsView } from "./views/TrendsView";
 // 3Dmol.js is most of the bundle and only the species page needs it.
 const SpeciesView = lazy(() => import("./views/SpeciesView").then((m) => ({ default: m.SpeciesView })));
 
-type Theme = "light" | "dark" | null;
-
-function useTheme(): [Theme, (t: Theme) => void] {
-  const [theme, setTheme] = useState<Theme>(() => {
-    try {
-      const t = localStorage.getItem("theme");
-      return t === "light" || t === "dark" ? t : null;
-    } catch {
-      return null;
-    }
-  });
-  useEffect(() => {
-    if (theme) document.documentElement.dataset.theme = theme;
-    else delete document.documentElement.dataset.theme;
-    try {
-      if (theme) localStorage.setItem("theme", theme);
-      else localStorage.removeItem("theme");
-    } catch {
-      /* private mode: the toggle still works for this visit */
-    }
-  }, [theme]);
-  return [theme, setTheme];
-}
-
 function Shell() {
   const { campaign = "baseline" } = useParams();
   const campaigns = useCampaigns();
   const navigate = useNavigate();
   const location = useLocation();
-  const [theme, setTheme] = useTheme();
+  const { theme, setTheme } = useTheme();
   const { lang, setLang, t } = useLang();
-  // Links from the Japanese wiki carry ?lang=ja: switch, then drop it from the address.
+  // Links from the wiki carry ?theme= (applied on load by ThemeProvider), and from the Japanese
+  // wiki ?lang=ja: switch, then drop both from the address.
   const [params, setParams] = useSearchParams();
   const asked = params.get("lang");
+  const linked = params.has("theme");
   useEffect(() => {
-    if (asked === null) return;
+    if (asked === null && !linked) return;
     if (LANGS.some((l) => l.code === asked)) setLang(asked as Lang);
-    setParams((p) => { p.delete("lang"); return p; }, { replace: true });
-  }, [asked, setLang, setParams]);
+    setParams((p) => { p.delete("lang"); p.delete("theme"); return p; }, { replace: true });
+  }, [asked, linked, setLang, setParams]);
   const keep = location.search; // T, p, quantity follow you between views
   const link = (path: string) => `/c/${campaign}${path}${keep}`;
 
@@ -70,7 +49,7 @@ function Shell() {
           <NavLink to={link("/benchmark")}>{t("nav.benchmark")}</NavLink>
           <NavLink to={link("/studies")}>{t("nav.studies")}</NavLink>
           <NavLink to={link("/jobs")}>{t("nav.jobs")}</NavLink>
-          <a href={wikiUrl("index", lang)} title={t("nav.wikiTitle")}>{t("nav.wiki")}</a>
+          <a href={wikiUrl("index", lang, { theme })} title={t("nav.wikiTitle")}>{t("nav.wiki")}</a>
         </nav>
         {/* One group: when the row is full, these move under the navigation together instead of
             leaving the last item (the language buttons) alone on a line of its own. */}

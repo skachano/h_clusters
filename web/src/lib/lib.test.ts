@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { WIKI_PAGES, wikiUrl } from "./wiki";
+import { parseTheme } from "./themeChoice";
 import { act, renderHook } from "@testing-library/react";
 import { useThemeVersion } from "./theme";
 import { niceExtent, ticks } from "../components/charts/frame";
@@ -193,7 +194,12 @@ describe("wiki links", () => {
       for (const suffix of [".md", ".ja.md"]) expect(existsSync(`${pages}/${page}${suffix}`), `${page}${suffix}`).toBe(true);
   });
   it("follow MkDocs' directory URLs, Japanese under ja/", () => {
-    expect(wikiUrl("index", "en", undefined, "/h_clusters/wiki/")).toBe("/h_clusters/wiki/");
-    expect(wikiUrl("methods/basis-sets", "ja", "names", "/w/")).toBe("/w/ja/methods/basis-sets/#names");
+    expect(wikiUrl("index", "en", { base: "/h_clusters/wiki/" })).toBe("/h_clusters/wiki/");
+    expect(wikiUrl("methods/basis-sets", "ja", { anchor: "names", base: "/w/" })).toBe("/w/ja/methods/basis-sets/#names");
+  });
+  it("carry the theme, auto included", () => {
+    expect(wikiUrl("index", "en", { theme: "dark", base: "/w/" })).toBe("/w/?theme=dark");
+    expect(wikiUrl("methods/dft", "en", { theme: null, anchor: "idea", base: "/w/" })).toBe("/w/methods/dft/?theme=auto#idea");
+    expect([parseTheme("light"), parseTheme("auto"), parseTheme("blue")]).toEqual(["light", null, undefined]);
   });
 });

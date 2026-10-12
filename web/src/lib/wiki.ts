@@ -3,6 +3,7 @@
 // overrides both. The wiki puts Japanese pages under ja/.
 import { STATIC } from "../api/static";
 import type { Lang } from "../i18n";
+import { themeParam, type Theme } from "./themeChoice";
 
 /** Every wiki page the app links to, as its path under wiki/pages without ".md".
  *  A test checks that each one exists in both languages. */
@@ -41,8 +42,12 @@ export function wikiBase(): string {
   return `${location.protocol}//${location.hostname}:8001/`;
 }
 
-/** MkDocs serves page.md at page/ and section/index.md at section/. */
-export function wikiUrl(page: WikiPage, lang: Lang, anchor?: string, base = wikiBase()): string {
+/** MkDocs serves page.md at page/ and section/index.md at section/. With a theme, the wiki
+ *  opens in it (?theme=, read by wiki/overrides/main.html); undefined leaves the wiki's own. */
+export function wikiUrl(page: WikiPage, lang: Lang, { anchor, theme, base = wikiBase() }: {
+  anchor?: string; theme?: Theme; base?: string;
+} = {}): string {
   const path = page === "index" ? "" : `${page.replace(/(^|\/)index$/, "")}/`;
-  return `${base}${lang === "en" ? "" : `${lang}/`}${path}${anchor ? `#${anchor}` : ""}`;
+  const query = theme === undefined ? "" : `?theme=${themeParam(theme)}`;
+  return `${base}${lang === "en" ? "" : `${lang}/`}${path}${query}${anchor ? `#${anchor}` : ""}`;
 }

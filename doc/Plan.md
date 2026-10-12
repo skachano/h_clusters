@@ -1247,6 +1247,9 @@ the same structures):**
   add `?lang=ja`, which the app applies and drops); the app links to pages
   through `web/src/lib/wiki.ts` (`<WikiLink page=…/>`), whose page list a
   Vitest test checks against `wiki/pages`.
+  The theme setting (auto, dark, light) crosses over too, as `?theme=`:
+  `wiki/overrides/main.html` stores it for Material's palette (which gained
+  an automatic option) and adds the wiki's current theme to app links.
 - **As built** (the plan above held, with these differences):
   - Export of the baseline: 14,441 files, **62.7 MB** in 2.5 min
     (`site-data.tar.gz` 7.6 MB). More than estimated: every grid and species

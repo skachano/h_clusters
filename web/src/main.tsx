@@ -5,6 +5,7 @@ import { STATIC } from "./api/static";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { App } from "./App";
 import { LangProvider } from "./i18n";
+import { ThemeProvider } from "./lib/themeChoice";
 import "./styles.css";
 
 // GitHub Pages has no fallback for client-side routes, so the static build keeps the route
@@ -19,9 +20,11 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <LangProvider>
-        <Router>
-          <App />
-        </Router>
+        <ThemeProvider>
+          <Router>
+            <App />
+          </Router>
+        </ThemeProvider>
       </LangProvider>
     </QueryClientProvider>
   </StrictMode>,

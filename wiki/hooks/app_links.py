@@ -44,4 +44,5 @@ def on_post_page(output: str, page, config) -> str:
     for m in HREF.finditer(output):
         if (s := SPECIES.fullmatch(m[1])) and not species_exists(*map(int, s.groups())):
             log.warning("%s: app:%s is not a state of the app", page.file.src_uri, m[1])
-    return HREF.sub(lambda m: f'href="{app_href(m[1], m[2] or "", m[3] or "", lang)}"', output)
+    # data-app-link: overrides/main.html adds the wiki's theme to these links.
+    return HREF.sub(lambda m: f'href="{app_href(m[1], m[2] or "", m[3] or "", lang)}" data-app-link', output)
