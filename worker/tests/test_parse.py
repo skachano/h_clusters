@@ -81,3 +81,16 @@ def test_cpscf_failure_is_classified_and_keeps_the_last_geometry(orca_fixture):
     r = parse_orca(orca_fixture("cpscf_fail_wb97xd4"), is_opt=True)
     assert not r.ok and r.error_kind == "cpscf"
     assert len(r.geometry) == 3  # the optimized structure, a restart point for NumFreq
+
+
+def test_neb_path_frames(tmp_path):
+    from hclust.parse import _frames
+
+    (tmp_path / "job_MEP_trj.xyz").write_text(
+        "2\nCoordinates from ORCA-job job_MEP E  -1.170000000000\nH 0 0 0\nH 0 0 0.74\n"
+        "2\nCoordinates from ORCA-job job_MEP E  -1.100000000000\nH 0 0 0\nH 0 0 1.50\n"
+    )
+    geometries, energies = _frames(tmp_path / "job_MEP_trj.xyz")
+    assert energies == [-1.17, -1.10]
+    assert geometries[1].coords[1, 2] == pytest.approx(1.5)
+    assert _frames(tmp_path / "missing.xyz") == ([], [])

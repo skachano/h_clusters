@@ -39,6 +39,9 @@ class Result:
     # GOAT: all distinct structures found, lowest energy first (geometry/energy = the first).
     ensemble: list[Geometry] | None = None
     ensemble_energies: list[float] | None = None
+    # NEB: the minimum-energy path from start to end (geometry = the climbing image).
+    path: list[Geometry] | None = None
+    path_energies: list[float] | None = None
 
     @property
     def ok(self) -> bool:

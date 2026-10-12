@@ -27,6 +27,7 @@ KEEP_SUFFIXES = (".inp", ".out", ".property.json", ".property.txt", ".xyz", ".he
 DISCARD_MARKERS = (".goat.", ".globaliter.")
 # xTB ranks H clusters wrongly, so keep a wide energy window of GOAT structures.
 GOAT_BLOCK = "%goat\n  MaxEn 30\nend\n"
+NEB_END = "end.xyz"
 
 
 class Task(StrEnum):
@@ -35,14 +36,16 @@ class Task(StrEnum):
     FREQ = "freq"
     OPTFREQ = "optfreq"
     GOAT = "goat"  # global structure search (GOAT-EXPLORE), returns an ensemble
+    TS = "ts"  # transition-state optimization from a computed Hessian, then frequencies
+    NEB = "neb"  # climbing-image nudged elastic band from `geometry` to `end_geometry`
 
     @property
     def optimizes(self) -> bool:
-        return self in (Task.OPT, Task.OPTFREQ)
+        return self in (Task.OPT, Task.OPTFREQ, Task.TS)
 
     @property
     def has_freq(self) -> bool:
-        return self in (Task.FREQ, Task.OPTFREQ)
+        return self in (Task.FREQ, Task.OPTFREQ, Task.TS)
 
 
 @dataclass(frozen=True)
@@ -59,6 +62,9 @@ class OrcaJob:
     ghosts: tuple[int, ...] = ()
     # Extra input blocks, e.g. "%scf EField 0, 0, 0.01 end" or "%cpcm epsilon 10 end".
     blocks: tuple[str, ...] = ()
+    # NEB only: the other end of the path (same atom order), held fixed like the start.
+    end_geometry: Geometry | None = None
+    neb_images: int = 10
 
     def __post_init__(self) -> None:
         if self.state.n_electrons == 0:
@@ -68,6 +74,10 @@ class OrcaJob:
             raise ValueError(f"geometry does not match {self.state.label}")
         if any(not 0 <= i < len(self.geometry) for i in self.ghosts):
             raise ValueError("ghost index out of range")
+        if (self.task is Task.NEB) != (self.end_geometry is not None):
+            raise ValueError("an NEB job needs an end geometry, and only an NEB job takes one")
+        if self.end_geometry is not None and self.end_geometry.symbols != self.geometry.symbols:
+            raise ValueError("the NEB end points must have the same atoms in the same order")
 
     @property
     def effective_task(self) -> Task:
@@ -87,8 +97,10 @@ class OrcaJob:
         words = ["HF" if fallback else level.method, level.basis]
         if state.mult > 1 and level.kind != "xtb":
             words.append("UKS" if level.kind == "dft" and not fallback else "UHF")
+        if task is Task.NEB:
+            words.append("NEB-CI")
         if task.optimizes:
-            words.append(level.opt_keyword)
+            words.append("OptTS" if task is Task.TS else level.opt_keyword)
             if not level.analytic_gradient and not fallback:
                 words.append("NumGrad")
         if task.has_freq and "NumFreq" not in self.extra_keywords:
@@ -119,13 +131,27 @@ class OrcaJob:
         return "\n".join(lines)
 
     def _geom_block(self) -> str:
-        if self.effective_task.optimizes and self.level.opt_max_iter:
-            return f"%geom\n  MaxIter {self.level.opt_max_iter}\nend\n"
-        return ""
+        task = self.effective_task
+        lines = []
+        if task is Task.TS:  # OptTS needs a Hessian to start; RI-MP2 has no analytic one
+            lines += ["  Calc_Hess true", "  NumHess true"]
+        if task.optimizes and self.level.opt_max_iter:
+            lines.append(f"  MaxIter {self.level.opt_max_iter}")
+        block = "%geom\n" + "".join(f"{line}\n" for line in lines) + "end\n" if lines else ""
+        if task is Task.NEB:  # the ends are minima (or fixed product complexes) already
+            block += (f"%neb\n  NEB_End_XYZFile \"{NEB_END}\"\n  NImages {self.neb_images}\n"
+                      "  PreOpt false\nend\n")
+        return block
+
+    @property
+    def files(self) -> dict[str, str]:
+        """Extra input files written next to the input (the NEB end point)."""
+        return {NEB_END: self.end_geometry.to_xyz()} if self.end_geometry is not None else {}
 
     @property
     def hash(self) -> str:
-        return job_hash(self.render(), orca_version())
+        files = "".join(f"\n# file {name}\n{text}" for name, text in sorted(self.files.items()))
+        return job_hash(self.render() + files, orca_version())
 
 
 def job_hash(input_text: str, version: str) -> str:
@@ -197,9 +223,10 @@ def run_orca(
     out = workdir / f"{BASENAME}.out"
     is_opt = job.effective_task.optimizes
     is_goat = job.effective_task is Task.GOAT
+    is_neb = job.effective_task is Task.NEB
 
     if out.exists() and NORMAL_TERMINATION in out.read_text(errors="replace"):
-        result = parse_orca(workdir, BASENAME, is_opt, is_goat)
+        result = parse_orca(workdir, BASENAME, is_opt, is_goat, is_neb)
         result.cached = True
         return result
 
@@ -212,16 +239,19 @@ def run_orca(
         shutil.rmtree(rundir, ignore_errors=True)
         rundir.mkdir(parents=True)
     try:
-        return _run_in(job, rundir, workdir, timeout_s, is_opt, is_goat)
+        return _run_in(job, rundir, workdir, timeout_s, is_opt, is_goat, is_neb)
     finally:
         if rundir != workdir:
             shutil.rmtree(rundir, ignore_errors=True)
 
 
 def _run_in(
-    job: OrcaJob, rundir: Path, workdir: Path, timeout_s: float, is_opt: bool, is_goat: bool
+    job: OrcaJob, rundir: Path, workdir: Path, timeout_s: float, is_opt: bool, is_goat: bool,
+    is_neb: bool = False,
 ) -> Result:
     (rundir / f"{BASENAME}.inp").write_text(job.render())
+    for name, text in job.files.items():
+        (rundir / name).write_text(text)
     with (rundir / f"{BASENAME}.out").open("w") as fh:
         # ORCA must be started by its absolute path to find its sub-programs. Its own
         # session makes the whole process tree killable at once.
@@ -251,7 +281,7 @@ def _run_in(
         cwd=rundir, capture_output=True, timeout=120,
     )
     _collect(rundir, workdir)
-    return parse_orca(workdir, BASENAME, is_opt, is_goat)
+    return parse_orca(workdir, BASENAME, is_opt, is_goat, is_neb)
 
 
 def _collect(rundir: Path, workdir: Path) -> None:

@@ -12,6 +12,8 @@ from hclust.units import BOHR_TO_ANGSTROM
 
 NORMAL_TERMINATION = "ORCA TERMINATED NORMALLY"
 OPT_CONVERGED = "THE OPTIMIZATION HAS CONVERGED"
+TS_CONVERGED = "THE TS OPTIMIZATION HAS CONVERGED"
+NEB_CONVERGED = "THE NEB OPTIMIZATION HAS CONVERGED"
 SCF_NOT_CONVERGED = "SCF NOT CONVERGED"
 # The coupled-perturbed SCF of an analytic Hessian failed (the optimization itself is done).
 CPSCF_FAILED = ("CP-SCF Solver", "error termination in SCF RESPONSE")
@@ -28,7 +30,8 @@ _ERRORS = (re.compile(r"\bError \(.*"), re.compile(r"^Error\b.*"))
 
 
 def parse_orca(
-    workdir: Path, basename: str = "job", is_opt: bool = False, is_goat: bool = False
+    workdir: Path, basename: str = "job", is_opt: bool = False, is_goat: bool = False,
+    is_neb: bool = False,
 ) -> Result:
     workdir = Path(workdir)
     out_path = workdir / f"{basename}.out"
@@ -47,6 +50,8 @@ def parse_orca(
         )
 
     props = json.loads((workdir / f"{basename}.property.json").read_text())
+    if is_neb:
+        return _neb_result(workdir, basename, out, props)
     last = props["Geometries"][-1]
 
     result = Result(
@@ -62,7 +67,7 @@ def parse_orca(
         result.ensemble, result.ensemble_energies = _ensemble(workdir / f"{basename}.finalensemble.xyz")
         result.geometry, result.energy = result.ensemble[0], result.ensemble_energies[0]
     elif is_opt:
-        result.opt_converged = OPT_CONVERGED in out
+        result.opt_converged = OPT_CONVERGED in out or TS_CONVERGED in out
         if not result.opt_converged:
             result.status, result.error_kind = "failed", "opt"
             result.error = "geometry optimization did not converge"
@@ -76,6 +81,35 @@ def parse_orca(
     if pg := _POINT_GROUP.findall(out):
         result.point_group, sym = pg[-1]
         result.symmetry_number = int(sym)
+    return result
+
+
+def _neb_result(workdir: Path, basename: str, out: str, props: dict) -> Result:
+    """An NEB run: the minimum-energy path, start to end, and its climbing image.
+
+    ORCA writes no per-geometry properties for NEB, so the energy and geometry come from
+    the converged climbing image, or the highest image of the path without one.
+    """
+    path, energies = _frames(workdir / f"{basename}_MEP_trj.xyz")
+    climbing = _frames(workdir / f"{basename}_NEB-CI_converged.xyz")
+    if climbing[0]:
+        geometry, energy = climbing[0][0], climbing[1][0]
+    elif path:
+        top = max(range(len(energies)), key=energies.__getitem__)
+        geometry, energy = path[top], energies[top]
+    else:
+        return Result(status="failed", error="NEB wrote no path", error_kind="other", workdir=workdir)
+    result = Result(
+        status="ok", energy=energy, geometry=geometry, path=path, path_energies=energies,
+        orca_version=_VERSION.search(out)[1],
+        wall_time_s=props.get("Calculation_Timings", {}).get("SUM"), workdir=workdir,
+    )
+    result.opt_converged = NEB_CONVERGED in out
+    if not result.opt_converged:
+        result.status, result.error_kind = "failed", "opt"
+        result.error = "NEB did not converge"
+    if s2 := _S2.findall(out):
+        result.s2 = float(s2[-1])
     return result
 
 
@@ -108,6 +142,21 @@ def _ensemble(path: Path) -> tuple[list[Geometry], list[float]]:
         i += n + 2
     order = sorted(range(len(energies)), key=energies.__getitem__)
     return [geometries[k] for k in order], [energies[k] for k in order]
+
+
+def _frames(path: Path) -> tuple[list[Geometry], list[float]]:
+    """Multi-frame XYZ written by NEB, in file order; comments end in 'E <energy in Eh>'."""
+    if not path.exists():
+        return [], []
+    lines = path.read_text().splitlines()
+    geometries, energies, i = [], [], 0
+    while i < len(lines) and lines[i].strip():
+        n = int(lines[i])
+        frame = Geometry.from_xyz("\n".join(lines[i : i + n + 2]))
+        energies.append(float(frame.comment.split()[-1]))
+        geometries.append(Geometry(frame.symbols, frame.coords))
+        i += n + 2
+    return geometries, energies
 
 
 def _charges(entry: dict) -> list[float] | None:

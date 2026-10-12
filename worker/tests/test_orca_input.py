@@ -107,3 +107,29 @@ def test_numfreq_modifier_replaces_the_analytic_hessian():
     job = OrcaJob(State(2, 0, 1), H2, LEVELS["L1"], Task.OPTFREQ, extra_keywords=("NumFreq",))
     assert job.keywords().split().count("NumFreq") == 1
     assert "Freq" not in job.keywords().split()
+
+
+def test_neb_input_carries_its_end_point():
+    h3 = Geometry.hydrogens([[0, 0, 0], [0.9, 0, 0], [0.45, 0.8, 0]])
+    end = Geometry.hydrogens([[0, 0, 0], [0.9, 0, 0], [0.45, 3.0, 0]])
+    job = OrcaJob(State(3, 1, 1), h3, LEVELS["L1M"], Task.NEB, end_geometry=end, neb_images=8)
+    text = job.render()
+    assert "! RI-MP2 RIJK aug-cc-pVTZ aug-cc-pVTZ/C aug-cc-pVTZ/JK NEB-CI TightSCF\n" in text
+    assert '%neb\n  NEB_End_XYZFile "end.xyz"\n  NImages 8\n  PreOpt false\nend\n' in text
+    assert job.files == {"end.xyz": end.to_xyz()}
+    other = Geometry.hydrogens([[0, 0, 0], [0.9, 0, 0], [0.45, 3.1, 0]])
+    assert job.hash != OrcaJob(State(3, 1, 1), h3, LEVELS["L1M"], Task.NEB, end_geometry=other, neb_images=8).hash
+    with pytest.raises(ValueError, match="NEB"):
+        OrcaJob(State(3, 1, 1), h3, LEVELS["L1M"], Task.NEB)
+    with pytest.raises(ValueError, match="NEB"):
+        OrcaJob(State(3, 1, 1), h3, LEVELS["L1M"], Task.OPT, end_geometry=end)
+    # every other job has no extra files and hashes its input text alone, as before
+    plain = OrcaJob(State(3, 1, 1), h3, LEVELS["L1M"], Task.OPT)
+    assert plain.files == {} and plain.hash == job_hash(plain.render(), "6.1.1")
+
+
+def test_transition_state_search_starts_from_a_computed_hessian():
+    h3 = Geometry.hydrogens([[0, 0, 0], [0.9, 0, 0], [0.45, 0.8, 0]])
+    text = OrcaJob(State(3, 1, 1), h3, LEVELS["L1M"], Task.TS).render()
+    assert "OptTS NumFreq TightSCF\n" in text and "TightOpt" not in text
+    assert "%geom\n  Calc_Hess true\n  NumHess true\n  MaxIter 150\nend\n" in text
