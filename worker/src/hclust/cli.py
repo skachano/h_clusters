@@ -210,7 +210,7 @@ def citations() -> None:
         typer.echo(render(collect(session, default_jobs_root())))
 
 
-STUDIES = ("vertical", "counterpoise", "anharmonic", "solvent", "field", "basis", "bonds")
+STUDIES = ("vertical", "counterpoise", "anharmonic", "solvent", "field", "basis", "bonds", "dmc")
 
 
 @app.command()

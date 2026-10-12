@@ -18,10 +18,11 @@ const COLUMNS: Record<string, Record<string, Key | { symbol: string }>> = {
   solvent: { state: "col.state", channel: "col.channel", gas: "col.gas", eps2: { symbol: "ε = 2" }, eps10: { symbol: "ε = 10" }, eps80: { symbol: "ε = 80" } },
   field: { state: "col.state", channel: "col.channel", F0: { symbol: "F = 0" }, "F0.005": { symbol: "0.005" }, "F0.01": { symbol: "0.01" }, "F0.02": { symbol: "0.02" }, alpha_au: { symbol: "α_zz (a.u.)" } },
   bonds: { state: "col.state", structure_id: "col.structure_id", units: "col.units", weakest_in_unit: "col.weakest_in_unit", strongest_in_unit: "col.strongest_in_unit", strongest_link: "col.strongest_link" },
+  dmc: { state: "col.state", channel: "col.channel", d_e_ccsdt_mev: "col.d_e_ccsdt_mev", d_e_model_mev: "col.d_e_model_mev", d0_harmonic_mev: "col.d0_harmonic_mev", d0_dmc_mev: "col.d0_dmc_mev", d0_dmc_err_mev: "col.d0_dmc_err_mev", d0_shallow_mev: "col.d0_shallow_mev", dmc_verdict: "col.dmc_verdict", method: "col.method", dmc_check_mev: "col.dmc_check_mev", spread_angstrom: "col.spread_angstrom", size_growth: "col.size_growth", exact_r_angstrom: "col.exact_r_angstrom" },
   basis: { item: "col.item", channel: "col.channelGeometry", avtz: "col.avtz", cbs: "col.cbs", change: "col.change", unit: "col.unit" },
 };
 
-const ORDER = ["vertical", "counterpoise", "anharmonic", "basis", "bonds", "solvent", "field"];
+const ORDER = ["vertical", "counterpoise", "anharmonic", "dmc", "basis", "bonds", "solvent", "field"];
 
 export function StudiesView() {
   const { campaign = "baseline" } = useParams();
@@ -47,7 +48,8 @@ export function StudiesView() {
 function cell(value: unknown, t: T): string {
   if (value == null) return "–";
   if (typeof value === "boolean") return value ? t("common.yes") : t("common.no");
-  if (typeof value === "number") return Number.isInteger(value) ? String(value) : value.toFixed(Math.abs(value) >= 100 ? 1 : 4);
+  // at most 4 decimals (1 from 100 up), without padding: reports round their values already
+  if (typeof value === "number") return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(Math.abs(value) >= 100 ? 1 : 4)));
   if (Array.isArray(value)) return value.map((v) => cell(v, t)).join(", ");
   return pretty(String(value));
 }
@@ -80,7 +82,8 @@ function StudyCard({ campaign, name }: { campaign: string; name: string }) {
             <tbody>
               {rows.map((r, i) => (
                 <tr key={i}>
-                  {columns.map((c) => <td key={c} className={typeof r[c] === "number" ? "num" : undefined}>{c === "verdict" && typeof r[c] === "string" && `verdict.${r[c]}` in en ? verdictLabel(t, r[c] as Verdict) : cell(r[c], t)}</td>)}
+                  {columns.map((c) => <td key={c} className={typeof r[c] === "number" ? "num" : undefined}>{c === "verdict" && typeof r[c] === "string" && `verdict.${r[c]}` in en ? verdictLabel(t, r[c] as Verdict)
+                    : c === "dmc_verdict" && `dmcv.${r[c]}` in en ? t(`dmcv.${r[c]}` as Key) : cell(r[c], t)}</td>)}
                 </tr>
               ))}
             </tbody>

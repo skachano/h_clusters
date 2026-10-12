@@ -1048,7 +1048,36 @@ the same structures):**
   0.60. Mayer orders (kept for comparison) dip below zero with these diffuse
   bases. Per atom: Löwdin charge and spin, Mayer free valence (≈ 0.99 on
   the radical H of doublet H₃).
-- **Web:** the 3D viewer draws bonds either by distance (now our 1.15 Å rule:
+- **Quantum nuclear motion (DMC study, 2026-10-12).** The neutral H₃–H₉ are
+  `bound` (D_e > 0) but not with harmonic ZPE; harmonic ZPE is poor for their
+  floppy intermolecular motion, so `studies/dmc.py` solves the nuclear problem.
+  - Potential from our own CCSD(T)/aug-cc-pVTZ, counterpoise-corrected scans
+    (693 jobs): H₂ rigid at ⟨r⟩₀ = 0.7668 Å and spherical (para-H₂, J = 0), so
+    H₂–H₂ is averaged over the L/T/H/X orientations, V₀₀ = (V_L + 4V_T + 2V_H +
+    2V_X)/9, and H–H₂ over the angle (3-point Gauss–Legendre). Wells: H₂–H₂
+    −2.61 meV at 3.52 Å, C₆ = 11.8 a.u. (literature: ~3 meV, ~12 a.u.; aVTZ
+    with CP is ~10 % shallow); H–H₂ −1.64 meV at 3.55 Å, C₆ = 8.8 a.u.
+    (A one-electron job must not get a `%mdci` block: ORCA then still starts
+    MDCI and stops, "number of pairs (0)".)
+  - `analysis/dmc.py`: unguided DMC with branching (E₀ = ⟨V⟩ over the walkers),
+    dt = 10 a.u., 2,000 walkers, 150,000 steps; an exact radial solver for the
+    dimers (tridiagonal, 600-bohr box: halo states need it). Tests: the 3D
+    harmonic oscillator, a Morse dimer against the exact level, an unbound
+    pair seen spreading. Halving dt from 20 lowered cluster energies by 3–4 %.
+  - Robustness: every cluster also on a potential 10 % shallower; "bound" must
+    survive it. Results (D₀ in meV; harmonic → quantum → 10 % shallower):
+    H₂·H −8.3 → +0.0007 (exact; a halo, ⟨r⟩ = 37 Å) → −0.0002: **at threshold**;
+    (H₂)₂ −13.4 → +0.238 (exact; DMC 0.231) → +0.167; (H₂)₂·H −29.5 → +0.071 →
+    +0.041; (H₂)₃ −36.8 → +0.62 → +0.44; (H₂)₃·H −54.8 → +0.10 → +0.08; (H₂)₄
+    −46.0 → +0.90 → +0.72; (H₂)₄·H −52.9 → +0.14 → +0.10: all **bound**.
+  - Reading: harmonic ZPE gets the sign wrong. The (H₂)ₖ clusters are bound by
+    0.2–0.9 meV (2–10 K), ~10–50× less than D_e, and binding grows with size
+    (the way to solid hydrogen). A lone H does not bind to one H₂ (at
+    threshold) but does to two or more, by ~0.1 meV. These are meV statements
+    on a model potential: three-body forces and H₂ anisotropy are left out.
+  - DMC without a trial function samples ψ, not |ψ|², so the walker spread is a
+    convergence diagnostic (it grows when a cluster falls apart), not a size.
+ (now our 1.15 Å rule:
   3Dmol's own guess only bonded H–H between 0.71 and 0.99 Å and dropped the
   1.04–1.06 Å bonds of H₂⁺ and the H₂⁺ cores of H₆⁺/H₈⁺/H₁₀⁺) or by bond
   order (one cylinder per bond, thickness ∝ √order, opacity 0.75·(e^{3·order} − 1)/(e³ − 1): weak links almost transparent, none solid;

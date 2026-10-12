@@ -280,6 +280,9 @@ export const en = {
   "st.basis": "Basis-set limit and CCSD(T) geometries",
   "st.basis.about":
     "L4: CCSD(T) extrapolated from aVTZ and aVQZ to the complete basis set, D_e recomputed. L3: CCSD(T) geometry optimizations of H₂, H₃⁺ and both H₅⁺ structures.",
+  "st.dmc": "Quantum nuclear motion: diffusion Monte Carlo",
+  "st.dmc.about":
+    "Are the neutral van der Waals clusters bound once the nuclei move quantum mechanically? Each H₂ is a rigid sphere (para-H₂, J = 0) and the potential a sum of isotropic H₂–H₂ and H–H₂ pair potentials from our own counterpoise-corrected CCSD(T)/aug-cc-pVTZ scans. DMC gives the exact ground state on that potential, so the quantum D₀ replaces the harmonic estimate; the dimers are solved exactly (DMC as a check). Every cluster is also solved on a potential 10 % shallower: “bound” must survive it, otherwise “at threshold”. The walker spread is a convergence diagnostic (it keeps growing when a cluster falls apart), not the cluster size. Left out: H₂ anisotropy beyond the average, three-body forces.",
   "col.state": "State",
   "col.kind": "Kind",
   "col.vertical_ev": "Vertical (eV)",
@@ -312,6 +315,21 @@ export const en = {
   "col.avtz": "aVTZ / start",
   "col.cbs": "CBS / CCSD(T) geometry",
   "col.change": "Change",
+  "col.d_e_ccsdt_mev": "D_e CCSD(T) (meV)",
+  "col.d_e_model_mev": "D_e pair model (meV)",
+  "col.d0_harmonic_mev": "D₀ harmonic (meV)",
+  "col.d0_dmc_mev": "D₀ quantum (meV)",
+  "col.d0_dmc_err_mev": "± (meV)",
+  "col.spread_angstrom": "Walker spread (Å)",
+  "col.exact_r_angstrom": "Exact ⟨r⟩ (Å)",
+  "col.size_growth": "Size growth",
+  "col.d0_shallow_mev": "D₀, well 10 % shallower (meV)",
+  "col.dmc_verdict": "Quantum verdict",
+  "col.method": "Method",
+  "col.dmc_check_mev": "D₀ DMC check (meV)",
+  "dmcv.bound": "bound",
+  "dmcv.threshold": "at threshold",
+  "dmcv.unbound": "unbound",
   "col.unit": "Units",
 } as const;
 

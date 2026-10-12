@@ -218,3 +218,35 @@ def test_atom_populations_open_and_closed_shell():
     assert closed == [{"charge": 0.070791, "spin": None, "valence": None, "free_valence": None},
                       {"charge": -0.070791, "spin": None, "valence": None, "free_valence": None}]
     assert atom_populations("nothing") is None
+
+
+def test_dmc_scan_jobs_are_valid_counterpoise_triples():
+    from hclust.studies import dmc as study
+
+    jobs = study.scan_jobs()
+    n_r = len(study.DISTANCES)
+    assert len(jobs) == n_r * (4 + 3) * 3
+    ab, a, b = (jobs[f"HH|T|3.40|{p}"] for p in ("AB", "A", "B"))
+    assert ab.geometry.coords.shape == a.geometry.coords.shape == (4, 3)
+    assert a.ghosts == (2, 3) and b.ghosts == (0, 1) and ab.ghosts == ()
+    assert "VeryTightSCF" in ab.render() and "STol 1e-7" in ab.render()
+    h = jobs["H|1|3.40|B"]
+    assert h.state.mult == 2 and h.ghosts == (0, 1)
+    assert "%mdci" not in h.render() and "! HF " in h.render()  # one electron: HF, no MDCI
+    # the H2 bond is the vibrationally averaged length in every geometry
+    c = ab.geometry.coords
+    assert np.linalg.norm(c[0] - c[1]) == pytest.approx(study.R_H2) and np.linalg.norm(c[2] - c[3]) == pytest.approx(study.R_H2)
+
+
+def test_dmc_isotropic_averages():
+    from hclust.studies import dmc as study
+
+    energies = {}
+    for name, v in zip(study.H2H2, (1.0, 2.0, 3.0, 4.0)):  # L, T, H, X interaction energies
+        energies |= {f"HH|{name}|3.40|AB": v, f"HH|{name}|3.40|A": 0.0, f"HH|{name}|3.40|B": 0.0}
+    for i in range(3):
+        energies |= {f"H|{i}|3.40|AB": -1.0, f"H|{i}|3.40|A": -0.5, f"H|{i}|3.40|B": -0.25}
+    curves = study.averaged_curves(energies)
+    assert curves["H2-H2"] == [(3.4, pytest.approx((1 + 4 * 2 + 2 * 3 + 2 * 4) / 9))]
+    assert curves["H-H2"] == [(3.4, pytest.approx(-0.25))]  # weights sum to one
+    assert sum(w for _, w in study.COS_THETA) == pytest.approx(1)
