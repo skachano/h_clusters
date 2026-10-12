@@ -32,8 +32,8 @@ observed, or computed without arbitrary choices, is:
 ### Two bookkeeping schemes on top of the density
 
 - **Orbital occupation.** Describe the molecule with the orbitals of its
-  pieces, e.g. the bonding orbital of each H₂, and count electrons in them as
-  whole numbers. "H₂·H₂⁺·H₂" means 2 + 1 + 2 electrons in the three H₂
+  pieces, e.g. the bonding orbital of each [H₂](app:s/2/0/1), and count electrons in them as
+  whole numbers. "H₂·H₂⁺·H₂" means 2 + 1 + 2 electrons in the three [H₂](app:s/2/0/1)
   bonding orbitals. These counts are exact only for pieces far apart; when
   the pieces interact, the true orbitals are mixtures and the counts become
   fractional. The whole-number label names the dominant configuration: the
@@ -45,7 +45,7 @@ observed, or computed without arbitrary choices, is:
   though usually the same trends.
 
 A label like "[H₂⁺](app:s/2/1/2)" is therefore a **formal** charge, a statement about
-orbital bookkeeping, while "+0.81 on the outer H₂" is a **partial** charge,
+orbital bookkeeping, while "+0.81 on the outer [H₂](app:s/2/0/1)" is a **partial** charge,
 one way of dividing a shared density. They need not agree. Familiar
 example: ammonium is written NH₄⁺, yet its nitrogen carries a *negative*
 partial charge and the positive charge sits on the hydrogens.
@@ -77,11 +77,11 @@ They vary independently in practice:
 | | Charge | Spin |
 |---|---|---|
 | H atom | 0 | 1 |
-| H₂⁺ | +0.5 per atom | 0.5 per atom |
+| [H₂⁺](app:s/2/1/2) | +0.5 per atom | 0.5 per atom |
 | [H₃⁺](app:s/3/1/1), [H₅⁺](app:s/5/1/1) (closed shells) | +1 spread out | 0 everywhere |
 | Neutral radicals, e.g. H₂·H | ≈ 0 everywhere | ≈ 1 on the lone H |
-| H₆⁺ central pair | +0.18 | 0.53 |
-| H₆⁺ outer H₂ (both) | +0.82 | 0.47 |
+| [H₆⁺](app:s/6/1/2) central pair | +0.18 | 0.53 |
+| [H₆⁺](app:s/6/1/2) outer [H₂](app:s/2/0/1) (both) | +0.82 | 0.47 |
 
 **Why they come apart: hole plus screening.** Remove one electron from one
 orbital φ and change nothing else (Koopmans' picture): the charge gains a
@@ -119,8 +119,8 @@ stronger and shorter the bond:
 
 | | Electrons in σ | Bond order | Bond length | $D_e$ |
 |---|---|---|---|---|
-| H₂ | 2 | 1 | 0.74 Å | 4.7 eV |
-| H₂⁺ | 1 | ½ | 1.06 Å | 2.8 eV |
+| [H₂](app:s/2/0/1) | 2 | 1 | 0.74 Å | 4.7 eV |
+| [H₂⁺](app:s/2/1/2) | 1 | ½ | 1.06 Å | 2.8 eV |
 
 The bond order is (bonding − antibonding electrons) / 2. The relation also
 works with fractions: drain part of a bonding orbital's density and the bond
@@ -137,11 +137,11 @@ inside unchanged.
 
 ## Example: H₆⁺, the H₂·H₂⁺·H₂ sandwich
 
-The lowest H₆⁺ (doublet) is a chain of three pairs: a central pair 1.05 Å
-long between two outer H₂ of 0.79 Å, linked at 1.22 Å. The literature
+The lowest [H₆⁺](app:s/6/1/2) (doublet) is a chain of three pairs: a central pair 1.05 Å
+long between two outer [H₂](app:s/2/0/1) of 0.79 Å, linked at 1.22 Å. The literature
 describes it as H₂·H₂⁺·H₂. Our ωB97X-D4 analysis:
 
-| | Central pair | Each outer H₂ | Free H₂⁺ | Free H₂ |
+| | Central pair | Each outer [H₂](app:s/2/0/1) | Free [H₂⁺](app:s/2/1/2) | Free [H₂](app:s/2/0/1) |
 |---|---|---|---|---|
 | Bond length | 1.05 Å | 0.79 Å | 1.06 Å | 0.74 Å |
 | Löwdin bond order | 0.39 | 0.55 | 0.5 | 1.0 |
@@ -149,26 +149,26 @@ describes it as H₂·H₂⁺·H₂. Our ωB97X-D4 analysis:
 | Löwdin charge | +0.18 | +0.41 | +1 | 0 |
 
 - **Bond length, bond order and spin** say the central pair has the
-  character of H₂⁺: one electron in a bonding orbital, half the unpaired
+  character of [H₂⁺](app:s/2/1/2): one electron in a bonding orbital, half the unpaired
   electron on it.
 - **The charge** looks inverted: most of the positive charge is on the outer
-  H₂. The half-empty bonding orbital of the central pair is a strong electron
-  acceptor; the outer H₂ donate density from their filled bonding orbitals
+  [H₂](app:s/2/0/1). The half-empty bonding orbital of the central pair is a strong electron
+  acceptor; the outer [H₂](app:s/2/0/1) donate density from their filled bonding orbitals
   into it (this three-centre bonding holds the sandwich together). About
-  0.8 e moves towards the centre, so the formal +1 of "H₂⁺" ends up mostly on
+  0.8 e moves towards the centre, so the formal +1 of "[H₂⁺](app:s/2/1/2)" ends up mostly on
   the donors.
 - **Charge and spin part ways** exactly as hole plus screening predicts: the
   spin still marks where the hole is (mostly central), the charge shows the
-  hole plus about 0.8 e of screening from the outer H₂.
+  hole plus about 0.8 e of screening from the outer [H₂](app:s/2/0/1).
 - **The outer bonds** confirm the donation: having given up part of their
   bonding density, they lengthen from 0.74 to 0.79 Å and their bond order
   falls from 1.0 to 0.55. The central pair, given a little density back, is
-  slightly shorter than free H₂⁺.
+  slightly shorter than free [H₂⁺](app:s/2/1/2).
 
 So "H₂·H₂⁺·H₂" is a good cartoon of where the hole started and what the
-central bond looks like, but the hole is partly spread over the outer H₂
+central bond looks like, but the hole is partly spread over the outer [H₂](app:s/2/0/1)
 (spin roughly 50 : 25 : 25), and the positive charge mostly is. The ion is
-closer to one delocalized (H₂H₂H₂)⁺ unit than to an H₂⁺ with two spectators.
+closer to one delocalized (H₂H₂H₂)⁺ unit than to an [H₂⁺](app:s/2/1/2) with two spectators.
 
 Two caveats: partial charges depend on the partition rule, and ωB97X-D4,
 like most functionals, spreads a hole too widely
@@ -180,7 +180,7 @@ correlated method would likely put somewhat more of it on the central pair.
 - Löwdin charges, spin populations and bond orders: the bonds study,
   `worker/src/hclust/studies/bonds.py`; the atom and bond tables and the
   "Highlight atoms" halos on each species page of the web app ([H₆⁺](app:s/6/1/2), for example)
-- Units of a cluster and their atoms (where H₆⁺ shows up as delocalized):
+- Units of a cluster and their atoms (where [H₆⁺](app:s/6/1/2) shows up as delocalized):
   `worker/src/hclust/analysis/units.py`
 - Plan: `doc/Plan.md`, Phase 8 (bonds study, units from fragmentation)
 

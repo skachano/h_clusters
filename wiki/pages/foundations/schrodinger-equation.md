@@ -72,7 +72,7 @@ other one, so the equation doesn't split into one-electron pieces.
 | System | Electrons | Exact? |
 |---|---|---|
 | H atom | 1 | Yes, on paper: $E_n = -\frac{1}{2n^2}$ hartree, so $E_1 = -0.5$ hartree = −13.6 eV |
-| H₂⁺ (nuclei held fixed) | 1 | Yes, numerically to any precision |
+| [H₂⁺](app:s/2/1/2) (nuclei held fixed) | 1 | Yes, numerically to any precision |
 | [H₂](app:s/2/0/1), [H⁻](app:s/1/-1/1), [H₃⁺](app:s/3/1/1), … | ≥ 2 | No. Only approximations, some of them very good |
 
 ### The variational principle

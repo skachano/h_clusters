@@ -98,7 +98,7 @@ convergence is the hallmark of Newton's method.
 - **Stuck on saddle points.** If the start has symmetry, the gradient keeps
   it, and the optimizer can converge to a saddle point. Only
   [frequencies](frequencies.md) tell.
-- **Flat surfaces.** Weakly bound clusters have very soft directions (an H₂
+- **Flat surfaces.** Weakly bound clusters have very soft directions (an [H₂](app:s/2/0/1)
   unit sliding around a core). The gradient is tiny everywhere, and the
   optimizer needs many steps.
 - **Falling apart.** Starting from a random geometry, fragments may drift
@@ -111,7 +111,7 @@ convergence is the hallmark of Newton's method.
   level's optimization keyword: `TightOpt` for L1/L1M, `Opt` for the screening
   level L0.
 - The default limit of 50 optimizer cycles was too short for floppy
-  clusters (Phase 4: H₂ units still sliding after 3 × 50 cycles), so L0, L1
+  clusters (Phase 4: [H₂](app:s/2/0/1) units still sliding after 3 × 50 cycles), so L0, L1
   and L1M set `%geom MaxIter 150`.
 - When an optimization runs out of cycles, the runner **restarts** it from
   its last geometry (`_next_action` in `worker/src/hclust/runner.py`, at most

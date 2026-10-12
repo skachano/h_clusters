@@ -18,7 +18,7 @@ An anion is **bound** if its energy is below that of the neutral molecule
 plus a free electron (energy zero): a positive electron affinity. If it
 isn't, the extra electron belongs to the continuum of free-electron states.
 Some such states live briefly before the electron escapes; these are
-**resonances**. H₂⁻ is one: it forms when slow electrons hit [H₂](app:s/2/0/1), and loses
+**resonances**. [H₂⁻](app:s/2/-1/2) is one: it forms when slow electrons hit [H₂](app:s/2/0/1), and loses
 its electron again within femtoseconds.
 
 ### What a finite basis does
@@ -39,7 +39,7 @@ that artificial state.
 
 ## Example: H₂⁻ in the campaign
 
-| Level | E(H₂⁻) − E(H₂) | H₂⁻ "bond length" | "Frequency" |
+| Level | E(H₂⁻) − E(H₂) | [H₂⁻](app:s/2/-1/2) "bond length" | "Frequency" |
 |---|---|---|---|
 | r²SCAN-3c (L0) | +4.70 eV | 1.72 Å | — |
 | ωB97X-D4 (L1) | +2.25 eV | 0.89 Å | 6000 cm⁻¹ |
@@ -48,19 +48,19 @@ that artificial state.
 
 The anion is above the neutral at every level: unbound, as expected. The
 geometries disagree wildly and the frequencies make no sense (6000 cm⁻¹ is
-far above H₂'s own 4401 cm⁻¹). Nothing in the individual outputs warns about it.
+far above [H₂](app:s/2/0/1)'s own 4401 cm⁻¹). Nothing in the individual outputs warns about it.
 
 ## Warning signs
 
 - **Negative electron affinity**: compare with the neutral at the same level.
   This is the decisive test.
 - **Positive HOMO energy.** An orbital with positive energy holds an electron
-  that would be better off at infinity. In the campaign, H₂⁻'s HOMO is
+  that would be better off at infinity. In the campaign, [H₂⁻](app:s/2/-1/2)'s HOMO is
   positive at every level (+0.05 hartree at CCSD(T)), and so is the HOMO of
   the unbound triplet [H⁻](app:s/1/-1/3). Bound singlet [H⁻](app:s/1/-1/1) has a negative HOMO with HF
   orbitals (−0.05 hartree at L1M and L2). DFT is less reliable here:
   [self-interaction](self-interaction-error.md) can push the HOMO of a truly
-  bound anion above zero (ωB97X-D4 gives +0.005 hartree for H⁻). The
+  bound anion above zero (ωB97X-D4 gives +0.005 hartree for [H⁻](app:s/1/-1/1)). The
   campaign turns this into a flag
   ([HOMO and LUMO](../foundations/homo-and-lumo.md#the-unbound-anion-flag)).
 - **Strong basis dependence**: the energy keeps falling as diffuse functions

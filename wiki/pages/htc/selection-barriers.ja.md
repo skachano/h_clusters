@@ -39,7 +39,7 @@
 
 すべての判断は `candidate` テーブルに入る: エネルギー、順位、`duplicate_of`、`dissociated`、`composition`、`source` (どの初期構造生成器か)、`n_imag`、そして `selected` かどうか。これまでのベースラインの `promote` ステージでは: 1016 構造、解離 120、重複 574、昇格 202。
 
-各選抜はログに 1 行を残す。一重項 H₃⁺ のベースラインでの例:
+各選抜はログに 1 行を残す。一重項 [H₃⁺](app:s/3/1/1) のベースラインでの例:
 
 ```text
 select H3+ (1)    promote: 22 structures, 0 dissociated, 2 unique, 1 promoted

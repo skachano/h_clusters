@@ -61,11 +61,11 @@ full CI. So the project's CCSD(T) energies of [H₂](app:s/2/0/1), [H₃⁺](app
 |---|---|---|---|
 | E(H₂), hartree | −1.17263 | −1.17447 | 0.0018 (0.05 eV) |
 | $D_e$(H₂) | 4.707 eV | 4.748 eV | 0.04 eV |
-| $D_e$(H₃⁺ → H₂ + H⁺) | 4.602 eV | 4.609 eV | 0.007 eV |
+| $D_e$(H₃⁺ → [H₂](app:s/2/0/1) + H⁺) | 4.602 eV | 4.609 eV | 0.007 eV |
 | EA(H) | 0.728 eV | 0.754 eV | 0.03 eV |
 
-Errors partly cancel in energy *differences*, which is why the H₃⁺ binding
-energy is far more accurate than the total H₂ energy. Closing the remaining
+Errors partly cancel in energy *differences*, which is why the [H₃⁺](app:s/3/1/1) binding
+energy is far more accurate than the total [H₂](app:s/2/0/1) energy. Closing the remaining
 gap needs bigger basis sets or extrapolation to the
 [complete basis set limit](basis-sets.md#convergence-and-the-cbs-limit).
 

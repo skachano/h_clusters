@@ -38,7 +38,7 @@ The Phase 0 smoke test was [H₃⁺](app:s/3/1/1), the simplest real cluster
 | r²SCAN-3c | triangle, r = 0.870 Å | linear 39.4 kcal/mol above |
 | CCSD(T)/cc-pVTZ | triangle, r = 0.875 Å | linear 40.5 kcal/mol above |
 
-GFN2-xTB gets the shape of H₃⁺ qualitatively wrong. Its parameters for
+GFN2-xTB gets the shape of [H₃⁺](app:s/3/1/1) qualitatively wrong. Its parameters for
 hydrogen were fitted to hydrogen in ordinary molecules (C–H, O–H bonds), not
 to three-centre two-electron bonds or bare cationic hydrogen clusters. That
 is the general lesson about parametrized methods: they interpolate well and

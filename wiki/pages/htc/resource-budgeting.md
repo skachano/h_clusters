@@ -67,8 +67,8 @@ data directory.
 
 ### What forced these settings
 
-- The first CCSD(T) run on H₁₀ died with "Failed to add matrix" when `/home`
-  ran out of space. CCSD(T)/aVTZ needs about 12 GB of scratch for H₁₀, and its
+- The first CCSD(T) run on [H₁₀](app:s/10/0/1) died with "Failed to add matrix" when `/home`
+  ran out of space. CCSD(T)/aVTZ needs about 12 GB of scratch for [H₁₀](app:s/10/0/1), and its
   low-disk integral mode can't be combined with RI (Phase 4 pilot). Hence the
   separate scratch volume and the budget.
 - `%maxcore` is per core and ORCA treats it as a soft limit, so the worker

@@ -5,7 +5,7 @@
     [Electrons, charge, spin and bond lengths](electrons-charges-and-bond-lengths.md)
 
 We describe clusters as made of units: (H₂)₄ is "four [H₂](app:s/2/0/1)", [H₇⁺](app:s/7/1/1) is "[H₃⁺](app:s/3/1/1) with
-two H₂". Physics has no "unit" observable, so every such decomposition is a
+two [H₂](app:s/2/0/1)". Physics has no "unit" observable, so every such decomposition is a
 description. But some descriptions are forced on us by the physics and some
 are not. This page says how to tell them apart.
 
@@ -50,40 +50,40 @@ timescales differ.
 
 ### Van der Waals clusters: about as real as it gets
 
-The H₂ units in (H₂)ₖ pass every test by large margins:
+The [H₂](app:s/2/0/1) units in (H₂)ₖ pass every test by large margins:
 
-- **Energy:** 4.7 eV inside an H₂, 2–10 meV between them, a factor of about
+- **Energy:** 4.7 eV inside an [H₂](app:s/2/0/1), 2–10 meV between them, a factor of about
   a thousand.
-- **Time:** the H₂ vibration (4400 cm⁻¹) is about a hundred times faster
+- **Time:** the [H₂](app:s/2/0/1) vibration (4400 cm⁻¹) is about a hundred times faster
   than the intermolecular motions (tens of cm⁻¹).
-- **Transferability:** in the cluster H₂ keeps its free bond length
+- **Transferability:** in the cluster [H₂](app:s/2/0/1) keeps its free bond length
   (0.74 Å), a bond order near 1, and nearly free rotation.
 - **Quantum numbers:** ortho- and para-H₂ (nuclear spin coupled to rotation)
-  remain labels of *each H₂* in the cluster. They interconvert only over
-  hours to days, so in a real sample each H₂ of a cluster really is para or
+  remain labels of *each [H₂](app:s/2/0/1)* in the cluster. They interconvert only over
+  hours to days, so in a real sample each [H₂](app:s/2/0/1) of a cluster really is para or
   ortho: a measurable property that belongs to one unit.
 - **Predictive success:** the
   [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md) study treats
-  the H₂ as rigid units on pair potentials and reproduces the exact
+  the [H₂](app:s/2/0/1) as rigid units on pair potentials and reproduces the exact
   answers. If the units were mere words, that model would fail.
 - **Robustness:** distances, bond orders and fragmentation energies all give
   the same units, and the cheapest split of a neutral cluster (≤ 0.01 eV) is
   far below anything else.
 
-So "(H₂)₄ is four H₂ molecules" describes a near-factorisation the physics
-imposes: spectroscopically it *is* four H₂, with small shifts.
+So "(H₂)₄ is four [H₂](app:s/2/0/1) molecules" describes a near-factorisation the physics
+imposes: spectroscopically it *is* four [H₂](app:s/2/0/1), with small shifts.
 
 ### Covalent units: nothing below them
 
-Inside H₃⁺ there are no units. Splitting it into H₂ + H⁺ fails every test:
+Inside [H₃⁺](app:s/3/1/1) there are no units. Splitting it into [H₂](app:s/2/0/1) + H⁺ fails every test:
 the bonding is shared over three centres, nothing is transferable, and the
-pieces cost 4.6 eV to separate. H₃⁺ is simply the unit.
+pieces cost 4.6 eV to separate. [H₃⁺](app:s/3/1/1) is simply the unit.
 
 ### Ions: where language starts to matter
 
 The ion clusters lie in between, and the answer degrades gradually:
 
-- **H₃⁺(H₂)ₙ:** largely physical. The H₃⁺ core keeps its identity, H₂ comes
+- **H₃⁺(H₂)ₙ:** largely physical. The [H₃⁺](app:s/3/1/1) core keeps its identity, [H₂](app:s/2/0/1) comes
   off one at a time, and the shell closing at [H₉⁺](app:s/9/1/1) appears in mass spectra.
   But the links cost 0.2–0.4 eV, with real charge transfer, so the
   separation of scales is only about tenfold.
@@ -92,7 +92,7 @@ The ion clusters lie in between, and the answer degrades gradually:
   barrier between them
   ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
   The decomposition depends on which question you ask.
-- **[H₆⁺](app:s/6/1/2) (doublet):** "H₃⁺ + H₂ + H" (what it falls apart into) and
+- **[H₆⁺](app:s/6/1/2) (doublet):** "[H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) + H" (what it falls apart into) and
   "H₂·H₂⁺·H₂" (what its pieces resemble) are both defensible and neither is
   complete: the hole is delocalised
   ([electrons, charge, spin and bond lengths](electrons-charges-and-bond-lengths.md)).
@@ -117,8 +117,8 @@ that no unique answer exists.
   `worker/src/hclust/analysis/units.py`; the Units card and fragmentation tree
   on each species page of the web app ([H₉⁻](app:s/9/-1/1), for example).
 - The distance-based groups (1.15 Å) and Löwdin bond orders, shown alongside.
-- An exploratory comparison with units chosen by resemblance to free H₂, [H₂⁺](app:s/2/1/2)
-  and H₃⁺ (bond lengths, spin) agreed for the neutral clusters, the anions
+- An exploratory comparison with units chosen by resemblance to free [H₂](app:s/2/0/1), [H₂⁺](app:s/2/1/2)
+  and [H₃⁺](app:s/3/1/1) (bond lengths, spin) agreed for the neutral clusters, the anions
   and the odd cations, and disagreed for the even and high-spin cations
   (`doc/Plan.md`, Phase 8); it is not in the app.
 

@@ -83,7 +83,7 @@ their equilibrium geometry it typically gets roughly 80–90 %.
   fluctuations of electrons on two molecules, which is what dispersion is.
   MP2 tends to overestimate it somewhat.
 - **Needs a large basis.** Correlation energy converges slowly with basis
-  size. MP2/aug-cc-p**VDZ** already collapses H₅⁺ to D₂d; triple-ζ keeps
+  size. MP2/aug-cc-p**VDZ** already collapses [H₅⁺](app:s/5/1/1) to D₂d; triple-ζ keeps
   C₂ᵥ (`doc/Plan.md`, Phase 4).
 - **Fails for stretched bonds and near-degeneracies.** When the gap
   $\varepsilon_a + \varepsilon_b - \varepsilon_i - \varepsilon_j$ becomes small,
@@ -115,7 +115,7 @@ How MP2 compares on the project's [H₂](app:s/2/0/1) (aug-cc-pVTZ basis):
 ## References
 
 - A. Szabo, N. S. Ostlund, *Modern Quantum Chemistry*, chapter 6
-  (many-body perturbation theory), including the H₂ example.
+  (many-body perturbation theory), including the [H₂](app:s/2/0/1) example.
 - C. Møller, M. S. Plesset, *Phys. Rev.* **46**, 618 (1934).
 - F. Jensen, *Introduction to Computational Chemistry*, 3rd ed., chapter on
   electron correlation methods.

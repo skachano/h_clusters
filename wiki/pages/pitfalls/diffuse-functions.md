@@ -27,7 +27,7 @@ gives it room.
 
 ## Example: H⁻ with and without diffuse functions
 
-[`h_minus_diffuse.py`](#the-code) computes H and H⁻ exactly (full CI) in
+[`h_minus_diffuse.py`](#the-code) computes H and [H⁻](app:s/1/-1/1) exactly (full CI) in
 s-type Gaussians. The start is the 4-function basis optimized for the
 neutral H atom on the [basis sets](../methods/basis-sets.md#example-the-hydrogen-atom)
 page; then diffuse functions with ever smaller exponents are added:
@@ -42,7 +42,7 @@ fitted to the H atom    -0.49874  -0.46001    -1.054
 
 - The neutral atom barely notices the extra functions (−0.49874 →
   −0.49881): its electron doesn't go that far.
-- **H⁻ without diffuse functions is unbound by 1.05 eV**, a qualitative error.
+- **[H⁻](app:s/1/-1/1) without diffuse functions is unbound by 1.05 eV**, a qualitative error.
   One diffuse function (α = 0.04) is enough to bind it; two converge the
   result.
 - The converged 0.39 eV is the limit for s functions only. The real 0.754 eV

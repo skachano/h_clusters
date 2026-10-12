@@ -55,18 +55,18 @@ CCSD(T)/aug-cc-pVTZ (L2):
 | IE(H₂), with ZPE | 15.39 eV | 15.43 eV |
 | EA(H): −0.499821 − (−0.526562) | 0.728 eV | 0.754 eV |
 
-The ZPE correction for H₂ uses the harmonic frequencies, 4401 cm⁻¹ (H₂) and
+The ZPE correction for [H₂](app:s/2/0/1) uses the harmonic frequencies, 4401 cm⁻¹ (H₂) and
 2322 cm⁻¹ (H₂⁺): [H₂⁺](app:s/2/1/2)'s weaker bond vibrates more slowly, so ionizing loses
 half the difference, 0.13 eV. Measured ionization energies always refer to
 the vibrational ground states.
 
-**[H⁻](app:s/1/-1/1): an electron affinity that methods disagree on.** H⁻ has two electrons
+**[H⁻](app:s/1/-1/1): an electron affinity that methods disagree on.** [H⁻](app:s/1/-1/1) has two electrons
 around one proton, and the second is held only by correlation. Different
-levels give (from the H and H⁻ energies at each level):
+levels give (from the H and [H⁻](app:s/1/-1/1) energies at each level):
 
 | Level | EA(H) |
 |---|---|
-| r²SCAN-3c (L0) | −1.57 eV: H⁻ unbound |
+| r²SCAN-3c (L0) | −1.57 eV: [H⁻](app:s/1/-1/1) unbound |
 | ωB97X-D4/def2-TZVPPD (L1) | 0.20 eV |
 | RI-MP2/aug-cc-pVTZ (L1M) | 0.48 eV |
 | CCSD(T)/aug-cc-pVTZ (L2) | 0.73 eV |
@@ -76,9 +76,9 @@ DFT's [self-interaction error](../pitfalls/self-interaction-error.md) and,
 for L0, the lack of [diffuse functions](../pitfalls/diffuse-functions.md)
 both weaken the binding.
 
-**[H₂⁻](app:s/2/-1/2): a negative electron affinity.** At CCSD(T), H₂⁻ is 0.057 hartree
-(1.6 eV) *above* H₂ + a free electron. The extra electron isn't bound; real
-H₂⁻ exists only as a short-lived resonance. The calculation still returns a
+**[H₂⁻](app:s/2/-1/2): a negative electron affinity.** At CCSD(T), [H₂⁻](app:s/2/-1/2) is 0.057 hartree
+(1.6 eV) *above* [H₂](app:s/2/0/1) + a free electron. The extra electron isn't bound; real
+[H₂⁻](app:s/2/-1/2) exists only as a short-lived resonance. The calculation still returns a
 number, because a finite basis set can't let the electron escape
 ([unbound anions](../pitfalls/unbound-anions.md)).
 
@@ -98,6 +98,6 @@ number, because a finite basis set can't let the electron escape
 
 - F. Jensen, *Introduction to Computational Chemistry*, 3rd ed., sections on
   ionization potentials and electron affinities.
-- NIST Chemistry WebBook: ionization energies of H and H₂.
+- NIST Chemistry WebBook: ionization energies of H and [H₂](app:s/2/0/1).
 - K. R. Lykke, K. K. Murray, W. C. Lineberger, *Phys. Rev. A* **43**, 6104 (1991):
   the electron affinity of H.

@@ -20,10 +20,10 @@ computes (charge −1, 0 or +1). For [H₅⁺](app:s/5/1/1) that gives four chan
 
 | Channel | Pieces |
 |---|---|
-| [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) | the expected one: lose a solvating H₂ |
+| [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) | the expected one: lose a solvating [H₂](app:s/2/0/1) |
 | [H₄⁺](app:s/4/1/2) + H | lose an atom |
 | [H₄](app:s/4/0/1) + H⁺ | lose a bare proton |
-| [H₃](app:s/3/0/2) + [H₂⁺](app:s/2/1/2) | the charge goes to the H₂ |
+| [H₃](app:s/3/0/2) + [H₂⁺](app:s/2/1/2) | the charge goes to the [H₂](app:s/2/0/1) |
 
 Each fragment can be in any computed spin state, and the plan uses the
 lowest-energy one (`doc/Plan.md` §2.2). Strictly, total spin is conserved
@@ -82,8 +82,8 @@ D_\text{frozen} = D_e + E_\text{relaxation} \;\ge\; D_e
 $$
 
 $D_e$ (and $D_0$, with zero-point energies at the relaxed minima) is the
-*adiabatic* cost, already credited with that relaxation. For [H₆⁺](app:s/6/1/2) → H₅⁺ + H,
-where an H₃⁺ triangle must form that the cluster does not contain, the frozen
+*adiabatic* cost, already credited with that relaxation. For [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H,
+where an [H₃⁺](app:s/3/1/1) triangle must form that the cluster does not contain, the frozen
 cost would be much larger than the 0.30 eV of $D_e$.
 
 **What $D_e$ misses: a barrier on the way out.** If the minimum-energy path
@@ -99,11 +99,11 @@ lowest threshold, not the lowest $D_e$; collision-induced dissociation
 experiments measure exactly these thresholds.
 
 - **No barrier:** ion–molecule and van der Waals splits, such as
-  H₃⁺(H₂)ₙ → H₃⁺(H₂)ₙ₋₁ + H₂. The products attract all the way out and
+  H₃⁺(H₂)ₙ → H₃⁺(H₂)ₙ₋₁ + [H₂](app:s/2/0/1). The products attract all the way out and
   nothing has to rearrange, so the threshold equals $D_0$.
-- **Possibly a barrier:** splits that need rearrangement. For H₆⁺ → H₅⁺ + H
-  none is expected: the reverse resembles H₂⁺ + H₂ → H₃⁺ + H, the barrierless
-  ion–molecule reaction that forms H₃⁺ in interstellar clouds. That is an
+- **Possibly a barrier:** splits that need rearrangement. For [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H
+  none is expected: the reverse resembles [H₂⁺](app:s/2/1/2) + [H₂](app:s/2/0/1) → [H₃⁺](app:s/3/1/1) + H, the barrierless
+  ion–molecule reaction that forms [H₃⁺](app:s/3/1/1) in interstellar clouds. That is an
   expectation, not a calculation.
 
 **Thresholds are not the whole story either.** Just above threshold the
@@ -123,17 +123,17 @@ each species):
 
 | Channel | Fragment energies (hartree) | ΔE (eV) |
 |---|---|---|
-| H₃⁺ + H₂ | −1.341728 − 1.172635 | **0.370** |
-| H₄⁺ + H | −1.850284 − 0.499821 | 4.84 |
-| H₃ + H₂⁺ | −1.672511 − 0.602302 | 6.89 |
-| H₄ + H⁺ | H₄ not yet computed at this level | — |
+| [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) | −1.341728 − 1.172635 | **0.370** |
+| [H₄⁺](app:s/4/1/2) + H | −1.850284 − 0.499821 | 4.84 |
+| [H₃](app:s/3/0/2) + [H₂⁺](app:s/2/1/2) | −1.672511 − 0.602302 | 6.89 |
+| [H₄](app:s/4/0/1) + H⁺ | [H₄](app:s/4/0/1) not yet computed at this level | — |
 
-with E(H₅⁺) = −2.527957 hartree. Losing an H₂ is by far the cheapest way
-apart, as expected for an H₃⁺ core solvated by H₂: $D_\text{min}$ = 0.37 eV
+with E(H₅⁺) = −2.527957 hartree. Losing an [H₂](app:s/2/0/1) is by far the cheapest way
+apart, as expected for an [H₃⁺](app:s/3/1/1) core solvated by [H₂](app:s/2/0/1): $D_\text{min}$ = 0.37 eV
 (8.5 kcal/mol). Once ZPE is included it drops to 5.75 kcal/mol
 ([zero-point energy](zero-point-energy.md#example-h5-h3-h2)).
 
-The missing row shows the "closure" property: a verdict for H₅⁺ needs H₄ to be
+The missing row shows the "closure" property: a verdict for [H₅⁺](app:s/5/1/1) needs [H₄](app:s/4/0/1) to be
 finished too.
 
 ## Where this appears in h_clusters
@@ -142,7 +142,7 @@ finished too.
   `Verdict` table stores `d_min`, `d0_min`, the verdict and the weakest
   channel per state and level (`doc/Plan.md` §3.4).
 - The cation channels are the source of the odd–even alternation expected in
-  §1.2: H₅⁺, [H₇⁺](app:s/7/1/1), [H₉⁺](app:s/9/1/1) (an H₃⁺ core plus H₂ units) should be more stable than
+  §1.2: [H₅⁺](app:s/5/1/1), [H₇⁺](app:s/7/1/1), [H₉⁺](app:s/9/1/1) (an [H₃⁺](app:s/3/1/1) core plus [H₂](app:s/2/0/1) units) should be more stable than
   their even neighbours.
 - The fragmentation tree and the units built on it (`analysis/units.py`)
   use $D_e$ and so assume every channel is barrierless; no dissociation

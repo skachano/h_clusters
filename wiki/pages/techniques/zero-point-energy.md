@@ -45,25 +45,25 @@ ZPEs from RI-MP2/aug-cc-pVTZ harmonic frequencies, both at the MP2 geometries.
 |---|---|---|---|
 | [H₅⁺](app:s/5/1/1) (C₂ᵥ) | −2.527957 | 0.035458 | 0.965 |
 | [H₃⁺](app:s/3/1/1) | −1.341728 | 0.020718 | 0.564 |
-| H₂ | −1.172615 | 0.010291 | 0.280 |
+| [H₂](app:s/2/0/1) | −1.172615 | 0.010291 | 0.280 |
 
 - $D_e$ = (−1.341728 − 1.172615) − (−2.527957) = 0.013614 hartree = **8.54 kcal/mol**
 - ΔZPE = 0.035458 − (0.020718 + 0.010291) = 0.004449 hartree = **2.79 kcal/mol**
 - $D_0$ = 8.54 − 2.79 = **5.75 kcal/mol**
 
-A third of the binding energy is eaten by zero-point energy. H₅⁺'s nine modes
+A third of the binding energy is eaten by zero-point energy. [H₅⁺](app:s/5/1/1)'s nine modes
 include five that don't exist in the fragments; the softest, 203 cm⁻¹, is the
-H₂ unit rocking against H₃⁺.
+[H₂](app:s/2/0/1) unit rocking against [H₃⁺](app:s/3/1/1).
 
 ## How reliable is it?
 
 The harmonic formula assumes each well is a parabola. That is good for stiff
-bonds (H₂, H₃⁺) and poor for the soft, floppy motions that hold clusters
+bonds (H₂, [H₃⁺](app:s/3/1/1)) and poor for the soft, floppy motions that hold clusters
 together, where the real potential is strongly anharmonic and the ZPE can be
-off by a large fraction. For H₅⁺ the effect goes further: its C₂ᵥ and D₂d
+off by a large fraction. For [H₅⁺](app:s/5/1/1) the effect goes further: its C₂ᵥ and D₂d
 structures differ by only 0.13 kcal/mol, far less than the ZPE, so the
 real molecule doesn't sit in either well. Its central proton moves freely
-between the two H₂ units (it is "fluxional").
+between the two [H₂](app:s/2/0/1) units (it is "fluxional").
 See [quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md).
 
 ## Where this appears in h_clusters
@@ -73,7 +73,7 @@ See [quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md).
 - The plan reports binding energies both as ΔE and ΔE₀ = ΔE + ΔZPE, and the
   stability verdict has a separate top category, `bound_with_zpe`, for
   clusters with $D_{0,\min} > 0$ (`doc/Plan.md` §2.2).
-- Phase 8 goes beyond the harmonic ZPE: VPT2 for H₂, H₃⁺ and H₅⁺, and
+- Phase 8 goes beyond the harmonic ZPE: VPT2 for [H₂](app:s/2/0/1), [H₃⁺](app:s/3/1/1) and [H₅⁺](app:s/5/1/1), and
   [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md) for the
   neutral clusters, where the harmonic $D_0 < 0$ turns out to be wrong.
 - Web app: compare the [grid by $D_e$](app:?q=d_e) with the

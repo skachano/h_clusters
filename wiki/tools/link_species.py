@@ -1,6 +1,6 @@
-"""Link the first mention of each cluster species on a page to its page in the web app.
+"""Link every mention of a cluster species on a page to its page in the web app.
 
-Run after writing or editing a page (safe to run again; links already there count):
+Run after writing or editing a page (safe to run again: links already there are left alone):
 
     python3 wiki/tools/link_species.py wiki/pages/**/*.md
 
@@ -17,10 +17,9 @@ from pathlib import Path
 
 SUB = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
 # Not after or before letters, digits or formula glue; Japanese text around it is fine.
-SPECIES = re.compile(r"(?<![A-Za-z0-9_\[·(/\-])H([₀-₉]+[⁺⁻]?|⁻)(?![A-Za-z0-9_₀-₉⁺⁻·(\]])")
+SPECIES = re.compile(r"(?<![A-Za-z0-9_₀-₉⁺⁻\[·(/\-])H([₀-₉]+[⁺⁻]?|⁻)(?![A-Za-z0-9_₀-₉⁺⁻·(\]])")
 # Spans to leave alone: inline code, inline math, Markdown links and images, HTML tags.
 PROTECTED = re.compile(r"`[^`]*`|\$[^$]*\$|!?\[[^\]]*\]\([^)]*\)|<[^>]+>")
-LINKED = re.compile(r"\]\(app:s/(\d+)/(-?\d+)/(\d+)\)")
 SKIP_LINE = re.compile(r"^\s*(#|!!!|\?\?\?|--8<--|\*\[)")
 SPIN = {"singlet": 1, "doublet": 2, "triplet": 3, "quartet": 4, "一重項": 1, "二重項": 2, "三重項": 3, "四重項": 4}
 WORDS = "|".join(SPIN)
@@ -46,13 +45,10 @@ def route(match: re.Match) -> str | None:
     return f"s/{m}/{charge}/{multiplicity(match, m, charge)}"
 
 
-def link_text(text: str, seen: set[str]) -> str:
+def link_text(text: str) -> str:
     def replace(match: re.Match) -> str:
         target = route(match)
-        if target is None or target in seen:
-            return match[0]
-        seen.add(target)
-        return f"[{match[0]}](app:{target})"
+        return match[0] if target is None else f"[{match[0]}](app:{target})"
 
     out, last = [], 0
     for span in PROTECTED.finditer(text):
@@ -63,7 +59,6 @@ def link_text(text: str, seen: set[str]) -> str:
 
 
 def link(text: str) -> str:
-    seen = {f"s/{m}/{c}/{mult}" for m, c, mult in LINKED.findall(text)}
     out, in_fence, in_math = [], False, False
     for line in text.split("\n"):
         stripped = line.strip()
@@ -72,7 +67,7 @@ def link(text: str) -> str:
         elif not in_fence and stripped == "$$":
             in_math = not in_math
         elif not (in_fence or in_math or SKIP_LINE.match(line)):
-            line = link_text(line, seen)
+            line = link_text(line)
         out.append(line)
     return "\n".join(out)
 

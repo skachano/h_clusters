@@ -39,40 +39,40 @@ Consequences that grow as the mass drops:
 ### H₅⁺: a molecule without a structure
 
 At CCSD(T), [H₅⁺](app:s/5/1/1)'s C₂ᵥ structure (H₃⁺·H₂) is 0.13 kcal/mol below the D₂d one (a
-proton shared by two H₂), which is the barrier for the proton to move from
-one H₂ to the other. H₅⁺'s zero-point energy is about 22 kcal/mol. The barrier
+proton shared by two [H₂](app:s/2/0/1)), which is the barrier for the proton to move from
+one [H₂](app:s/2/0/1) to the other. [H₅⁺](app:s/5/1/1)'s zero-point energy is about 22 kcal/mol. The barrier
 is far below the ZPE, so the central proton isn't localized on one side: in
 its ground state, the central proton's wavefunction spreads over both sides,
-shared between the two H₂ units, although the shared-proton D₂d structure
-isn't a minimum. The question "which structure is H₅⁺?" has no classical answer.
+shared between the two [H₂](app:s/2/0/1) units, although the shared-proton D₂d structure
+isn't a minimum. The question "which structure is [H₅⁺](app:s/5/1/1)?" has no classical answer.
 
 ### H₅⁺ in units: two textbook descriptions
 
-Split into familiar units, H₅⁺ has two standard descriptions, and the
+Split into familiar units, [H₅⁺](app:s/5/1/1) has two standard descriptions, and the
 literature uses both:
 
-- **H₃⁺·H₂: the structure at the minimum.** The C₂ᵥ minimum is an H₂
-  attached side-on to one corner of an [H₃⁺](app:s/3/1/1) triangle. This is how H₅⁺ appears
+- **H₃⁺·H₂: the structure at the minimum.** The C₂ᵥ minimum is an [H₂](app:s/2/0/1)
+  attached side-on to one corner of an [H₃⁺](app:s/3/1/1) triangle. This is how [H₅⁺](app:s/5/1/1) appears
   as the first member of the H₃⁺(H₂)ₙ series in cluster chemistry,
-  astrochemistry and the classic infrared spectra of H₅⁺, [H₇⁺](app:s/7/1/1) and [H₉⁺](app:s/9/1/1): H₂
-  ligands added around an H₃⁺ core, with the first shell complete at H₉⁺,
-  one H₂ on each corner. The project's cheapest dissociation channel agrees:
-  H₅⁺ → H₃⁺ + H₂ costs 0.37 eV.
-- **H₂·H⁺·H₂: the shared proton.** A proton held between two H₂,
+  astrochemistry and the classic infrared spectra of [H₅⁺](app:s/5/1/1), [H₇⁺](app:s/7/1/1) and [H₉⁺](app:s/9/1/1): [H₂](app:s/2/0/1)
+  ligands added around an [H₃⁺](app:s/3/1/1) core, with the first shell complete at [H₉⁺](app:s/9/1/1),
+  one [H₂](app:s/2/0/1) on each corner. The project's cheapest dissociation channel agrees:
+  [H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) costs 0.37 eV.
+- **H₂·H⁺·H₂: the shared proton.** A proton held between two [H₂](app:s/2/0/1),
   [H₂–H–H₂]⁺, like the Zundel ion H₅O₂⁺ in water. Its symmetric D₂d form is
-  the saddle point the proton crosses on its way from one H₂ to the other.
+  the saddle point the proton crosses on its way from one [H₂](app:s/2/0/1) to the other.
   That barrier is about 48 cm⁻¹ here, against a zero-point energy of about
   7800 cm⁻¹, so in the ground state the central proton is shared: its
   wavefunction spreads over both sides, and the vibrationally averaged ion is
   effectively symmetric. Spectroscopy and quantum dynamics therefore often
-  call H₅⁺ a shared-proton (proton-bound) complex; its low-frequency
-  spectrum is dominated by the proton's motion between the two H₂, and
+  call [H₅⁺](app:s/5/1/1) a shared-proton (proton-bound) complex; its low-frequency
+  spectrum is dominated by the proton's motion between the two [H₂](app:s/2/0/1), and
   isotopic substitution (H₄D⁺) partly localizes it.
 
 Neither is wrong: H₃⁺·H₂ describes the classical minimum and the cluster
 series built on it, H₂·H⁺·H₂ where the nuclei actually are in the ground
 state. For labels computed from minimum structures, as in this project,
-H₃⁺ + H₂ is the natural primary one, with the shared proton noted as what the
+[H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) is the natural primary one, with the shared proton noted as what the
 real ion does.
 
 ### Methods that go beyond
@@ -91,19 +91,19 @@ to CCSD(T) scans: cheap to evaluate a billion times.
 
 ### What the harmonic picture gets wrong here
 
-The campaign's harmonic ZPE makes every neutral cluster beyond H₂ unbound
+The campaign's harmonic ZPE makes every neutral cluster beyond [H₂](app:s/2/0/1) unbound
 ($D_0 < 0$ by 8–55 meV). Diffusion Monte Carlo on a CCSD(T) potential finds
 the opposite: (H₂)ₖ is bound by 0.2–0.9 meV and a lone H atom stays with two
-or more H₂ by about 0.1 meV; only H₂·H is at the threshold of binding. The
+or more [H₂](app:s/2/0/1) by about 0.1 meV; only H₂·H is at the threshold of binding. The
 harmonic approximation treats the soft intermolecular motions as stiff
 parabolas and overestimates their zero-point energy several-fold. For the
 cations, where the binding is much larger, VPT2 changes $D_0$ of
-H₅⁺ → H₃⁺ + H₂ only from 0.244 to 0.280 eV.
+[H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) only from 0.244 to 0.280 eV.
 
 ### Nuclear spin
 
 Protons have spin ½ too. Exchanging two protons must change the sign of the total
-wavefunction, which couples nuclear spin to rotation: H₂ comes as *para*
+wavefunction, which couples nuclear spin to rotation: [H₂](app:s/2/0/1) comes as *para*
 (nuclear spins paired, even rotational levels) and *ortho* (parallel, odd
 levels). At low temperatures this changes rotational energies and entropies.
 The project's thermochemistry ignores it; the DMC study assumes para-H₂,
@@ -113,10 +113,10 @@ whose $j = 0$ ground state is spherical.
 
 - Every vibrational quantity in the project is harmonic: frequencies, ZPE
   and thermochemistry (`Freq`/`NumFreq` in `engines/orca.py`).
-- The plan names the risk: "Harmonic ZPE is unreliable for floppy H₂ units"
+- The plan names the risk: "Harmonic ZPE is unreliable for floppy [H₂](app:s/2/0/1) units"
   (`doc/Plan.md` §7), and the physics caveat in §1.2: clusters that are minima
   in the harmonic picture can be unbound once ZPE is included.
-- Phase 8 studies: VPT2 on H₂, H₃⁺ and H₅⁺ (`studies/anharmonic.py`), and
+- Phase 8 studies: VPT2 on [H₂](app:s/2/0/1), [H₃⁺](app:s/3/1/1) and [H₅⁺](app:s/5/1/1) (`studies/anharmonic.py`), and
   diffusion Monte Carlo of the neutral clusters (`studies/dmc.py`; see
   [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md)).
 - Reporting both ΔE and ΔE₀, and the separate `bound_with_zpe` verdict, keep

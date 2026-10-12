@@ -41,7 +41,7 @@ for a linear molecule).
 | [H₃⁺](app:s/3/1/1) | 3 | 3 |
 | [H₁₀](app:s/10/0/1) | 10 | 24 |
 
-H₂ is the only case you can draw. Everything below is easiest to picture on a
+[H₂](app:s/2/0/1) is the only case you can draw. Everything below is easiest to picture on a
 curve, then imagine in more dimensions.
 
 ### Landmarks
@@ -54,7 +54,7 @@ The slope of the surface is the **gradient** $\mathbf{g} = \partial E /
 |---|---|---|---|
 | **Minimum** | zero | all positive | A stable structure. A PES can have several: the **isomers**. The lowest is the **global minimum** |
 | **Saddle point** (first order) | zero | exactly one negative | A transition state: the highest point on the lowest path between two minima |
-| **Asymptote** | goes to zero | | Fragments far apart, e.g. H₂ → H + H |
+| **Asymptote** | goes to zero | | Fragments far apart, e.g. [H₂](app:s/2/0/1) → H + H |
 
 The gradient finds points where the surface is flat; only the Hessian tells
 a minimum from a saddle point. That is why the project computes
@@ -65,7 +65,7 @@ the Hessian) after every optimization.
 
 A minimum is where the nuclei *want* to be, but they never sit still there.
 Push a ball off the bottom of a bowl and it rolls back, overshoots and rolls
-back again. Nuclei on a PES do the same: in H₂ the bond keeps stretching and
+back again. Nuclei on a PES do the same: in [H₂](app:s/2/0/1) the bond keeps stretching and
 compressing around $R_e$. That oscillation is a **vibration**.
 
 Near the bottom, any well looks like a parabola, $E \approx E_\text{min} +
@@ -77,10 +77,10 @@ $$
 \omega = \sqrt{k/\mu}
 $$
 
-with $\mu$ the reduced mass ($m_\text{H}/2$ for H₂). $\omega$ is measured in
+with $\mu$ the reduced mass ($m_\text{H}/2$ for [H₂](app:s/2/0/1)). $\omega$ is measured in
 radians per second; the ordinary frequency, the number of oscillations per
 second, is $\nu = \omega/2\pi$. A stiff bond (large $k$) and light atoms
-(small $\mu$) vibrate fast. H₂ completes one vibration every
+(small $\mu$) vibrate fast. [H₂](app:s/2/0/1) completes one vibration every
 $1/\nu$ = 7.6 femtoseconds.
 
 Quantum mechanics changes one thing: the vibration can't have any energy it
@@ -93,7 +93,7 @@ E_v = \hbar\omega\left(v + \tfrac{1}{2}\right)
 $$
 
 A real well widens towards the top, so its levels crowd together there, and
-only a finite number fit below the dissociation limit. H₂ has 15 (v = 0 to 14).
+only a finite number fit below the dissociation limit. [H₂](app:s/2/0/1) has 15 (v = 0 to 14).
 A molecule that receives more energy than the top of the ladder falls apart.
 
 The important level is the lowest. Even at $v = 0$, at absolute zero, the
@@ -101,7 +101,7 @@ energy is $\tfrac{1}{2}\hbar\omega$ above the bottom of the well, not zero.
 That leftover is the **zero-point energy** (ZPE). It is forced by the
 uncertainty principle: a nucleus confined to a well can't also have exactly
 zero momentum, so it can't be at rest at the minimum. At room temperature
-almost every H₂ molecule is in $v = 0$ (the gap to $v = 1$ is about 20 times
+almost every [H₂](app:s/2/0/1) molecule is in $v = 0$ (the gap to $v = 1$ is about 20 times
 the thermal energy), so $v = 0$ is the state that matters for stability.
 
 !!! note "Units"
@@ -114,7 +114,7 @@ the thermal energy), so $v = 0$ is the state that matters for stability.
 
     Chemists still call $\tilde\nu$ the "frequency". The energy quantum is
     $\hbar\omega = h\nu = hc\tilde\nu$, so in cm⁻¹ it is just $\tilde\nu$
-    (1 eV = 8065.5 cm⁻¹). H₂'s harmonic frequency is 4401 cm⁻¹
+    (1 eV = 8065.5 cm⁻¹). [H₂](app:s/2/0/1)'s harmonic frequency is 4401 cm⁻¹
     ($\nu$ = 1.32 × 10¹⁴ Hz, $\omega$ = 8.29 × 10¹⁴ rad/s), so its harmonic ZPE
     is half of that, 2200 cm⁻¹ = 0.27 eV.
 
@@ -143,14 +143,14 @@ fragments. They differ in where you start:
   actually needed to break a molecule in its ground state, and what experiments
   measure.
 
-The diagram shows H₂'s well with its vibrational levels, from a Morse
-potential: a standard model curve fitted to H₂'s measured well depth and
-vibration frequency. (The Morse model holds 17 levels rather than H₂'s real
+The diagram shows [H₂](app:s/2/0/1)'s well with its vibrational levels, from a Morse
+potential: a standard model curve fitted to [H₂](app:s/2/0/1)'s measured well depth and
+vibration frequency. (The Morse model holds 17 levels rather than [H₂](app:s/2/0/1)'s real
 15, but its ZPE and $D_0$ come out right.) Hover a level for its energy.
 
 --8<-- "morse_levels.svg.html"
 
-For a diatomic like H₂, the fragments are single atoms, which can't vibrate.
+For a diatomic like [H₂](app:s/2/0/1), the fragments are single atoms, which can't vibrate.
 So the whole ZPE of the molecule is lost on breaking, and
 
 $$
@@ -165,9 +165,9 @@ D_0 = D_e - \Delta\text{ZPE}, \qquad
 \Delta\text{ZPE} = \text{ZPE}(\text{cluster}) - \sum_\text{fragments} \text{ZPE}(\text{fragment})
 $$
 
-Take H₅⁺ → H₃⁺ + H₂. The cluster has $3 \cdot 5 - 6 = 9$ normal modes; the
+Take [H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1). The cluster has $3 \cdot 5 - 6 = 9$ normal modes; the
 fragments have $3 + 1 = 4$ between them. The extra five are the soft motions
-of H₂ against H₃⁺ that hold the cluster together, and each brings its own
+of [H₂](app:s/2/0/1) against [H₃⁺](app:s/3/1/1) that hold the cluster together, and each brings its own
 zero-point energy. So $\Delta\text{ZPE}$ is typically positive and $D_0 < D_e$.
 
 Hydrogen is the lightest atom, so its frequencies and ZPE are the largest of
@@ -180,13 +180,13 @@ even at absolute zero.
 
 Each combination of charge and spin multiplicity is a different set of
 electrons, so it has its own PES. Two hydrogen atoms with paired spins (the
-singlet) attract and form H₂. With parallel spins (the triplet) the curve has
+singlet) attract and form [H₂](app:s/2/0/1). With parallel spins (the triplet) the curve has
 essentially no well, only a tiny van der Waals dip: the atoms repel. A "species" in this project, such as [H₄⁺](app:s/4/1/2) in
 the doublet state, is one surface.
 
 ## Example: the H₂ curve, computed two ways
 
-[`h2_minimal_basis.py`](#the-code) computes the H₂ energy at many bond
+[`h2_minimal_basis.py`](#the-code) computes the [H₂](app:s/2/0/1) energy at many bond
 lengths with two methods (explained in [Hartree–Fock](../methods/hartree-fock.md)),
 both in the smallest possible basis set, STO-3G:
 
@@ -250,15 +250,15 @@ appear or vanish.
 
 - **Structure search** (`doc/Plan.md` §2.1, `worker/src/hclust/structures.py`)
   looks for all the low minima on each species' PES. With 24 dimensions for
-  H₁₀, it starts many optimizations from different seed geometries and keeps the
+  [H₁₀](app:s/10/0/1), it starts many optimizations from different seed geometries and keeps the
   distinct results.
 - **Geometry optimization** at each level in `worker/src/hclust/levels.py`
   (L0, L1, L1M) follows the gradient downhill to the nearest minimum.
 - **Frequencies** check that each optimized structure is a minimum (all
   positive Hessian eigenvalues) and give its ZPE (`doc/Plan.md` §1, question 2).
-  H₃ is a known case where the stationary point is a saddle point. ORCA
+  [H₃](app:s/3/0/2) is a known case where the stationary point is a saddle point. ORCA
   computes *harmonic* frequencies (the parabola approximation), which is least
-  reliable for the floppy H₂-against-core motions (`doc/Plan.md` §7).
+  reliable for the floppy [H₂](app:s/2/0/1)-against-core motions (`doc/Plan.md` §7).
 - **$D_e$ vs $D_0$:** binding energies are reported both without and with ZPE
   (ΔE and ΔE₀, `doc/Plan.md` §1.2), because the two can disagree on whether a
   cluster is bound.
@@ -266,7 +266,7 @@ appear or vanish.
   smallest dissociation energy over all ways of splitting a cluster
   (`doc/Plan.md` §1, question 3).
 - **Method dependence is real here:** the DFT levels L0 and L1 turn the C₂ᵥ
-  H₅⁺ minimum into a proton-shared D₂d structure, while MP2 keeps it (comment on
+  [H₅⁺](app:s/5/1/1) minimum into a proton-shared D₂d structure, while MP2 keeps it (comment on
   L1M in `worker/src/hclust/levels.py`). C₂ᵥ and D₂d are
   [point groups](../techniques/point-groups.md), names for the two shapes'
   symmetry. This is exactly why the project has more than
@@ -277,8 +277,8 @@ appear or vanish.
 ## References
 
 - A. Szabo, N. S. Ostlund, *Modern Quantum Chemistry*, §2.1 (Born–Oppenheimer
-  approximation) and §3.5 (the minimal-basis H₂ calculations reproduced here).
+  approximation) and §3.5 (the minimal-basis [H₂](app:s/2/0/1) calculations reproduced here).
 - F. Jensen, *Introduction to Computational Chemistry*, 3rd ed., chapters on
   optimization techniques and the Born–Oppenheimer approximation.
 - W. Kołos, L. Wolniewicz, *J. Chem. Phys.* **49**, 404 (1968): the essentially exact
-  H₂ energy curve.
+  [H₂](app:s/2/0/1) energy curve.

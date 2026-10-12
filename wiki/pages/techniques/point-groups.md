@@ -30,23 +30,23 @@ group, and only a limited number of such groups exist.
 |---|---|---|
 | D∞h | infinite-fold axis, $i$ | [H₂](app:s/2/0/1), symmetric linear chains |
 | C∞v | infinite-fold axis, no $i$ | asymmetric linear chains |
-| D₃h | $C_3$, three $C_2$, $\sigma_h$ | H₃⁺: equilateral triangle |
-| C₂ᵥ | $C_2$, two $\sigma_v$ | [H₅⁺](app:s/5/1/1) (MP2): an H₂ on one corner of H₃⁺, perpendicular to the triangle |
-| D₂d | $S_4$, $C_2$ axes, two $\sigma_d$ | H₅⁺ (DFT): a proton between two crossed H₂ |
+| D₃h | $C_3$, three $C_2$, $\sigma_h$ | [H₃⁺](app:s/3/1/1): equilateral triangle |
+| C₂ᵥ | $C_2$, two $\sigma_v$ | [H₅⁺](app:s/5/1/1) (MP2): an [H₂](app:s/2/0/1) on one corner of [H₃⁺](app:s/3/1/1), perpendicular to the triangle |
+| D₂d | $S_4$, $C_2$ axes, two $\sigma_d$ | [H₅⁺](app:s/5/1/1) (DFT): a proton between two crossed [H₂](app:s/2/0/1) |
 | T_d | tetrahedral | four points on a sphere |
 | C₁ | none ($E$ only) | no symmetry at all |
 
 ### Why it matters
 
 - **Degenerate modes.** Symmetric molecules have vibrations with exactly equal
-  frequencies. H₃⁺'s 2743 cm⁻¹ mode comes twice: in D₃h the two
+  frequencies. [H₃⁺](app:s/3/1/1)'s 2743 cm⁻¹ mode comes twice: in D₃h the two
   distortions of the triangle are related by a 120° rotation, so they must
   have the same energy.
 - **Rotational entropy.** The **symmetry number** $\sigma$ counts how many
-  rotations map the molecule onto itself. Rotating H₂ by 180° gives an
+  rotations map the molecule onto itself. Rotating [H₂](app:s/2/0/1) by 180° gives an
   indistinguishable molecule, so only half its orientations are distinct:
   $S_\text{rot}$ is reduced by $k_B\ln\sigma$ ([thermochemistry](thermochemistry.md)).
-  Values in the campaign: H₂ 2, H₃⁺ 6, C₂ᵥ H₅⁺ 2, D₂d H₅⁺ 4.
+  Values in the campaign: [H₂](app:s/2/0/1) 2, [H₃⁺](app:s/3/1/1) 6, C₂ᵥ [H₅⁺](app:s/5/1/1) 2, D₂d [H₅⁺](app:s/5/1/1) 4.
 - **Optimizations keep symmetry.** The gradient of a symmetric structure is
   itself symmetric, so an optimizer can't break symmetry on its own and can
   stop at a symmetric saddle point. That's why the runner displaces along
@@ -60,9 +60,9 @@ when the forces are *small*, not zero. A symmetry finder therefore needs a
 tolerance, and a too-strict one gives the wrong answer. Two examples from
 this project:
 
-- ORCA labelled an ωB97M-V H₃⁺ C₂ᵥ, although its three bonds differed by less
+- ORCA labelled an ωB97M-V [H₃⁺](app:s/3/1/1) C₂ᵥ, although its three bonds differed by less
   than 3·10⁻⁴ Å (Phase 1 findings).
-- In the baseline campaign, three RI-MP2 H₅⁺ results with the same energy to
+- In the baseline campaign, three RI-MP2 [H₅⁺](app:s/5/1/1) results with the same energy to
   10⁻⁶ hartree and the same bond lengths to 10⁻⁴ Å are labelled C₂ᵥ, C₁ and C₁.
 
 ## Where this appears in h_clusters

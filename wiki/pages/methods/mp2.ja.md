@@ -60,7 +60,7 @@ MP2 の値は Szabo & Ostlund と一致する。この小さな基底では、MP
 
 - **自己相互作用誤差がない。** MP2 は自己相互作用のない HF 軌道から出発する。MP2 が [H₅⁺](app:s/5/1/1) の C₂ᵥ H₃⁺·H₂ 構造を保つのはこのためであり、このプロジェクトの DFT レベルはどれもそれを陽子共有型の D₂d 構造に変えてしまう。
 - **分散力を含む。**二電子励起は、2 つの分子上の電子の相関したゆらぎを記述する。それがまさに分散力である。MP2 は分散力をいくらか過大評価しがちである。
-- **大きな基底が必要。**相関エネルギーは基底の大きさに対してゆっくり収束する。MP2/aug-cc-p**VDZ** ではすでに H₅⁺ が D₂d に崩れ、三重ζで C₂ᵥ が保たれる (`doc/Plan.md`、フェーズ 4)。
+- **大きな基底が必要。**相関エネルギーは基底の大きさに対してゆっくり収束する。MP2/aug-cc-p**VDZ** ではすでに [H₅⁺](app:s/5/1/1) が D₂d に崩れ、三重ζで C₂ᵥ が保たれる (`doc/Plan.md`、フェーズ 4)。
 - **伸びた結合やほぼ縮退した状態では破綻する。**差 $\varepsilon_a + \varepsilon_b - \varepsilon_i - \varepsilon_j$ が小さくなると項が発散する。摂動論は HF がよい出発点であることを前提にしているが、[結合の切断](hartree-fock.md#bond-breaking)ではそうではない。
 - **開殻:** 非制限 MP2 (UMP2) は UHF 参照の [スピン汚染](../pitfalls/spin-contamination.md)をそのまま引き継ぐ。
 - **コスト:** 基底関数の数の $N^5$ で増える。[RI](resolution-of-identity.md) を使えばはるかに安くなる。
@@ -81,6 +81,6 @@ MP2 の値は Szabo & Ostlund と一致する。この小さな基底では、MP
 
 ## 参考文献
 
-- A. Szabo, N. S. Ostlund, *Modern Quantum Chemistry*, 6 章 (多体摂動論)。H₂ の例を含む。
+- A. Szabo, N. S. Ostlund, *Modern Quantum Chemistry*, 6 章 (多体摂動論)。[H₂](app:s/2/0/1) の例を含む。
 - C. Møller, M. S. Plesset, *Phys. Rev.* **46**, 618 (1934)。
 - F. Jensen, *Introduction to Computational Chemistry*, 3rd ed., 電子相関法の章。

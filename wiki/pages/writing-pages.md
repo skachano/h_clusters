@@ -91,7 +91,7 @@ server, or the app on GitHub Pages. A species route that is not a state of
 the app fails the strict build; other routes are not checked, so open them
 once in the preview.
 
-The first mention of each species on a page links to its page in the app.
+Every mention of a species links to its page in the app.
 After writing a page, run
 
 ```sh

@@ -41,7 +41,7 @@ $$
 $$
 
 In **restricted** HF (RHF), electrons are paired: each spatial orbital holds
-one spin-up (α) and one spin-down (β) electron. The H₂ ground state is one
+one spin-up (α) and one spin-down (β) electron. The [H₂](app:s/2/0/1) ground state is one
 orbital, $\sigma_g$, holding both electrons.
 
 ### Step 2: the mean field
@@ -135,7 +135,7 @@ transform the eigenvectors back with $\mathbf{C} = \mathbf{X}\mathbf{C}'$.
 ## Example: H₂ from scratch
 
 `wiki/examples/h2_minimal_basis.py` implements all of the above with numpy,
-for H₂ in the STO-3G basis: one 1s-like function per atom, each a sum of three
+for [H₂](app:s/2/0/1) in the STO-3G basis: one 1s-like function per atom, each a sum of three
 Gaussians. The SCF loop is the core:
 
 ```python
@@ -169,7 +169,7 @@ These match the values in Szabo & Ostlund, §3.5. Reading the output:
   \phi_B$ (bonding) and $\sigma_u \propto \phi_A - \phi_B$ (antibonding).
   Bigger problems need more iterations (see the ORCA run below).
 - **Orbital energies.** $-\varepsilon_{\sigma_g}$ = 0.578 hartree = 15.7 eV,
-  near the measured ionization energy of H₂ (15.4 eV).
+  near the measured ionization energy of [H₂](app:s/2/0/1) (15.4 eV).
 - **Total energy** = electronic energy + nuclear repulsion = −1.8310 + 0.7143.
 
 ### The same thing in ORCA
@@ -203,9 +203,9 @@ E_\text{corr} = E_\text{exact} - E_\text{HF}
 $$
 
 It is small compared with the total, but on the scale of chemistry it is
-large. For H₂ at 1.4 bohr in STO-3G it is −0.0206 hartree (−0.56 eV). In a
+large. For [H₂](app:s/2/0/1) at 1.4 bohr in STO-3G it is −0.0206 hartree (−0.56 eV). In a
 complete basis it is −0.041 hartree (−1.1 eV), about a quarter of the bond
-energy. Weak binding, like H₂ molecules clustering around [H₃⁺](app:s/3/1/1), comes almost
+energy. Weak binding, like [H₂](app:s/2/0/1) molecules clustering around [H₃⁺](app:s/3/1/1), comes almost
 entirely from correlation (dispersion), so HF alone can't describe most of
 this project's clusters. MP2 and coupled cluster add correlation on top of
 HF.
@@ -245,7 +245,7 @@ pure singlet (**spin contamination**, measured by ⟨S²⟩).
   (or `UKS` for DFT) to every input with multiplicity > 1. Closed-shell
   singlets get ORCA's default, RHF. `TightSCF` tightens the convergence
   thresholds of the loop above.
-- **One-electron species.** H and H₂⁺ have no electron pairs to correlate.
+- **One-electron species.** H and [H₂⁺](app:s/2/1/2) have no electron pairs to correlate.
   Levels marked `correlated` in `worker/src/hclust/levels.py` (MP2, CCSD(T))
   fall back to plain HF for them, which is exact within the basis.
 - **Reference for correlated methods.** L1M (RI-MP2) and L2 (CCSD(T)) both run
@@ -260,7 +260,7 @@ pure singlet (**spin contamination**, measured by ⟨S²⟩).
 ## References
 
 - A. Szabo, N. S. Ostlund, *Modern Quantum Chemistry*, chapter 3 (the
-  Hartree–Fock approximation; §3.5 has the H₂ calculation reproduced here).
+  Hartree–Fock approximation; §3.5 has the [H₂](app:s/2/0/1) calculation reproduced here).
 - F. Jensen, *Introduction to Computational Chemistry*, 3rd ed., chapter on
   Hartree–Fock theory.
 - W. J. Hehre, R. F. Stewart, J. A. Pople, *J. Chem. Phys.* **51**, 2657 (1969):

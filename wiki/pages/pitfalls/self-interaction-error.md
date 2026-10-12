@@ -47,10 +47,10 @@ hybrids (ωB97X) use 100 % HF exchange at long range. Neither removes it.
 
 ## Examples from this project
 
-**H₂⁺, one electron.** Hartree–Fock is exact here, so every deviation of DFT
+**[H₂⁺](app:s/2/1/2), one electron.** Hartree–Fock is exact here, so every deviation of DFT
 is self-interaction:
 
-| H₂⁺ | r²SCAN-3c (L0) | ωB97X-D4 (L1) | HF (exact in basis) | Exact |
+| [H₂⁺](app:s/2/1/2) | r²SCAN-3c (L0) | ωB97X-D4 (L1) | HF (exact in basis) | Exact |
 |---|---|---|---|---|
 | Bond length | 1.083 Å | 1.105 Å | 1.058 Å | 1.057 Å |
 | Harmonic frequency | — | 2074 cm⁻¹ | 2322 cm⁻¹ | 2322 cm⁻¹ |
@@ -60,14 +60,14 @@ The bond is too long and too soft but too strong: the electron is happier
 spread over both protons than it should be.
 
 **[H⁻](app:s/1/-1/1), an anion.** The electron affinity of H is 0.754 eV. ωB97X-D4 gives
-0.20 eV, r²SCAN-3c leaves H⁻ unbound (−1.57 eV, made worse by its lack of
+0.20 eV, r²SCAN-3c leaves [H⁻](app:s/1/-1/1) unbound (−1.57 eV, made worse by its lack of
 [diffuse functions](diffuse-functions.md)). MP2 and CCSD(T), built on HF
 orbitals, give 0.48 and 0.73 eV
 ([electron affinity](../techniques/ionization-and-electron-affinity.md)).
 
 **[H₅⁺](app:s/5/1/1), a shared proton.** Every DFT level in the project, and ωB97M-V too,
 turns the C₂ᵥ H₃⁺·H₂ structure into a D₂d structure with the proton shared
-equally between two H₂ units (four bonds of 1.13 Å). MP2 keeps C₂ᵥ; at MP2
+equally between two [H₂](app:s/2/0/1) units (four bonds of 1.13 Å). MP2 keeps C₂ᵥ; at MP2
 the D₂d structure is a saddle point (546i cm⁻¹), and CCSD(T) puts C₂ᵥ
 0.13 kcal/mol lower (`doc/Plan.md`, Phase 3).
 
@@ -81,9 +81,9 @@ the D₂d structure is a saddle point (546i cm⁻¹), and CCSD(T) puts C₂ᵥ
 
 ## Where this appears in h_clusters
 
-- The **L1M** (RI-MP2) geometry level exists because of the H₅⁺ result (comment
+- The **L1M** (RI-MP2) geometry level exists because of the [H₅⁺](app:s/5/1/1) result (comment
   in `worker/src/hclust/levels.py`).
-- The anchor tests (`worker/tests/test_anchors.py`) keep the DFT H₂⁺ bond
+- The anchor tests (`worker/tests/test_anchors.py`) keep the DFT [H₂⁺](app:s/2/1/2) bond
   length as a strict expected failure, so a change that "fixes" it would be noticed.
 - CCSD(T) single points on both the DFT and MP2 geometries decide each
   structure (`dft_ref`, `mp2_ref` in `campaigns/baseline.yaml`).

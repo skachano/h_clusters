@@ -67,8 +67,8 @@ Examples from the campaign (CCSD(T)/aug-cc-pVTZ):
 
 | Species | Ground state | Higher-spin state |
 |---|---|---|
-| H₂ | singlet, bound by 4.7 eV | triplet: no bond; the atoms fly apart in every optimization |
-| H₃⁺ | singlet triangle, −1.3417 hartree | triplet, −1.1155 hartree: 6.2 eV higher |
+| [H₂](app:s/2/0/1) | singlet, bound by 4.7 eV | triplet: no bond; the atoms fly apart in every optimization |
+| [H₃⁺](app:s/3/1/1) | singlet triangle, −1.3417 hartree | triplet, −1.1155 hartree: 6.2 eV higher |
 | [H⁻](app:s/1/-1/1) | singlet, bound | triplet: above H + a free electron, so not a bound state |
 
 ### ⟨S²⟩, a check on the wavefunction

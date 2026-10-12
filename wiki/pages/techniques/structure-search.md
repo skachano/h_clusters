@@ -59,7 +59,7 @@ flowchart LR
 
 - Templates: `chain`, `ring`, `sphere` (points spread over a sphere, a
   compact polyhedron), `h2_units` ((H₂)ₖ arrangements) and `h3_core` (an [H₃⁺](app:s/3/1/1)
-  triangle surrounded by [H₂](app:s/2/0/1) units, the expected motif of H₅⁺, [H₇⁺](app:s/7/1/1), [H₉⁺](app:s/9/1/1)).
+  triangle surrounded by [H₂](app:s/2/0/1) units, the expected motif of [H₅⁺](app:s/5/1/1), [H₇⁺](app:s/7/1/1), [H₉⁺](app:s/9/1/1)).
 - Random: atoms placed uniformly in a ball of radius 0.8·m^(1/3) + 0.4 Å,
   no two closer than 0.6 Å, and every atom within 1.6 Å of another so the
   start isn't already in pieces. The random generator takes an explicit seed,
@@ -100,7 +100,7 @@ hydrogen clusters have few minima, and many roads lead to each. Of the
 lowest-energy structures per state, 31 came from random starts and 14 from
 templates. Both sources are needed.
 
-For H₃⁺, all 20 random starts found the triangle (Phase 3). For H₅⁺ every
+For [H₃⁺](app:s/3/1/1), all 20 random starts found the triangle (Phase 3). For [H₅⁺](app:s/5/1/1) every
 start ended in the D₂d structure at L0, because the screening level's DFT
 has no C₂ᵥ minimum. The MP2 branch recovered C₂ᵥ from those structures only
 because its optimizer, and the saddle-point displacement, moved them there.

@@ -64,21 +64,21 @@ keeps growing.
 
 [H₂](app:s/2/0/1) can be treated as a **rigid rotor**: its axis is a unit vector, and its
 rotational energy $B\,j(j+1)$ is diffusion on a sphere with diffusion
-constant $B$ (59.3 cm⁻¹ for H₂). Each walker then carries positions and axes,
+constant $B$ (59.3 cm⁻¹ for [H₂](app:s/2/0/1)). Each walker then carries positions and axes,
 and the potential may depend on orientation. When the potential is
-spherical on average, as for para-H₂ in its $j = 0$ state, H₂ can instead be
+spherical on average, as for para-H₂ in its $j = 0$ state, [H₂](app:s/2/0/1) can instead be
 a point particle on an orientation-averaged potential.
 
 ## How this project uses it
 
 1. **Potential.** Counterpoise-corrected CCSD(T)/aug-cc-pVTZ scans of the
-   interaction between rigid H₂ (at its vibrationally averaged length,
-   0.7668 Å) and a second H₂ or an H atom, over distance and orientation:
-   693 jobs. The H₂–H₂ curve is averaged over four standard orientations,
-   H–H₂ over three angles. A spline joins the points, with an exponential
+   interaction between rigid [H₂](app:s/2/0/1) (at its vibrationally averaged length,
+   0.7668 Å) and a second [H₂](app:s/2/0/1) or an H atom, over distance and orientation:
+   693 jobs. The [H₂](app:s/2/0/1)–[H₂](app:s/2/0/1) curve is averaged over four standard orientations,
+   H–[H₂](app:s/2/0/1) over three angles. A spline joins the points, with an exponential
    wall inside and a $-C_6/R^6 - C_8/R^8$ tail outside.
 2. **Clusters** are sums of these pair potentials: (H₂)ₖ and (H₂)ₖ·H for
-   k = 1–4. The H₂ vibration (4400 cm⁻¹) is far too fast to couple and is
+   k = 1–4. The [H₂](app:s/2/0/1) vibration (4400 cm⁻¹) is far too fast to couple and is
    left out.
 3. **Checks.** Every pair (H₂·H, (H₂)₂) is also solved exactly as a one-dimensional
    radial equation; DMC must agree. The code is tested on a 3D harmonic
@@ -89,7 +89,7 @@ a point particle on an orientation-averaged potential.
 
 ## Example: the neutral clusters are bound after all
 
-The campaign's harmonic analysis calls every neutral cluster beyond H₂
+The campaign's harmonic analysis calls every neutral cluster beyond [H₂](app:s/2/0/1)
 "bound but not with ZPE": $D_e > 0$ but $D_0 < 0$. DMC on the same CCSD(T)
 potential says otherwise:
 
@@ -110,50 +110,50 @@ potential says otherwise:
   only in very cold environments such as helium droplets or supersonic jets.
 - H₂·H has at most a "halo" state, bound by under a microelectronvolt with
   a mean separation of 37 Å, which disappears on the shallower well. A lone H
-  atom does stay with two or more H₂, by about 0.1 meV.
+  atom does stay with two or more [H₂](app:s/2/0/1), by about 0.1 meV.
 
 The walker spread is a convergence diagnostic, not the cluster size: DMC
 without a trial function samples $\psi_0$, not $|\psi_0|^2$.
 
 ## Example: the anions, where orientation and three-body forces matter
 
-The singlet anions [H₃⁻](app:s/3/-1/1)–[H₉⁻](app:s/9/-1/1) are [H⁻](app:s/1/-1/1) with one to four H₂ around it. Like the
+The singlet anions [H₃⁻](app:s/3/-1/1)–[H₉⁻](app:s/9/-1/1) are [H⁻](app:s/1/-1/1) with one to four [H₂](app:s/2/0/1) around it. Like the
 neutral clusters they are bound in $D_e$ but not after harmonic ZPE. The ion
 changes two things:
 
-- **Orientation.** The H⁻–H₂ interaction is strongly anisotropic: −52.5 meV
-  end-on, −6.15 meV averaged over angles. So H₂ is a rotating rigid rotor
-  here (rotor DMC), not a sphere. For H₃⁻ the exact answer comes from a
+- **Orientation.** The [H⁻](app:s/1/-1/1)–[H₂](app:s/2/0/1) interaction is strongly anisotropic: −52.5 meV
+  end-on, −6.15 meV averaged over angles. So [H₂](app:s/2/0/1) is a rotating rigid rotor
+  here (rotor DMC), not a sphere. For [H₃⁻](app:s/3/-1/1) the exact answer comes from a
   coupled-channel calculation (the rotor states $j = 0, 2, 4, \ldots$ coupled
   by the anisotropy): $D_0 = 6.83$ meV, with the free-rotor $j = 0$ state
   89 % of the wavefunction. Rotor DMC gives 6.82.
-- **Three-body forces.** The ion polarises every H₂ at once, and the energy is
+- **Three-body forces.** The ion polarises every [H₂](app:s/2/0/1) at once, and the energy is
   not a sum of pairs. CCSD(T) on whole clusters puts the non-additive part at
-  −23, −77 and −125 meV for [H₅⁻](app:s/5/-1/1), [H₇⁻](app:s/7/-1/1) and H₉⁻. The study tabulates the
-  three-body term (798 CCSD(T) jobs over distances, angles and H₂
+  −23, −77 and −125 meV for [H₅⁻](app:s/5/-1/1), [H₇⁻](app:s/7/-1/1) and [H₉⁻](app:s/9/-1/1). The study tabulates the
+  three-body term (798 CCSD(T) jobs over distances, angles and [H₂](app:s/2/0/1)
   orientations). Pairs plus three-body then overbind by 4–14 %, because the
   four-body and higher terms are repulsive, while pairs alone underbind. The
   truth lies between the two models.
 
-Results, $D_0$ in meV for losing one H₂:
+Results, $D_0$ in meV for losing one [H₂](app:s/2/0/1):
 
-| Cluster | Harmonic | Pairs only | Pairs + three-body | 10 % shallower | H₂ as spheres | Verdict |
+| Cluster | Harmonic | Pairs only | Pairs + three-body | 10 % shallower | [H₂](app:s/2/0/1) as spheres | Verdict |
 |---|---|---|---|---|---|---|
-| H₃⁻ = H⁻·H₂ | −13.9 | 6.83 (exact) | 6.83 (exact) | 5.52 | 3.44 | bound |
-| H₅⁻ = H⁻(H₂)₂ | −28 | 7.27 | 8.63 ± 0.05 | 6.81 | 4.14 | bound |
-| H₇⁻ = H⁻(H₂)₃ | −39 | 7.83 | 10.92 ± 0.11 | 8.61 | 4.73 | bound |
-| H₉⁻ = H⁻(H₂)₄ | −46 | 7.85 | 12.65 ± 0.23 | 9.75 | 5.25 | bound |
+| [H₃⁻](app:s/3/-1/1) = H⁻·H₂ | −13.9 | 6.83 (exact) | 6.83 (exact) | 5.52 | 3.44 | bound |
+| [H₅⁻](app:s/5/-1/1) = H⁻(H₂)₂ | −28 | 7.27 | 8.63 ± 0.05 | 6.81 | 4.14 | bound |
+| [H₇⁻](app:s/7/-1/1) = H⁻(H₂)₃ | −39 | 7.83 | 10.92 ± 0.11 | 8.61 | 4.73 | bound |
+| [H₉⁻](app:s/9/-1/1) = H⁻(H₂)₄ | −46 | 7.85 | 12.65 ± 0.23 | 9.75 | 5.25 | bound |
 
 - All four anions are bound, in every variant, by 7–13 meV (80–150 K): ten to
   a hundred times more than the neutral clusters.
-- Orientation doubles the binding: H₂ lines up with the ion's field, which a
+- Orientation doubles the binding: [H₂](app:s/2/0/1) lines up with the ion's field, which a
   sphere cannot do.
-- With pairs alone, each further H₂ is bound by about the same 7.8 meV; the
+- With pairs alone, each further [H₂](app:s/2/0/1) is bound by about the same 7.8 meV; the
   growth with size comes from the three-body term, whose exact size is the
   main uncertainty.
-- The study also exposed a gap in the campaign. For H₅⁻ and H₇⁻ the MP2
+- The study also exposed a gap in the campaign. For [H₅⁻](app:s/5/-1/1) and [H₇⁻](app:s/7/-1/1) the MP2
   optimisations had stopped at shallow saddle points, so their reference
-  energies came from DFT geometries with H⁻ too close to H₂ (2.1 Å instead
+  energies came from DFT geometries with [H⁻](app:s/1/-1/1) too close to [H₂](app:s/2/0/1) (2.1 Å instead
   of 2.5–2.7 Å, see
   [self-interaction error](../pitfalls/self-interaction-error.md)). Restarted
   from the DMC model's minima, MP2 found true minima 50 and 23 meV lower in

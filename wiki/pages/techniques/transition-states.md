@@ -74,7 +74,7 @@ because the bottleneck moves with energy.
 - **Light nuclei.** Hydrogen tunnels through barriers, and its zero-point
   energy is large. For low barriers they matter as much as the barrier
   height: Wigner or Eckart corrections are the simple estimates, instanton
-  and ring-polymer methods the rigorous ones. In H₅⁺ the zero-point level
+  and ring-polymer methods the rigorous ones. In [H₅⁺](app:s/5/1/1) the zero-point level
   already lies above the barrier for the proton shuttling between its two
   [H₂](app:s/2/0/1) ends ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
 
@@ -82,13 +82,13 @@ because the bottleneck moves with energy.
 
 | Channel type | Example | Rearrangement? | Tool |
 |---|---|---|---|
-| Loss of a ligand | [H₇⁺](app:s/7/1/1) → H₅⁺ + H₂, H⁻(H₂)ₖ → H⁻(H₂)ₖ₋₁ + H₂ | no | relaxed scan; expected to confirm $D_e$ |
-| Van der Waals split | (H₂)₄ → (H₂)₃ + H₂ | no | relaxed scan |
-| Rearranging core | [H₆⁺](app:s/6/1/2) → H₅⁺ + H (an H₃⁺ triangle must form) | yes | NEB → TS → IRC |
+| Loss of a ligand | [H₇⁺](app:s/7/1/1) → [H₅⁺](app:s/5/1/1) + [H₂](app:s/2/0/1), H⁻(H₂)ₖ → H⁻(H₂)ₖ₋₁ + [H₂](app:s/2/0/1) | no | relaxed scan; expected to confirm $D_e$ |
+| Van der Waals split | (H₂)₄ → (H₂)₃ + [H₂](app:s/2/0/1) | no | relaxed scan |
+| Rearranging core | [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H (an [H₃⁺](app:s/3/1/1) triangle must form) | yes | NEB → TS → IRC |
 | Spin change | high-spin cations to low-spin products | — | MECP |
 
-For H₆⁺ → H₅⁺ + H no barrier is expected, because the reverse reaction
-resembles [H₂⁺](app:s/2/1/2) + H₂ → H₃⁺ + H, which has none
+For [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H no barrier is expected, because the reverse reaction
+resembles [H₂⁺](app:s/2/1/2) + [H₂](app:s/2/0/1) → [H₃⁺](app:s/3/1/1) + H, which has none
 ([fragmentation](fragmentation.md#products-versus-process-rearrangement-and-barriers)).
 That expectation is exactly what an NEB calculation would test.
 

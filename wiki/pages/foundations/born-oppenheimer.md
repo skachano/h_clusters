@@ -54,7 +54,7 @@ surface: the same bond length and the same well depth $D_e$. They differ only in
 Deuterium is twice as heavy, so it vibrates more slowly and has a smaller
 zero-point energy, which makes D₂ harder to break:
 
-| | H₂ | D₂ |
+| | [H₂](app:s/2/0/1) | D₂ |
 |---|---|---|
 | $D_e$ (well depth) | 4.75 eV | 4.75 eV |
 | Vibrational frequency $\omega_e$ | 4401 cm⁻¹ | 3116 cm⁻¹ (= 4401/√2) |
@@ -66,7 +66,7 @@ The approximation assumes the electrons always stay on one surface. That
 fails where two electronic states come close in energy (near crossings of surfaces), where a
 small nuclear motion can switch the electrons from one state to another.
 This matters for photochemistry and some reactions. For the ground states of
-the clusters in this project, it is excellent: corrections to H₂'s
+the clusters in this project, it is excellent: corrections to [H₂](app:s/2/0/1)'s
 dissociation energy are below 0.01 eV.
 
 !!! note "Born–Oppenheimer is not the same as treating nuclei classically"
@@ -88,4 +88,4 @@ dissociation energy are below 0.01 eV.
 
 - A. Szabo, N. S. Ostlund, *Modern Quantum Chemistry*, §2.1.
 - K. P. Huber, G. Herzberg, *Constants of Diatomic Molecules* (1979), and the
-  NIST Chemistry WebBook: spectroscopic constants of H₂ and D₂.
+  NIST Chemistry WebBook: spectroscopic constants of [H₂](app:s/2/0/1) and D₂.

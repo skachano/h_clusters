@@ -78,7 +78,7 @@ clearly ([self-interaction error](../pitfalls/self-interaction-error.md)):
 | Property | r²SCAN-3c (L0) | ωB97X-D4 (L1) | Reference |
 |---|---|---|---|
 | [H₂⁺](app:s/2/1/2) bond length | 1.083 Å | 1.105 Å | 1.058 Å (HF, exact for one electron) |
-| H₂⁺ frequency | — | 2074 cm⁻¹ | 2322 cm⁻¹ |
+| [H₂⁺](app:s/2/1/2) frequency | — | 2074 cm⁻¹ | 2322 cm⁻¹ |
 | Electron affinity of H | −1.57 eV (H⁻ unbound) | 0.20 eV | 0.73 eV (CCSD(T)), 0.754 exact |
 | [H₅⁺](app:s/5/1/1) shape | D₂d, shared proton | D₂d, shared proton | C₂ᵥ H₃⁺·H₂ (MP2, CCSD(T)) |
 
@@ -102,10 +102,10 @@ an r²SCAN-3c gradient took 3 s and an ωB97X-D4 gradient 48 s on one core.
   tuned for low cost. It pre-optimizes every candidate structure.
 - **L1, ωB97X-D4/def2-TZVPPD**: the main DFT geometry level. Chosen over
   ωB97M-V because it has analytic second derivatives: 16 min instead of
-  2 h for an H₁₀ optimization plus frequencies (`doc/Plan.md`, Phase 4).
+  2 h for an [H₁₀](app:s/10/0/1) optimization plus frequencies (`doc/Plan.md`, Phase 4).
 - **L1b, B3LYP** (no dispersion): kept for teaching, to show the failures.
 - Open-shell states run as unrestricted Kohn–Sham (`UKS`, `engines/orca.py`).
-- DFT's H₅⁺ shape is the reason the MP2 geometry level L1M exists
+- DFT's [H₅⁺](app:s/5/1/1) shape is the reason the MP2 geometry level L1M exists
   (comment on L1M in `worker/src/hclust/levels.py`).
 
 ## References

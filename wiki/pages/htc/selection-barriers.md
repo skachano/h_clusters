@@ -58,7 +58,7 @@ Every decision lands in the `candidate` table: energy, rank, `duplicate_of`,
 whether it was `selected`. From the `promote` stage of the baseline so far:
 1016 structures, 120 dissociated, 574 duplicates, 202 promoted.
 
-Each selection logs one line. For singlet H₃⁺ in the baseline:
+Each selection logs one line. For singlet [H₃⁺](app:s/3/1/1) in the baseline:
 
 ```text
 select H3+ (1)    promote: 22 structures, 0 dissociated, 2 unique, 1 promoted

@@ -14,7 +14,7 @@ clusters, which are held together by little else, that is the whole story.
 
 ### Where dispersion comes from
 
-The electrons of H₂ fluctuate: at any instant the charge is slightly
+The electrons of [H₂](app:s/2/0/1) fluctuate: at any instant the charge is slightly
 lopsided, a momentary dipole. That dipole polarizes a neighbouring molecule,
 whose induced dipole is oriented to attract the first. Averaged over time,
 neither molecule has a dipole, but the correlated fluctuations give a net
@@ -43,11 +43,11 @@ coefficients depend on each atom's environment and charge.
 
 ## What it means for hydrogen clusters
 
-The plan expects neutral H_m beyond H₂ to be only weak van der Waals
-complexes of H₂ units (plus an H atom for odd m) (`doc/Plan.md` §1.2). The
+The plan expects neutral H_m beyond [H₂](app:s/2/0/1) to be only weak van der Waals
+complexes of [H₂](app:s/2/0/1) units (plus an H atom for odd m) (`doc/Plan.md` §1.2). The
 binding is tiny. In the baseline campaign at CCSD(T)/aug-cc-pVTZ, neutral [H₃](app:s/3/0/2)
-(H₂·H) lies only about 0.04 kcal/mol (under 2 meV) below H₂ + H. At RI-MP2 the complex
-is linear, with the H atom 3.32 Å from the end of the H₂. Without dispersion, such complexes don't exist: the
+(H₂·H) lies only about 0.04 kcal/mol (under 2 meV) below [H₂](app:s/2/0/1) + H. At RI-MP2 the complex
+is linear, with the H atom 3.32 Å from the end of the [H₂](app:s/2/0/1). Without dispersion, such complexes don't exist: the
 fragments drift apart during optimization.
 
 That binding is so small that the zero-point energy of the soft intermolecular
@@ -55,7 +55,7 @@ motion will decide whether the complex is really bound
 ([zero-point energy](../techniques/zero-point-energy.md)).
 
 Charged clusters are different. H₃⁺·H₂ (H₅⁺) and H⁻·H₂ are held mainly by the
-ion polarizing the H₂ (induction, falling off as $R^{-4}$), which even methods
+ion polarizing the [H₂](app:s/2/0/1) (induction, falling off as $R^{-4}$), which even methods
 without dispersion describe. Dispersion is a smaller correction there.
 
 ## Where this appears in h_clusters

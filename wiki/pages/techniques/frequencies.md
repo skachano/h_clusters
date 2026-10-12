@@ -86,13 +86,13 @@ D₃h symmetry ([point groups](point-groups.md)); 3368 cm⁻¹ is the symmetric
 
 [H₅⁺](app:s/5/1/1) shows how frequencies tell structures apart (`doc/Plan.md`, Phase 3):
 
-| H₅⁺ at RI-MP2/aug-cc-pVTZ | Frequencies |
+| [H₅⁺](app:s/5/1/1) at RI-MP2/aug-cc-pVTZ | Frequencies |
 |---|---|
-| C₂ᵥ H₃⁺·H₂ | 9 real, the lowest 203 cm⁻¹ (the soft H₂–H₃⁺ motion) |
+| C₂ᵥ H₃⁺·H₂ | 9 real, the lowest 203 cm⁻¹ (the soft [H₂](app:s/2/0/1)–[H₃⁺](app:s/3/1/1) motion) |
 | D₂d shared proton | 1 imaginary, **546i cm⁻¹**: a saddle point at this level |
 
 At the DFT levels the D₂d structure is a minimum instead. The imaginary
-mode of D₂d at MP2 moves the central proton towards one H₂, the motion that
+mode of D₂d at MP2 moves the central proton towards one [H₂](app:s/2/0/1), the motion that
 turns it into C₂ᵥ.
 
 ## Where this appears in h_clusters
@@ -106,8 +106,8 @@ turns it into C₂ᵥ.
 - **Saddle points are pushed downhill**: if a result has imaginary
   frequencies, `displace_along_imaginary_mode()` in `worker/src/hclust/runner.py`
   moves the atoms 0.1 Å along the most imaginary mode (alternating sign
-  between attempts) and re-optimizes. This turned a linear H₃⁺ chain into the
-  triangle (Phase 2) and both MP2 D₂d H₅⁺ structures into C₂ᵥ (Phase 3).
+  between attempts) and re-optimizes. This turned a linear [H₃⁺](app:s/3/1/1) chain into the
+  triangle (Phase 2) and both MP2 D₂d [H₅⁺](app:s/5/1/1) structures into C₂ᵥ (Phase 3).
   After 3 attempts the structure is kept as a saddle point (`n_imag > 0`).
 - Stages with `minima_only` or `when: minimum` (`campaigns/baseline.yaml`)
   only pass on structures with no imaginary frequencies.
