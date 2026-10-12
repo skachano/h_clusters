@@ -68,6 +68,7 @@ jobs:
         run: |
           docker build -t hclust-docs wiki
           docker run --rm -e APP_URL=/${{ github.event.repository.name }}/#/ \
+            -e SITE_URL=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/wiki/ \
             -v "$PWD/wiki:/docs" -v "$PWD/web/dist:/out" hclust-docs build --strict -d /out/wiki
           test -f web/dist/wiki/index.html && test -f web/dist/wiki/ja/index.html
 

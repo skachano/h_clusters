@@ -1,6 +1,9 @@
 site_name: H-Clusters Wiki
 site_description: Concepts, methods and techniques behind the h_clusters experiment
 docs_dir: pages
+# Where the wiki is served: the Pages build sets it, since the language switch on the home
+# pages and 404.html links to <path of site_url>/ja/. Unset (the dev server at /): links from /.
+site_url: !ENV SITE_URL
 # Broken links and anchors fail `build --strict`.
 validation:
   anchors: warn
