@@ -21,12 +21,14 @@
   --series-3: #1baf7a;
 
   --none: #f0efec;
-  --ord-1: #86b6ef;
-  --ord-2: #2a78d6;
-  --ord-3: #104281;
-  --ink-on-ord-1: #0b0b0b;
-  --ink-on-ord-2: #ffffff;
-  --ink-on-ord-3: #ffffff;
+  --ord-1: var(--div-pos-1);
+  --ord-2: var(--div-pos-2);
+  --ord-3: var(--div-pos-3);
+  --ord-4: var(--div-pos-4);
+  --ink-on-ord-1: var(--ink-on-div-1);
+  --ink-on-ord-2: var(--ink-on-div-2);
+  --ink-on-ord-3: var(--ink-on-div-3);
+  --ink-on-ord-4: var(--ink-on-div-4);
 
   --div-mid: #f0efec;
   --div-pos-1: #86b6ef;
@@ -65,12 +67,14 @@
     --series-2: #d95926;
     --series-3: #199e70;
     --none: #2a2a28;
-    --ord-1: #184f95;
-    --ord-2: #3987e5;
-    --ord-3: #9ec5f4;
-    --ink-on-ord-1: #ffffff;
-    --ink-on-ord-2: #0b0b0b;
-    --ink-on-ord-3: #0b0b0b;
+    --ord-1: var(--div-pos-1);
+    --ord-2: var(--div-pos-2);
+    --ord-3: var(--div-pos-3);
+    --ord-4: var(--div-pos-4);
+    --ink-on-ord-1: var(--ink-on-div-1);
+    --ink-on-ord-2: var(--ink-on-div-2);
+    --ink-on-ord-3: var(--ink-on-div-3);
+    --ink-on-ord-4: var(--ink-on-div-4);
     --div-mid: #383835;
     --div-pos-1: #184f95;
     --div-pos-2: #2a78d6;
@@ -104,12 +108,14 @@
   --series-2: #d95926;
   --series-3: #199e70;
   --none: #2a2a28;
-  --ord-1: #184f95;
-  --ord-2: #3987e5;
-  --ord-3: #9ec5f4;
-  --ink-on-ord-1: #ffffff;
-  --ink-on-ord-2: #0b0b0b;
-  --ink-on-ord-3: #0b0b0b;
+  --ord-1: var(--div-pos-1);
+  --ord-2: var(--div-pos-2);
+  --ord-3: var(--div-pos-3);
+  --ord-4: var(--div-pos-4);
+  --ink-on-ord-1: var(--ink-on-div-1);
+  --ink-on-ord-2: var(--ink-on-div-2);
+  --ink-on-ord-3: var(--ink-on-div-3);
+  --ink-on-ord-4: var(--ink-on-div-4);
   --div-mid: #383835;
   --div-pos-1: #184f95;
   --div-pos-2: #2a78d6;
@@ -195,6 +201,18 @@ select {
   background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 5px 8px;
 }
 .hint { font-size: 12px; color: var(--text-muted); }
+.control.dim { opacity: 0.5; }
+.control.dim:hover, .control.dim:focus-within { opacity: 0.8; }
+th button.column-pick {
+  font: inherit; color: var(--text-secondary); background: none; border: 1px solid transparent;
+  border-radius: 6px; padding: 2px 6px; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px;
+}
+th button.column-pick:hover { border-color: var(--border); }
+th button.column-pick[aria-pressed="true"] {
+  color: var(--text-primary); background: var(--surface-2); font-weight: 600; text-decoration: none;
+}
+td.picked { font-weight: 600; }
+.verdict-cell { display: inline-flex; align-items: center; gap: 6px; }
 
 /* tables */
 table { border-collapse: collapse; width: 100%; }

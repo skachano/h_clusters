@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import type { GridOut, StateDetail } from "../api/client";
@@ -110,6 +110,34 @@ describe("GridView", () => {
     expect(url).toContain("temperature=1000");
     expect(url).toContain("pressure=0.5");
     expect(screen.getByText(/D_G \(eV\): falls apart/)).toBeInTheDocument(); // value legend
+  });
+
+  it("the verdict follows the selected D, and T and p dim when they do not matter", async () => {
+    const { unmount } = renderAt("/c/mini?q=d_e");
+    await screen.findByRole("gridcell", { name: /^H3\+ \(1\): bound \(D_e > 0\)/ });
+    expect(document.getElementById("temperature")?.closest(".control")).toHaveClass("dim");
+    unmount();
+    renderAt("/c/mini?q=d_g&T=20&p=0.001");
+    await screen.findByRole("gridcell", { name: /^H3\+ \(1\): holds together at T and p/ });
+    expect(screen.getByText("holds together at 20.0 K, 1.0e-3 atm (D_G > 0)")).toBeInTheDocument();
+    expect(document.getElementById("temperature")?.closest(".control")).not.toHaveClass("dim");
+  });
+
+  it("the table shows every D, follows both switches, and picks D from its headings", async () => {
+    renderAt("/c/mini?q=d_e&color=value");
+    await screen.findByRole("gridcell", { name: /^H3\+/ });
+    fireEvent.click(screen.getByRole("button", { name: "Table" }));
+    const table = screen.getByRole("table");
+    expect(within(table).getByRole("button", { name: "D_e" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(table).getByText("bound (D_e > 0)")).toBeInTheDocument();
+    expect(within(table).getByLabelText("D_e 0.169 eV")).toHaveStyle({ background: "var(--div-pos-2)" });
+    expect(within(table).getAllByText("+0.150").length).toBeGreaterThan(0); // D_G alongside
+
+    fireEvent.click(within(table).getByRole("button", { name: "D_G" }));
+    expect(await within(table).findByText("holds together at T and p (D_G > 0)")).toBeInTheDocument();
+    expect(within(table).getByText("Weakest channel (D_G)")).toBeInTheDocument();
+    const urls = vi.mocked(fetch).mock.calls.map(([input]) => (input instanceof Request ? input.url : String(input)));
+    expect(urls.some((u) => u.includes("/grid") && u.includes("quantity=d_g"))).toBe(true);
   });
 });
 

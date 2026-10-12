@@ -8,6 +8,10 @@ export const DEFAULT_P = 1;
 export const T_RANGE = [10, 3000] as const; // K (Plan §4: conditions slider)
 export const P_RANGE = [1e-6, 1e3] as const; // atm
 
+/** How the sliders and legends write T and p. */
+export const formatT = (v: number) => (v >= 100 ? v.toFixed(0) : v.toFixed(1));
+export const formatP = (v: number) => (v >= 0.01 && v < 1000 ? v.toPrecision(3) : v.toExponential(1));
+
 export type ColorBy = "verdict" | "value";
 
 /** Labels are symbols (the same in every language); hints are i18n keys `q.<value>`. */
@@ -40,7 +44,7 @@ export function useConditions() {
     pressure: number(params, "p", DEFAULT_P, P_RANGE),
   }, grid);
   const q = params.get("q");
-  const quantity: Quantity = QUANTITIES.some((x) => x.value === q) ? (q as Quantity) : "d_e";
+  const quantity: Quantity = QUANTITIES.some((x) => x.value === q) ? (q as Quantity) : "d_0"; // D₀ by default: the full 0 K verdict
   const colorBy: ColorBy = params.get("color") === "value" ? "value" : "verdict";
 
   const update = (changes: Record<string, string | number | null>) =>

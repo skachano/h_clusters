@@ -1,15 +1,17 @@
 // Temperature and pressure (log sliders), and the plotted quantity: one row above the content.
 import { useEffect, useState } from "react";
-import { P_RANGE, QUANTITIES, T_RANGE, type ColorBy } from "../lib/conditions";
+import { P_RANGE, QUANTITIES, T_RANGE, formatP, formatT, type ColorBy } from "../lib/conditions";
 import { useManifest, type Conditions, type Quantity } from "../api/client";
 import { nearestIndex } from "../api/static";
 import { useT, type Key } from "../i18n";
 
 const log = Math.log10;
 
-function LogSlider({ id, label, value, range, unit, format, onChange, grid }: {
+function LogSlider({ id, label, value, range, unit, format, onChange, grid, dimmed }: {
   id: string; label: string; value: number; range: readonly [number, number]; unit: string;
   format: (v: number) => string; onChange: (v: number) => void;
+  /** Why the value does not matter right now: the slider dims (but still works) and says why. */
+  dimmed?: string;
   /** Static site: the slider steps through these exported values only. */
   grid?: number[];
 }) {
@@ -22,12 +24,12 @@ function LogSlider({ id, label, value, range, unit, format, onChange, grid }: {
     return () => clearTimeout(t);
   }, [local, value, onChange]);
   return (
-    <div className="control">
+    <div className={dimmed ? "control dim" : "control"} title={dimmed}>
       <label htmlFor={id}>
         {label} <output htmlFor={id}>{format(local)} {unit}</output>
       </label>
       <input
-        id={id} type="range" min={log(range[0])} max={log(range[1])} step={0.01}
+        id={id} type="range" aria-description={dimmed} min={log(range[0])} max={log(range[1])} step={0.01}
         value={log(local)}
         onChange={(e) => {
           const v = 10 ** Number(e.target.value);
@@ -62,6 +64,7 @@ export function ConditionsBar({ conditions, quantity, colorBy, update, children 
   const thermal = quantity === "d_h" || quantity === "d_g";
   const grid = useManifest().data?.conditions;
   const t = useT();
+  const dimmed = quantity && !thermal ? t("cond.thermalOnly") : undefined;
   return (
     <div className="controls">
       {children}
@@ -79,17 +82,14 @@ export function ConditionsBar({ conditions, quantity, colorBy, update, children 
       )}
       <LogSlider
         id="temperature" label={t("cond.temperature")} value={conditions.temperature} range={T_RANGE} unit="K"
-        format={(v) => (v >= 100 ? v.toFixed(0) : v.toFixed(1))} onChange={(v) => update({ T: v })}
-        grid={grid?.temperatures}
+        format={formatT} onChange={(v) => update({ T: v })}
+        grid={grid?.temperatures} dimmed={dimmed}
       />
       <LogSlider
         id="pressure" label={t("cond.pressure")} value={conditions.pressure} range={P_RANGE} unit="atm"
-        format={(v) => (v >= 0.01 && v < 1000 ? v.toPrecision(3) : v.toExponential(1))}
-        onChange={(v) => update({ p: v })} grid={grid?.pressures}
+        format={formatP}
+        onChange={(v) => update({ p: v })} grid={grid?.pressures} dimmed={dimmed}
       />
-      {quantity && !thermal && (
-        <span className="hint">{t("cond.thermalOnly")}</span>
-      )}
       {grid && (
         <span className="hint">{t("cond.static", { nt: grid.temperatures.length, np: grid.pressures.length })}</span>
       )}

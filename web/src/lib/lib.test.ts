@@ -7,7 +7,8 @@ import { translate, type Key } from "../i18n";
 import { haloStyle, halos } from "./halos";
 import { pretty, signed, species } from "./format";
 import { bondStyle, bonds, parseXyz, project, setBonds } from "./geometry";
-import { valueStep } from "./scales";
+import type { Verdict } from "../api/client";
+import { entropyLimited, rung, rungs, valueStep } from "./scales";
 
 describe("format", () => {
   it("writes species with sub- and superscripts", () => {
@@ -31,6 +32,30 @@ describe("diverging bins", () => {
     expect(valueStep(-0.5)).toMatchObject({ bin: -3, fill: "var(--div-neg-3)" });
     expect(valueStep(4.7).bin).toBe(4);
     expect(valueStep(null).fill).toBe("var(--none)");
+  });
+});
+
+describe("verdict ladder", () => {
+  const s = (d_e: number, d_0: number, d_h: number, d_g: number, verdict: Verdict = "bound_with_zpe") =>
+    ({ verdict, d_e, d_0, d_h, d_g });
+  it("climbs as far as the selected D, each rung passing every test below it", () => {
+    const h5 = s(0.37, 0.244, 0.308, 0.059);
+    expect([rung(h5, "d_e"), rung(h5, "d_0"), rung(h5, "d_h"), rung(h5, "d_g")])
+      .toEqual(["bound_e", "bound_with_zpe", "bound_with_zpe", "holds"]);
+    const h7 = s(0.216, 0.097, 0.129, -0.105);
+    expect(rung(h7, "d_g")).toBe("bound_with_zpe");
+    // D_G > 0 without D₀ > 0 stays on the D₀ rung: the tests are nested
+    expect(rung(s(0.05, -0.01, 0.02, 0.01, "bound"), "d_g")).toBe("bound");
+    expect(rung(s(-0.1, -0.1, -0.1, -0.1, "metastable"), "d_e")).toBe("metastable");
+    expect(rung({ verdict: "atom", d_e: null, d_0: null, d_h: null, d_g: null }, "d_g")).toBe("atom");
+    expect(rungs("d_e")).toEqual(["metastable", "bound_e"]);
+    expect(rungs("d_g")).toHaveLength(4);
+  });
+  it("marks D_H > 0 with D_G <= 0 only when D_H is selected", () => {
+    const h7 = s(0.216, 0.097, 0.129, -0.105);
+    expect(entropyLimited(h7, "d_h")).toBe(true);
+    expect(entropyLimited(h7, "d_g")).toBe(false);
+    expect(entropyLimited(s(0.37, 0.244, 0.308, 0.059), "d_h")).toBe(false);
   });
 });
 

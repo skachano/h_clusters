@@ -1,14 +1,14 @@
 // View 1: the periodic grid. Rows are charge, columns m; each cell is a species' ground state.
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useGrid, type GridCell, type Quantity } from "../api/client";
+import { useGrid, type Conditions, type GridCell, type Quantity, type StateBrief } from "../api/client";
 import { ConditionsBar } from "../components/ConditionsBar";
 import { Thumbnail } from "../components/Thumbnail";
 import { focusPoint, useTooltip } from "../components/Tooltip";
-import { QUANTITIES, useConditions, type ColorBy } from "../lib/conditions";
+import { QUANTITIES, formatP, formatT, useConditions, type ColorBy } from "../lib/conditions";
 import { fmt, pretty, signed, species } from "../lib/format";
-import { VALUE_BINS, VERDICT_FILL, VERDICT_INK, valueStep } from "../lib/scales";
-import { useT, type T } from "../i18n";
+import { VALUE_BINS, VERDICT_FILL, VERDICT_INK, entropyLimited, rung, rungs, valueStep, type Rung } from "../lib/scales";
+import { useT, type Key, type T } from "../i18n";
 import { chargeLabel, multName, verdictLabel, verdictShort } from "../i18n/terms";
 
 const CHARGES = [-1, 0, 1];
@@ -43,7 +43,8 @@ export function GridView() {
           </div>
         </div>
       </ConditionsBar>
-      <ScaleLegend colorBy={colorBy} quantityLabel={qLabel} />
+      <ScaleLegend colorBy={colorBy} quantity={quantity} quantityLabel={qLabel} conditions={conditions}
+        entropy={quantity === "d_h" && (grid.data?.cells ?? []).some((c) => c.ground && entropyLimited(c.ground, quantity))} />
 
       {grid.isError && <p className="error">{t("grid.error", { error: String(grid.error) })}</p>}
       {grid.isPending && <p className="loading">{t("common.loading")}</p>}
@@ -66,7 +67,10 @@ export function GridView() {
           </div>
         </div>
       )}
-      {grid.data && asTable && <GridTable cells={grid.data.cells} quantityLabel={qLabel} campaign={campaign} search={search} />}
+      {grid.data && asTable && (
+        <GridTable cells={grid.data.cells} quantity={quantity} colorBy={colorBy} campaign={campaign} search={search}
+          select={(q) => update({ q })} stale={grid.isPlaceholderData} />
+      )}
       {tip.node}
     </div>
   );
@@ -86,17 +90,21 @@ function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, sea
     );
   }
   const g = cell.ground;
+  const r = rung(g, quantity);
+  const entropy = entropyLimited(g, quantity);
   const step = valueStep(cell.value);
-  const fill = colorBy === "verdict" ? VERDICT_FILL[g.verdict] : step.fill;
-  const ink = colorBy === "verdict" ? VERDICT_INK[g.verdict] : step.ink;
+  const fill = colorBy === "verdict" ? VERDICT_FILL[r] : step.fill;
+  const ink = colorBy === "verdict" ? VERDICT_INK[r] : step.ink;
+  const channel = channelFor(g, quantity);
   const details = (
     <div>
-      <div className="tt-value">{pretty(g.label)} · {verdictLabel(t, g.verdict)}</div>
-      <div className="tt-label">{quantityLabel} {signed(cell.value, 3, "eV")}{g.channel ? ` → ${pretty(quantity === "d_g" ? g.channel_g ?? g.channel : g.channel)}` : ""}</div>
+      <div className="tt-value">{pretty(g.label)} · {verdictLabel(t, r)}</div>
+      <div className="tt-label">{quantityLabel} {signed(cell.value, 3, "eV")}{channel ? ` → ${pretty(channel)}` : ""}</div>
+      {entropy && <div className="tt-label">{t("grid.entropy")}</div>}
       {g.units && <div className="tt-label">{t("grid.units", { units: pretty(g.units) })}{g.point_group ? ` · ${g.point_group}` : ""}</div>}
       {cell.states.length > 1 && (
         <div className="tt-label" style={{ marginTop: 4 }}>
-          {cell.states.map((s) => `${multName(t, s.mult)}: ${verdictShort(t, s.verdict)}`).join(" · ")}
+          {cell.states.map((s) => `${multName(t, s.mult)}: ${shortRung(t, s, quantity)}`).join(" · ")}
         </div>
       )}
     </div>
@@ -107,7 +115,7 @@ function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, sea
       to={`/c/${campaign}/s/${m}/${charge}/${g.mult}${search ? `?${search}` : ""}`}
       className="periodic-cell"
       style={{ background: fill, color: ink }}
-      aria-label={`${g.label}: ${verdictLabel(t, g.verdict)}, ${quantityLabel} ${fmt(cell.value, 3, "eV")}`}
+      aria-label={`${g.label}: ${verdictLabel(t, r)}${entropy ? ` (${t("grid.entropy")})` : ""}, ${quantityLabel} ${fmt(cell.value, 3, "eV")}`}
       onPointerMove={(e) => tip.show(e.clientX, e.clientY, details)}
       onPointerLeave={tip.hide}
       onFocus={(e) => tip.show(...focusPoint(e), details)}
@@ -118,21 +126,43 @@ function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, sea
         <span className="cell-mult num" title={t("grid.multTitle")}>{g.mult}</span>
       </div>
       <div className="cell-thumb">{cell.xyz ? <Thumbnail xyz={cell.xyz} bonds={cell.bonds} size={52} ink={ink} /> : <span className="cell-none">—</span>}</div>
-      <div className="cell-verdict">{verdictShort(t, g.verdict)}</div>
+      <div className="cell-verdict">{shortRung(t, g, quantity)}</div>
       <div className="cell-value num">{cell.value == null ? " " : signed(cell.value, cell.value !== 0 && Math.abs(cell.value) < 0.1 ? 3 : 2)}</div>
     </Link>
   );
 }
 
-function ScaleLegend({ colorBy, quantityLabel }: { colorBy: ColorBy; quantityLabel: string }) {
+/** The weakest channel behind the selected D: the API gives the one for D_e and the one for D_G. */
+function channelFor(s: StateBrief, q: Quantity) {
+  return q === "d_g" ? s.channel_g ?? s.channel : s.channel;
+}
+
+/** The short verdict on the selected ladder, starred when D_H holds it but D_G does not. */
+function shortRung(t: T, s: StateBrief, q: Quantity) {
+  return verdictShort(t, rung(s, q)) + (entropyLimited(s, q) ? " *" : "");
+}
+
+const RUNG_LEGEND: Partial<Record<Rung, Key>> = {
+  metastable: "legend.metastable", bound_e: "legend.boundE", bound: "legend.bound",
+  bound_with_zpe: "legend.boundZpe", holds: "legend.holds",
+};
+
+function ScaleLegend({ colorBy, quantity, quantityLabel, conditions, entropy }: {
+  colorBy: ColorBy; quantity: Quantity; quantityLabel: string; conditions: Conditions; entropy: boolean;
+}) {
   const t = useT();
+  const note = entropy ? <span>{t("legend.entropy")}</span> : null;
   if (colorBy === "verdict") {
     return (
       <div className="legend" aria-label={t("legend.aria")}>
         <span className="legend-item"><span className="swatch" style={{ background: "var(--none)", border: "1px solid var(--border)" }} />{t("legend.none")}</span>
-        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-1)" }} />{t("legend.metastable")}</span>
-        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-2)" }} />{t("legend.bound")}</span>
-        <span className="legend-item"><span className="swatch" style={{ background: "var(--ord-3)" }} />{t("legend.boundZpe")}</span>
+        {rungs(quantity).map((r) => (
+          <span className="legend-item" key={r}>
+            <span className="swatch" style={{ background: VERDICT_FILL[r] }} />
+            {t(RUNG_LEGEND[r]!, { T: formatT(conditions.temperature), p: formatP(conditions.pressure) })}
+          </span>
+        ))}
+        {note}
       </div>
     );
   }
@@ -155,31 +185,69 @@ function ScaleLegend({ colorBy, quantityLabel }: { colorBy: ColorBy; quantityLab
         <span className="legend-item" key={s.label}><span className="swatch" style={{ background: s.fill }} />{s.label}</span>
       ))}
       <span>{t("legend.boundEnd")}</span>
+      {note}
     </div>
   );
 }
 
-function GridTable({ cells, quantityLabel, campaign, search }: { cells: GridCell[]; quantityLabel: string; campaign: string; search: string }) {
+function GridTable({ cells, quantity, colorBy, campaign, search, select, stale }: {
+  cells: GridCell[]; quantity: Quantity; colorBy: ColorBy; campaign: string; search: string;
+  select: (q: Quantity) => void; stale: boolean;
+}) {
   const t = useT();
+  const qLabel = QUANTITIES.find((q) => q.value === quantity)?.label ?? quantity;
   return (
-    <div className="card table-wrap">
+    <div className={`card table-wrap ${stale ? "stale" : ""}`}>
       <table>
+        <caption className="hint" style={{ captionSide: "bottom", textAlign: "left", paddingTop: 8 }}>{t("grid.tableCaption")}</caption>
         <thead>
-          <tr><th>{t("th.species")}</th><th>{t("grid.thGround")}</th><th>{t("th.verdict")}</th><th className="num">{quantityLabel} (eV)</th><th>{t("grid.thWeakest")}</th><th>{t("th.units")}</th><th>{t("th.pointGroup")}</th><th>{t("grid.thOther")}</th></tr>
+          <tr>
+            <th>{t("th.species")}</th><th>{t("grid.thGround")}</th><th>{t("th.verdict")}</th>
+            {QUANTITIES.map((q) => (
+              <th key={q.value} className="num">
+                <button type="button" className="column-pick" aria-pressed={q.value === quantity}
+                  title={t(`q.${q.value}` as Key)} onClick={() => select(q.value)}>{q.label}</button>
+              </th>
+            ))}
+            <th>{t("grid.thChannel", { q: quantity === "d_g" ? "D_G" : "D_e" })}</th>
+            <th>{t("th.units")}</th><th>{t("th.pointGroup")}</th><th>{t("grid.thOther")}</th>
+          </tr>
         </thead>
         <tbody>
-          {cells.map((c) => c.ground && (
-            <tr key={`${c.m},${c.charge}`}>
-              <td>{species(c.m, c.charge)}</td>
-              <td><Link to={`/c/${campaign}/s/${c.m}/${c.charge}/${c.ground.mult}${search ? `?${search}` : ""}`}>{pretty(c.ground.label)}</Link></td>
-              <td>{verdictLabel(t, c.ground.verdict)}</td>
-              <td className="num">{signed(c.value, 3)}</td>
-              <td>{c.ground.channel ? pretty(c.ground.channel) : "–"}</td>
-              <td>{c.ground.units ? pretty(c.ground.units) : "–"}</td>
-              <td>{c.ground.point_group ?? "–"}</td>
-              <td className="secondary">{c.states.filter((s) => s.mult !== c.ground!.mult).map((s) => `${s.mult}: ${verdictShort(t, s.verdict)}`).join(", ")}</td>
-            </tr>
-          ))}
+          {cells.map((c) => {
+            const g = c.ground;
+            if (!g) return null;
+            const r = rung(g, quantity);
+            const channel = channelFor(g, quantity);
+            return (
+              <tr key={`${c.m},${c.charge}`}>
+                <td>{species(c.m, c.charge)}</td>
+                <td><Link to={`/c/${campaign}/s/${c.m}/${c.charge}/${g.mult}${search ? `?${search}` : ""}`}>{pretty(g.label)}</Link></td>
+                <td>
+                  <span className="verdict-cell">
+                    {colorBy === "verdict" && <span className="swatch" style={{ background: VERDICT_FILL[r], border: "1px solid var(--border)" }} />}
+                    {verdictLabel(t, r)}{entropyLimited(g, quantity) ? " *" : ""}
+                  </span>
+                </td>
+                {QUANTITIES.map((q) => {
+                  const v = g[q.value];
+                  const picked = q.value === quantity;
+                  const step = valueStep(v);
+                  return (
+                    <td key={q.value} className={`num${picked ? " picked" : ""}`}
+                      aria-label={picked ? `${qLabel} ${fmt(v, 3, "eV")}` : undefined}
+                      style={picked && colorBy === "value" ? { background: step.fill, color: step.ink } : undefined}>
+                      {signed(v, 3)}
+                    </td>
+                  );
+                })}
+                <td>{channel ? pretty(channel) : "–"}</td>
+                <td>{g.units ? pretty(g.units) : "–"}</td>
+                <td>{g.point_group ?? "–"}</td>
+                <td className="secondary">{c.states.filter((s) => s.mult !== g.mult).map((s) => `${s.mult}: ${shortRung(t, s, quantity)}`).join(", ")}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
