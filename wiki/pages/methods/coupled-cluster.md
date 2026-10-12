@@ -59,9 +59,9 @@ full CI. So the project's CCSD(T) energies of [H₂](app:s/2/0/1), [H₃⁺](app
 
 | Quantity (CCSD(T)/aug-cc-pVTZ) | Computed | Exact | Error |
 |---|---|---|---|
-| E(H₂), hartree | −1.17263 | −1.17447 | 0.0018 (0.05 eV) |
-| $D_e$(H₂) | 4.707 eV | 4.748 eV | 0.04 eV |
-| $D_e$(H₃⁺ → [H₂](app:s/2/0/1) + H⁺) | 4.602 eV | 4.609 eV | 0.007 eV |
+| E([H₂](app:s/2/0/1)), hartree | −1.17263 | −1.17447 | 0.0018 (0.05 eV) |
+| $D_e$([H₂](app:s/2/0/1)) | 4.707 eV | 4.748 eV | 0.04 eV |
+| $D_e$([H₃⁺](app:s/3/1/1) → [H₂](app:s/2/0/1) + H⁺) | 4.602 eV | 4.609 eV | 0.007 eV |
 | EA(H) | 0.728 eV | 0.754 eV | 0.03 eV |
 
 Errors partly cancel in energy *differences*, which is why the [H₃⁺](app:s/3/1/1) binding

@@ -39,7 +39,7 @@ that artificial state.
 
 ## Example: H₂⁻ in the campaign
 
-| Level | E(H₂⁻) − E(H₂) | [H₂⁻](app:s/2/-1/2) "bond length" | "Frequency" |
+| Level | E([H₂⁻](app:s/2/-1/2)) − E([H₂](app:s/2/0/1)) | [H₂⁻](app:s/2/-1/2) "bond length" | "Frequency" |
 |---|---|---|---|
 | r²SCAN-3c (L0) | +4.70 eV | 1.72 Å | — |
 | ωB97X-D4 (L1) | +2.25 eV | 0.89 Å | 6000 cm⁻¹ |

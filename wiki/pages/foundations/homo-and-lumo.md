@@ -116,14 +116,14 @@ the verdicts):
 |---|---|---|---|---|---|---|
 | H | H | −13.60 | +0.42 | 14.03 | 13.60 | 13.60 |
 | [H₂](app:s/2/0/1) | [H₂](app:s/2/0/1) | −16.16 | +1.43 | 17.59 | 16.16 | 15.52 |
-| [H₃](app:s/3/0/2) | H₂·H | −13.64 | +0.45 | 14.09 | 13.64 | 9.00 |
-| [H₄](app:s/4/0/1) | H₂·H₂ | −16.01 | +1.31 | 17.32 | 16.01 | 13.47 |
+| [H₃](app:s/3/0/2) | [H₂·H](app:s/3/0/2) | −13.64 | +0.45 | 14.09 | 13.64 | 9.00 |
+| [H₄](app:s/4/0/1) | [H₂·H₂](app:s/4/0/1) | −16.01 | +1.31 | 17.32 | 16.01 | 13.47 |
 | [H⁻](app:s/1/-1/1) | [H⁻](app:s/1/-1/1) | −1.24 | +6.59 | 7.83 | 1.24 | 0.73 |
-| [H₃⁻](app:s/3/-1/1) | H₂·H⁻ | −1.28 | +3.85 | 5.13 | 1.28 | 0.78 |
-| [H₉⁻](app:s/9/-1/1) | (H₂)₄·H⁻ | −1.57 | +3.68 | 5.25 | 1.57 | 0.99 |
+| [H₃⁻](app:s/3/-1/1) | [H₂·H⁻](app:s/3/-1/1) | −1.28 | +3.85 | 5.13 | 1.28 | 0.78 |
+| [H₉⁻](app:s/9/-1/1) | [(H₂)₄·H⁻](app:s/9/-1/1) | −1.57 | +3.68 | 5.25 | 1.57 | 0.99 |
 | [H₃⁺](app:s/3/1/1) | [H₃⁺](app:s/3/1/1) | −32.91 | −5.38 | 27.53 | | |
-| [H₅⁺](app:s/5/1/1) | H₃⁺·H₂ | −24.39 | −4.42 | 19.97 | | |
-| [H₉⁺](app:s/9/1/1) | H₃⁺·(H₂)₃ | −21.92 | −3.53 | 18.39 | | |
+| [H₅⁺](app:s/5/1/1) | [H₃⁺·H₂](app:s/5/1/1) | −24.39 | −4.42 | 19.97 | | |
+| [H₉⁺](app:s/9/1/1) | [H₃⁺·(H₂)₃](app:s/9/1/1) | −21.92 | −3.53 | 18.39 | | |
 
 Reading the table:
 
@@ -133,12 +133,12 @@ Reading the table:
 - **[H₂](app:s/2/0/1): a typical Koopmans error.** 16.16 eV against 15.52 eV. Part of the
   difference is vertical against adiabatic: [H₂⁺](app:s/2/1/2) has a longer bond.
 - **[H₃](app:s/3/0/2) and [H₄](app:s/4/0/1): vertical is not adiabatic.** The HOMO of a cluster is that of
-  its loosest unit: the H atom's 1s in H₂·H (−13.64 eV), [H₂](app:s/2/0/1)'s $\sigma_g$ in
-  H₂·H₂ (−16.01 eV). Every neutral doublet in the campaign has its HOMO at
+  its loosest unit: the H atom's 1s in [H₂·H](app:s/3/0/2) (−13.64 eV), [H₂](app:s/2/0/1)'s $\sigma_g$ in
+  [H₂·H₂](app:s/4/0/1) (−16.01 eV). Every neutral doublet in the campaign has its HOMO at
   −13.6 eV and every neutral singlet near −16.0 eV. But once ionized these
-  clusters rearrange around an [H₃⁺](app:s/3/1/1) core (H₃⁺, and H₃⁺·H for [H₄⁺](app:s/4/1/2)), which
+  clusters rearrange around an [H₃⁺](app:s/3/1/1) core ([H₃⁺](app:s/3/1/1), and [H₃⁺·H](app:s/4/1/2) for [H₄⁺](app:s/4/1/2)), which
   releases a lot of energy, so the
-  adiabatic IE is 4.6 eV (H₃) and 2.5 eV (H₄) below Koopmans. The orbital
+  adiabatic IE is 4.6 eV ([H₃](app:s/3/0/2)) and 2.5 eV ([H₄](app:s/4/0/1)) below Koopmans. The orbital
   energy can't know that.
 - **The [H⁻](app:s/1/-1/1) family: the HOMO labels the extra electron.** Every bound
   anion singlet has its HOMO between −1.2 and −1.6 eV, the [H⁻](app:s/1/-1/1) ion's lone

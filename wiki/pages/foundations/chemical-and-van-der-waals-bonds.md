@@ -31,13 +31,13 @@ this in two ways:
 
 ### How the two kinds differ
 
-| | Chemical (covalent) bond: [H₂](app:s/2/0/1), [H₃⁺](app:s/3/1/1) | Van der Waals bond: (H₂)₂, H₂·H |
+| | Chemical (covalent) bond: [H₂](app:s/2/0/1), [H₃⁺](app:s/3/1/1) | Van der Waals bond: [(H₂)₂](app:s/4/0/1), [H₂·H](app:s/3/0/2) |
 |---|---|---|
 | Origin | electrons shared in a common orbital: the bonding orbital is occupied | correlated fluctuations of separate electron clouds (dispersion, $-C_6/R^6$), balanced by Pauli repulsion at contact |
 | Electron sharing | yes: bond order ~0.5–1 | essentially none: each unit keeps its own electrons |
 | Energy | eV: [H₂](app:s/2/0/1) $D_e \approx 4.7$ eV | meV: the [H₂](app:s/2/0/1)–[H₂](app:s/2/0/1) well is 2.6 meV (orientation-averaged), whole clusters 1–10 meV |
-| Distance | 0.74 Å (H₂), 0.87 Å (H₃⁺) | 3–3.5 Å between molecule centres |
-| Stiffness | stiff, high-frequency vibration (H₂: 4400 cm⁻¹) | very soft, large-amplitude motion |
+| Distance | 0.74 Å ([H₂](app:s/2/0/1)), 0.87 Å ([H₃⁺](app:s/3/1/1)) | 3–3.5 Å between molecule centres |
+| Stiffness | stiff, high-frequency vibration ([H₂](app:s/2/0/1): 4400 cm⁻¹) | very soft, large-amplitude motion |
 | Direction | a definite geometry | weakly directional: [H₂](app:s/2/0/1) rotates almost freely in (H₂)ₖ |
 | Additivity | not additive: [H₃](app:s/3/0/2) is not three H–H bonds | nearly pairwise additive |
 
@@ -59,7 +59,7 @@ consequences of every approximation.
   as a whole van der Waals well.
 - **Nuclear motion.** For a covalent bond the harmonic
   [zero-point energy](../techniques/zero-point-energy.md) is a modest
-  correction (H₂: 0.27 eV out of 4.75). For a van der Waals bond it is as
+  correction ([H₂](app:s/2/0/1): 0.27 eV out of 4.75). For a van der Waals bond it is as
   large as the well itself, and the harmonic estimate fails: it calls the
   neutral clusters unbound, while diffusion Monte Carlo finds them weakly
   bound ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
@@ -70,7 +70,7 @@ The clusters in this project run from pure van der Waals binding to nearly
 chemical binding:
 
 1. **Neutral (H₂)ₖ:** pure dispersion.
-2. **H₂·H:** dispersion plus a little exchange.
+2. **[H₂·H](app:s/3/0/2):** dispersion plus a little exchange.
 3. **Anions H⁻(H₂)ₖ:** mostly the ion's charge polarizing each [H₂](app:s/2/0/1) (falling
    off as $R^{-4}$) and attracting its quadrupole, with only slight electron
    sharing. The quadrupole term makes the binding strongly directional:
@@ -89,10 +89,10 @@ lie in between, which is why they are 10–100 times more strongly bound.
 | Pair | Well depth | Equilibrium distance | Character |
 |---|---|---|---|
 | H–H in [H₂](app:s/2/0/1) | 4.7 eV | 0.74 Å | covalent, bond order 1.00 |
-| [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) → [H₅⁺](app:s/5/1/1) | 0.37 eV | — | ion–molecule, shared proton |
-| [H⁻](app:s/1/-1/1) + [H₂](app:s/2/0/1) (end-on) | 0.05 eV | 3.2 Å (centres) | ion–induced dipole and ion–quadrupole |
-| [H₂](app:s/2/0/1) + [H₂](app:s/2/0/1) (orientation-averaged) | 0.0026 eV | 3.5 Å | dispersion |
-| H + [H₂](app:s/2/0/1) (orientation-averaged) | 0.0016 eV | 3.55 Å | dispersion |
+| [H₃⁺ + H₂ → H₅⁺](app:s/5/1/1) | 0.37 eV | — | ion–molecule, shared proton |
+| [H⁻ + H₂](app:s/3/-1/1) (end-on) | 0.05 eV | 3.2 Å (centres) | ion–induced dipole and ion–quadrupole |
+| [H₂ + H₂](app:s/4/0/1) (orientation-averaged) | 0.0026 eV | 3.5 Å | dispersion |
+| [H + H₂](app:s/3/0/2) (orientation-averaged) | 0.0016 eV | 3.55 Å | dispersion |
 
 Numbers from CCSD(T)/aug-cc-pVTZ in this project, counterpoise-corrected for
 the weak pairs.

@@ -4,7 +4,7 @@
     [Chemical and van der Waals bonds](chemical-and-van-der-waals-bonds.md),
     [Electrons, charge, spin and bond lengths](electrons-charges-and-bond-lengths.md)
 
-We describe clusters as made of units: (H₂)₄ is "four [H₂](app:s/2/0/1)", [H₇⁺](app:s/7/1/1) is "[H₃⁺](app:s/3/1/1) with
+We describe clusters as made of units: [(H₂)₄](app:s/8/0/1) is "four [H₂](app:s/2/0/1)", [H₇⁺](app:s/7/1/1) is "[H₃⁺](app:s/3/1/1) with
 two [H₂](app:s/2/0/1)". Physics has no "unit" observable, so every such decomposition is a
 description. But some descriptions are forced on us by the physics and some
 are not. This page says how to tell them apart.
@@ -70,7 +70,7 @@ The [H₂](app:s/2/0/1) units in (H₂)ₖ pass every test by large margins:
   the same units, and the cheapest split of a neutral cluster (≤ 0.01 eV) is
   far below anything else.
 
-So "(H₂)₄ is four [H₂](app:s/2/0/1) molecules" describes a near-factorisation the physics
+So "[(H₂)₄](app:s/8/0/1) is four [H₂](app:s/2/0/1) molecules" describes a near-factorisation the physics
 imposes: spectroscopically it *is* four [H₂](app:s/2/0/1), with small shifts.
 
 ### Covalent units: nothing below them
@@ -87,13 +87,13 @@ The ion clusters lie in between, and the answer degrades gradually:
   off one at a time, and the shell closing at [H₉⁺](app:s/9/1/1) appears in mass spectra.
   But the links cost 0.2–0.4 eV, with real charge transfer, so the
   separation of scales is only about tenfold.
-- **[H₅⁺](app:s/5/1/1):** two legitimate descriptions, H₃⁺·H₂ at the minimum and H₂·H⁺·H₂
+- **[H₅⁺](app:s/5/1/1):** two legitimate descriptions, [H₃⁺·H₂](app:s/5/1/1) at the minimum and [H₂·H⁺·H₂](app:s/5/1/1)
   in the ground state, because the proton's zero-point motion crosses the
   barrier between them
   ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
   The decomposition depends on which question you ask.
 - **[H₆⁺](app:s/6/1/2) (doublet):** "[H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) + H" (what it falls apart into) and
-  "H₂·H₂⁺·H₂" (what its pieces resemble) are both defensible and neither is
+  "[H₂·H₂⁺·H₂](app:s/6/1/2)" (what its pieces resemble) are both defensible and neither is
   complete: the hole is delocalised
   ([electrons, charge, spin and bond lengths](electrons-charges-and-bond-lengths.md)).
   Here the units are mostly language; what is physical is the disagreement

@@ -77,7 +77,7 @@ their equilibrium geometry it typically gets roughly 80–90 %.
 ## Strengths and weaknesses
 
 - **No self-interaction error.** MP2 starts from HF orbitals, which are free
-  of it. This is why MP2 keeps [H₅⁺](app:s/5/1/1)'s C₂ᵥ H₃⁺·H₂ structure, which every DFT
+  of it. This is why MP2 keeps [H₅⁺](app:s/5/1/1)'s C₂ᵥ [H₃⁺·H₂](app:s/5/1/1) structure, which every DFT
   level in the project turns into a shared-proton D₂d structure.
 - **Includes dispersion.** The double excitations describe correlated
   fluctuations of electrons on two molecules, which is what dispersion is.

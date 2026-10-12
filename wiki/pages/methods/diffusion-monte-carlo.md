@@ -80,7 +80,7 @@ a point particle on an orientation-averaged potential.
 2. **Clusters** are sums of these pair potentials: (H₂)ₖ and (H₂)ₖ·H for
    k = 1–4. The [H₂](app:s/2/0/1) vibration (4400 cm⁻¹) is far too fast to couple and is
    left out.
-3. **Checks.** Every pair (H₂·H, (H₂)₂) is also solved exactly as a one-dimensional
+3. **Checks.** Every pair ([H₂·H](app:s/3/0/2), [(H₂)₂](app:s/4/0/1)) is also solved exactly as a one-dimensional
    radial equation; DMC must agree. The code is tested on a 3D harmonic
    oscillator, an exactly solvable Morse dimer and a pair too shallow to bind.
 4. **Robustness.** Every cluster is solved again on a potential 10 %
@@ -95,20 +95,20 @@ potential says otherwise:
 
 | Cluster | Harmonic $D_0$ (meV) | Quantum $D_0$ (meV) | Well 10 % shallower | Verdict |
 |---|---|---|---|---|
-| [H₃](app:s/3/0/2) = H₂·H | −8.3 | +0.0007 (exact) | −0.0002 | at threshold |
-| [H₄](app:s/4/0/1) = (H₂)₂ | −13.4 | +0.238 (exact; DMC 0.231) | +0.167 | bound |
-| [H₅](app:s/5/0/2) = (H₂)₂·H | −29.5 | +0.071 ± 0.004 | +0.041 | bound |
-| [H₆](app:s/6/0/1) = (H₂)₃ | −36.8 | +0.62 ± 0.01 | +0.44 | bound |
-| [H₇](app:s/7/0/2) = (H₂)₃·H | −54.8 | +0.10 ± 0.01 | +0.08 | bound |
-| [H₈](app:s/8/0/1) = (H₂)₄ | −46.0 | +0.90 ± 0.02 | +0.72 | bound |
-| [H₉](app:s/9/0/2) = (H₂)₄·H | −52.9 | +0.14 ± 0.02 | +0.10 | bound |
+| [H₃](app:s/3/0/2) = [H₂·H](app:s/3/0/2) | −8.3 | +0.0007 (exact) | −0.0002 | at threshold |
+| [H₄](app:s/4/0/1) = [(H₂)₂](app:s/4/0/1) | −13.4 | +0.238 (exact; DMC 0.231) | +0.167 | bound |
+| [H₅](app:s/5/0/2) = [(H₂)₂·H](app:s/5/0/2) | −29.5 | +0.071 ± 0.004 | +0.041 | bound |
+| [H₆](app:s/6/0/1) = [(H₂)₃](app:s/6/0/1) | −36.8 | +0.62 ± 0.01 | +0.44 | bound |
+| [H₇](app:s/7/0/2) = [(H₂)₃·H](app:s/7/0/2) | −54.8 | +0.10 ± 0.01 | +0.08 | bound |
+| [H₈](app:s/8/0/1) = [(H₂)₄](app:s/8/0/1) | −46.0 | +0.90 ± 0.02 | +0.72 | bound |
+| [H₉](app:s/9/0/2) = [(H₂)₄·H](app:s/9/0/2) | −52.9 | +0.14 ± 0.02 | +0.10 | bound |
 
 - The harmonic estimate gets the **sign** wrong. It treats the soft
   intermolecular motions as stiff parabolas and overestimates their
   zero-point energy several-fold.
 - (H₂)ₖ is bound by 0.2–0.9 meV, i.e. a few kelvin: such clusters can exist
   only in very cold environments such as helium droplets or supersonic jets.
-- H₂·H has at most a "halo" state, bound by under a microelectronvolt with
+- [H₂·H](app:s/3/0/2) has at most a "halo" state, bound by under a microelectronvolt with
   a mean separation of 37 Å, which disappears on the shallower well. A lone H
   atom does stay with two or more [H₂](app:s/2/0/1), by about 0.1 meV.
 
@@ -139,10 +139,10 @@ Results, $D_0$ in meV for losing one [H₂](app:s/2/0/1):
 
 | Cluster | Harmonic | Pairs only | Pairs + three-body | 10 % shallower | [H₂](app:s/2/0/1) as spheres | Verdict |
 |---|---|---|---|---|---|---|
-| [H₃⁻](app:s/3/-1/1) = H⁻·H₂ | −13.9 | 6.83 (exact) | 6.83 (exact) | 5.52 | 3.44 | bound |
-| [H₅⁻](app:s/5/-1/1) = H⁻(H₂)₂ | −28 | 7.27 | 8.63 ± 0.05 | 6.81 | 4.14 | bound |
-| [H₇⁻](app:s/7/-1/1) = H⁻(H₂)₃ | −39 | 7.83 | 10.92 ± 0.11 | 8.61 | 4.73 | bound |
-| [H₉⁻](app:s/9/-1/1) = H⁻(H₂)₄ | −46 | 7.85 | 12.65 ± 0.23 | 9.75 | 5.25 | bound |
+| [H₃⁻](app:s/3/-1/1) = [H⁻·H₂](app:s/3/-1/1) | −13.9 | 6.83 (exact) | 6.83 (exact) | 5.52 | 3.44 | bound |
+| [H₅⁻](app:s/5/-1/1) = [H⁻(H₂)₂](app:s/5/-1/1) | −28 | 7.27 | 8.63 ± 0.05 | 6.81 | 4.14 | bound |
+| [H₇⁻](app:s/7/-1/1) = [H⁻(H₂)₃](app:s/7/-1/1) | −39 | 7.83 | 10.92 ± 0.11 | 8.61 | 4.73 | bound |
+| [H₉⁻](app:s/9/-1/1) = [H⁻(H₂)₄](app:s/9/-1/1) | −46 | 7.85 | 12.65 ± 0.23 | 9.75 | 5.25 | bound |
 
 - All four anions are bound, in every variant, by 7–13 meV (80–150 K): ten to
   a hundred times more than the neutral clusters.

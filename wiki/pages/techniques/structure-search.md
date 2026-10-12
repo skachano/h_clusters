@@ -80,7 +80,7 @@ def fingerprint(geometry: Geometry) -> np.ndarray:
 A structure counts as dissociated if it splits into pieces with no contact
 shorter than 3.5 Å. That is recorded as a result, never retried and never
 promoted. The cutoff started at 2.5 Å, which turned out to discard real
-complexes: H⁻·H₂ has a 2.84 Å contact, H₂·H₂ about 3.3 Å (Phase 4 findings).
+complexes: [H⁻·H₂](app:s/3/-1/1) has a 2.84 Å contact, [H₂·H₂](app:s/4/0/1) about 3.3 Å (Phase 4 findings).
 Bonded units (contacts under 1.15 Å) give each structure a **composition**
 label such as `H3·H2·H2`.
 

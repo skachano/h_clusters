@@ -58,7 +58,7 @@ include five that don't exist in the fragments; the softest, 203 cm⁻¹, is the
 ## How reliable is it?
 
 The harmonic formula assumes each well is a parabola. That is good for stiff
-bonds (H₂, [H₃⁺](app:s/3/1/1)) and poor for the soft, floppy motions that hold clusters
+bonds ([H₂](app:s/2/0/1), [H₃⁺](app:s/3/1/1)) and poor for the soft, floppy motions that hold clusters
 together, where the real potential is strongly anharmonic and the ZPE can be
 off by a large fraction. For [H₅⁺](app:s/5/1/1) the effect goes further: its C₂ᵥ and D₂d
 structures differ by only 0.13 kcal/mol, far less than the ZPE, so the

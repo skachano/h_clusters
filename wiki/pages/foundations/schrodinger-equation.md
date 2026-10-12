@@ -101,7 +101,7 @@ within 0.004 eV ([`h_atom_basis.py`](../methods/basis-sets.md#example-the-hydrog
 ## Where this appears in h_clusters
 
 - Each species H_m^n has $N = m - n$ electrons
-  (`worker/src/hclust/species.py`), from 0 (H⁺) to 11 (H₁₀⁻).
+  (`worker/src/hclust/species.py`), from 0 (H⁺) to 11 ([H₁₀⁻](app:s/10/-1/2)).
 - H⁺ has no electrons, so there is nothing to solve: its energy is
   defined as 0 (`doc/Plan.md` §1.1), and `engines/orca.py` refuses to run it.
 - The H atom is the one case with a known exact answer, so it measures each

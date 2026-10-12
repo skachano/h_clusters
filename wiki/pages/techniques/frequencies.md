@@ -88,7 +88,7 @@ D₃h symmetry ([point groups](point-groups.md)); 3368 cm⁻¹ is the symmetric
 
 | [H₅⁺](app:s/5/1/1) at RI-MP2/aug-cc-pVTZ | Frequencies |
 |---|---|
-| C₂ᵥ H₃⁺·H₂ | 9 real, the lowest 203 cm⁻¹ (the soft [H₂](app:s/2/0/1)–[H₃⁺](app:s/3/1/1) motion) |
+| C₂ᵥ [H₃⁺·H₂](app:s/5/1/1) | 9 real, the lowest 203 cm⁻¹ (the soft [H₂](app:s/2/0/1)–[H₃⁺](app:s/3/1/1) motion) |
 | D₂d shared proton | 1 imaginary, **546i cm⁻¹**: a saddle point at this level |
 
 At the DFT levels the D₂d structure is a minimum instead. The imaginary

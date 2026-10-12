@@ -38,7 +38,7 @@ called **delocalization error**:
 - **Anions** are underbound: the extra electron's self-repulsion pushes it
   away, sometimes off the molecule entirely.
 - **Shared charges** are favoured: a proton sitting symmetrically between
-  two [H₂](app:s/2/0/1) units looks better than a localized H₃⁺·H₂.
+  two [H₂](app:s/2/0/1) units looks better than a localized [H₃⁺·H₂](app:s/5/1/1).
 - **Barriers** to reactions come out too low, because transition states are
   usually more delocalized.
 
@@ -66,7 +66,7 @@ orbitals, give 0.48 and 0.73 eV
 ([electron affinity](../techniques/ionization-and-electron-affinity.md)).
 
 **[H₅⁺](app:s/5/1/1), a shared proton.** Every DFT level in the project, and ωB97M-V too,
-turns the C₂ᵥ H₃⁺·H₂ structure into a D₂d structure with the proton shared
+turns the C₂ᵥ [H₃⁺·H₂](app:s/5/1/1) structure into a D₂d structure with the proton shared
 equally between two [H₂](app:s/2/0/1) units (four bonds of 1.13 Å). MP2 keeps C₂ᵥ; at MP2
 the D₂d structure is a saddle point (546i cm⁻¹), and CCSD(T) puts C₂ᵥ
 0.13 kcal/mol lower (`doc/Plan.md`, Phase 3).

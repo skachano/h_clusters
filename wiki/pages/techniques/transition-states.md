@@ -17,7 +17,7 @@ minimum in every direction except one, along which it is a maximum.
 
 1. **End points.** The reactant is the cluster minimum. For the products,
    use the **product complex**: the fragments still touching (for example
-   H₅⁺···H), relaxed to their own shallow minimum, rather than fragments
+   [H₅⁺···H](app:s/6/1/2)), relaxed to their own shallow minimum, rather than fragments
    infinitely far apart. Both ends need the same atom numbering, so that
    the path maps each atom to itself.
 2. **Path: nudged elastic band (NEB).** A chain of 8–16 *images*, copies of
@@ -67,7 +67,7 @@ because the bottleneck moves with energy.
   than the cluster, the two states live on different surfaces. The
   bottleneck is then the **minimum-energy crossing point** (MECP) of the two
   surfaces, not a saddle point on one of them.
-- **Breaking a covalent bond.** Breaking an H–H bond inside a core (H₂⁺,
+- **Breaking a covalent bond.** Breaking an H–H bond inside a core ([H₂⁺](app:s/2/1/2),
   [H₃⁺](app:s/3/1/1)) changes the electronic structure strongly, and a single-determinant
   method can fail along the way. Check the T₁ and D₁ diagnostics of
   coupled cluster, or use CASSCF and NEVPT2 along the path.
@@ -83,7 +83,7 @@ because the bottleneck moves with energy.
 | Channel type | Example | Rearrangement? | Tool |
 |---|---|---|---|
 | Loss of a ligand | [H₇⁺](app:s/7/1/1) → [H₅⁺](app:s/5/1/1) + [H₂](app:s/2/0/1), H⁻(H₂)ₖ → H⁻(H₂)ₖ₋₁ + [H₂](app:s/2/0/1) | no | relaxed scan; expected to confirm $D_e$ |
-| Van der Waals split | (H₂)₄ → (H₂)₃ + [H₂](app:s/2/0/1) | no | relaxed scan |
+| Van der Waals split | [(H₂)₄](app:s/8/0/1) → [(H₂)₃](app:s/6/0/1) + [H₂](app:s/2/0/1) | no | relaxed scan |
 | Rearranging core | [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H (an [H₃⁺](app:s/3/1/1) triangle must form) | yes | NEB → TS → IRC |
 | Spin change | high-spin cations to low-spin products | — | MECP |
 

@@ -79,8 +79,8 @@ clearly ([self-interaction error](../pitfalls/self-interaction-error.md)):
 |---|---|---|---|
 | [H₂⁺](app:s/2/1/2) bond length | 1.083 Å | 1.105 Å | 1.058 Å (HF, exact for one electron) |
 | [H₂⁺](app:s/2/1/2) frequency | — | 2074 cm⁻¹ | 2322 cm⁻¹ |
-| Electron affinity of H | −1.57 eV (H⁻ unbound) | 0.20 eV | 0.73 eV (CCSD(T)), 0.754 exact |
-| [H₅⁺](app:s/5/1/1) shape | D₂d, shared proton | D₂d, shared proton | C₂ᵥ H₃⁺·H₂ (MP2, CCSD(T)) |
+| Electron affinity of H | −1.57 eV ([H⁻](app:s/1/-1/1) unbound) | 0.20 eV | 0.73 eV (CCSD(T)), 0.754 exact |
+| [H₅⁺](app:s/5/1/1) shape | D₂d, shared proton | D₂d, shared proton | C₂ᵥ [H₃⁺·H₂](app:s/5/1/1) (MP2, CCSD(T)) |
 
 (The r²SCAN-3c electron affinity also suffers from its small basis set, which
 has no diffuse functions; see [diffuse functions](../pitfalls/diffuse-functions.md).)

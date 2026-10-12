@@ -33,7 +33,7 @@ observed, or computed without arbitrary choices, is:
 
 - **Orbital occupation.** Describe the molecule with the orbitals of its
   pieces, e.g. the bonding orbital of each [H₂](app:s/2/0/1), and count electrons in them as
-  whole numbers. "H₂·H₂⁺·H₂" means 2 + 1 + 2 electrons in the three [H₂](app:s/2/0/1)
+  whole numbers. "[H₂·H₂⁺·H₂](app:s/6/1/2)" means 2 + 1 + 2 electrons in the three [H₂](app:s/2/0/1)
   bonding orbitals. These counts are exact only for pieces far apart; when
   the pieces interact, the true orbitals are mixtures and the counts become
   fractional. The whole-number label names the dominant configuration: the
@@ -79,7 +79,7 @@ They vary independently in practice:
 | H atom | 0 | 1 |
 | [H₂⁺](app:s/2/1/2) | +0.5 per atom | 0.5 per atom |
 | [H₃⁺](app:s/3/1/1), [H₅⁺](app:s/5/1/1) (closed shells) | +1 spread out | 0 everywhere |
-| Neutral radicals, e.g. H₂·H | ≈ 0 everywhere | ≈ 1 on the lone H |
+| Neutral radicals, e.g. [H₂·H](app:s/3/0/2) | ≈ 0 everywhere | ≈ 1 on the lone H |
 | [H₆⁺](app:s/6/1/2) central pair | +0.18 | 0.53 |
 | [H₆⁺](app:s/6/1/2) outer [H₂](app:s/2/0/1) (both) | +0.82 | 0.47 |
 
@@ -139,7 +139,7 @@ inside unchanged.
 
 The lowest [H₆⁺](app:s/6/1/2) (doublet) is a chain of three pairs: a central pair 1.05 Å
 long between two outer [H₂](app:s/2/0/1) of 0.79 Å, linked at 1.22 Å. The literature
-describes it as H₂·H₂⁺·H₂. Our ωB97X-D4 analysis:
+describes it as [H₂·H₂⁺·H₂](app:s/6/1/2). Our ωB97X-D4 analysis:
 
 | | Central pair | Each outer [H₂](app:s/2/0/1) | Free [H₂⁺](app:s/2/1/2) | Free [H₂](app:s/2/0/1) |
 |---|---|---|---|---|
@@ -165,10 +165,10 @@ describes it as H₂·H₂⁺·H₂. Our ωB97X-D4 analysis:
   falls from 1.0 to 0.55. The central pair, given a little density back, is
   slightly shorter than free [H₂⁺](app:s/2/1/2).
 
-So "H₂·H₂⁺·H₂" is a good cartoon of where the hole started and what the
+So "[H₂·H₂⁺·H₂](app:s/6/1/2)" is a good cartoon of where the hole started and what the
 central bond looks like, but the hole is partly spread over the outer [H₂](app:s/2/0/1)
 (spin roughly 50 : 25 : 25), and the positive charge mostly is. The ion is
-closer to one delocalized (H₂H₂H₂)⁺ unit than to an [H₂⁺](app:s/2/1/2) with two spectators.
+closer to one delocalized [(H₂H₂H₂)⁺](app:s/6/1/2) unit than to an [H₂⁺](app:s/2/1/2) with two spectators.
 
 Two caveats: partial charges depend on the partition rule, and ωB97X-D4,
 like most functionals, spreads a hole too widely

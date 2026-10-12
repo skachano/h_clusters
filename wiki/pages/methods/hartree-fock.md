@@ -174,7 +174,7 @@ These match the values in Szabo & Ostlund, §3.5. Reading the output:
 
 ### The same thing in ORCA
 
-ORCA's output for a real job from this project (H₃⁺ as a triplet, 69 basis functions in
+ORCA's output for a real job from this project ([H₃⁺](app:s/3/1/1) as a triplet, 69 basis functions in
 aug-cc-pVTZ, UHF):
 
 ```text

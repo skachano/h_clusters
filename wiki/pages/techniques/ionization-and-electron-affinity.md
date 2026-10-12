@@ -51,12 +51,12 @@ CCSD(T)/aug-cc-pVTZ (L2):
 | Quantity | Computed | Experiment |
 |---|---|---|
 | IE(H) = E(H⁺) − E(H) = 0 − (−0.499821) | 13.601 eV | 13.606 eV |
-| IE(H₂), adiabatic: −0.602302 − (−1.172635) | 15.52 eV | — |
-| IE(H₂), with ZPE | 15.39 eV | 15.43 eV |
+| IE([H₂](app:s/2/0/1)), adiabatic: −0.602302 − (−1.172635) | 15.52 eV | — |
+| IE([H₂](app:s/2/0/1)), with ZPE | 15.39 eV | 15.43 eV |
 | EA(H): −0.499821 − (−0.526562) | 0.728 eV | 0.754 eV |
 
-The ZPE correction for [H₂](app:s/2/0/1) uses the harmonic frequencies, 4401 cm⁻¹ (H₂) and
-2322 cm⁻¹ (H₂⁺): [H₂⁺](app:s/2/1/2)'s weaker bond vibrates more slowly, so ionizing loses
+The ZPE correction for [H₂](app:s/2/0/1) uses the harmonic frequencies, 4401 cm⁻¹ ([H₂](app:s/2/0/1)) and
+2322 cm⁻¹ ([H₂⁺](app:s/2/1/2)): [H₂⁺](app:s/2/1/2)'s weaker bond vibrates more slowly, so ionizing loses
 half the difference, 0.13 eV. Measured ionization energies always refer to
 the vibrational ground states.
 

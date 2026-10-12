@@ -46,7 +46,7 @@ coefficients depend on each atom's environment and charge.
 The plan expects neutral H_m beyond [H₂](app:s/2/0/1) to be only weak van der Waals
 complexes of [H₂](app:s/2/0/1) units (plus an H atom for odd m) (`doc/Plan.md` §1.2). The
 binding is tiny. In the baseline campaign at CCSD(T)/aug-cc-pVTZ, neutral [H₃](app:s/3/0/2)
-(H₂·H) lies only about 0.04 kcal/mol (under 2 meV) below [H₂](app:s/2/0/1) + H. At RI-MP2 the complex
+([H₂·H](app:s/3/0/2)) lies only about 0.04 kcal/mol (under 2 meV) below [H₂](app:s/2/0/1) + H. At RI-MP2 the complex
 is linear, with the H atom 3.32 Å from the end of the [H₂](app:s/2/0/1). Without dispersion, such complexes don't exist: the
 fragments drift apart during optimization.
 
@@ -54,7 +54,7 @@ That binding is so small that the zero-point energy of the soft intermolecular
 motion will decide whether the complex is really bound
 ([zero-point energy](../techniques/zero-point-energy.md)).
 
-Charged clusters are different. H₃⁺·H₂ (H₅⁺) and H⁻·H₂ are held mainly by the
+Charged clusters are different. [H₃⁺·H₂](app:s/5/1/1) ([H₅⁺](app:s/5/1/1)) and [H⁻·H₂](app:s/3/-1/1) are held mainly by the
 ion polarizing the [H₂](app:s/2/0/1) (induction, falling off as $R^{-4}$), which even methods
 without dispersion describe. Dispersion is a smaller correction there.
 

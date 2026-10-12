@@ -128,7 +128,7 @@ each species):
 | [H₃](app:s/3/0/2) + [H₂⁺](app:s/2/1/2) | −1.672511 − 0.602302 | 6.89 |
 | [H₄](app:s/4/0/1) + H⁺ | [H₄](app:s/4/0/1) not yet computed at this level | — |
 
-with E(H₅⁺) = −2.527957 hartree. Losing an [H₂](app:s/2/0/1) is by far the cheapest way
+with E([H₅⁺](app:s/5/1/1)) = −2.527957 hartree. Losing an [H₂](app:s/2/0/1) is by far the cheapest way
 apart, as expected for an [H₃⁺](app:s/3/1/1) core solvated by [H₂](app:s/2/0/1): $D_\text{min}$ = 0.37 eV
 (8.5 kcal/mol). Once ZPE is included it drops to 5.75 kcal/mol
 ([zero-point energy](zero-point-energy.md#example-h5-h3-h2)).
