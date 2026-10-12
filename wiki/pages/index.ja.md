@@ -20,6 +20,11 @@
 flowchart LR
   F[基礎] --> M[計算手法] --> T[計算技法] --> P[落とし穴]
   M --> H[ハイスループット計算]
+  click F href "foundations/"
+  click M href "methods/"
+  click T href "techniques/"
+  click P href "pitfalls/"
+  click H href "htc/"
 ```
 
 ## 参考文献

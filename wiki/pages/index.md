@@ -26,6 +26,11 @@ here from the terms it uses.
 flowchart LR
   F[Foundations] --> M[Methods] --> T[Techniques] --> P[Pitfalls]
   M --> H[High-throughput computing]
+  click F href "foundations/"
+  click M href "methods/"
+  click T href "techniques/"
+  click P href "pitfalls/"
+  click H href "htc/"
 ```
 
 ## References
