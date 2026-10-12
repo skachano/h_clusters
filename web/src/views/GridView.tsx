@@ -198,8 +198,7 @@ function GridTable({ cells, quantity, colorBy, campaign, search, select, stale }
   const qLabel = QUANTITIES.find((q) => q.value === quantity)?.label ?? quantity;
   return (
     <div className={`card table-wrap ${stale ? "stale" : ""}`}>
-      <table>
-        <caption className="hint" style={{ captionSide: "bottom", textAlign: "left", paddingTop: 8 }}>{t("grid.tableCaption")}</caption>
+      <table style={{ whiteSpace: "nowrap" }}>
         <thead>
           <tr>
             <th>{t("th.species")}</th><th>{t("grid.thGround")}</th><th>{t("th.verdict")}</th>
@@ -250,6 +249,7 @@ function GridTable({ cells, quantity, colorBy, campaign, search, select, stale }
           })}
         </tbody>
       </table>
+      <p className="hint" style={{ position: "sticky", left: 0, margin: "8px 0 0" }}>{t("grid.tableCaption")}</p>
     </div>
   );
 }
