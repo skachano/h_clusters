@@ -4,7 +4,7 @@
     [Ionization energy and electron affinity](../techniques/ionization-and-electron-affinity.md),
     [Missing diffuse functions](diffuse-functions.md)
 
-Ask a program for H₂⁻ and it returns an energy, an optimized geometry and
+Ask a program for [H₂⁻](app:s/2/-1/2) and it returns an energy, an optimized geometry and
 frequencies, as if the anion existed. It doesn't: the extra electron isn't
 bound, and would leave immediately. The calculation can't show that,
 because a finite basis set gives the electron nowhere to go. Spotting
@@ -18,7 +18,7 @@ An anion is **bound** if its energy is below that of the neutral molecule
 plus a free electron (energy zero): a positive electron affinity. If it
 isn't, the extra electron belongs to the continuum of free-electron states.
 Some such states live briefly before the electron escapes; these are
-**resonances**. H₂⁻ is one: it forms when slow electrons hit H₂, and loses
+**resonances**. H₂⁻ is one: it forms when slow electrons hit [H₂](app:s/2/0/1), and loses
 its electron again within femtoseconds.
 
 ### What a finite basis does
@@ -57,7 +57,7 @@ far above H₂'s own 4401 cm⁻¹). Nothing in the individual outputs warns abou
 - **Positive HOMO energy.** An orbital with positive energy holds an electron
   that would be better off at infinity. In the campaign, H₂⁻'s HOMO is
   positive at every level (+0.05 hartree at CCSD(T)), and so is the HOMO of
-  the unbound triplet H⁻. Bound singlet H⁻ has a negative HOMO with HF
+  the unbound triplet [H⁻](app:s/1/-1/3). Bound singlet [H⁻](app:s/1/-1/1) has a negative HOMO with HF
   orbitals (−0.05 hartree at L1M and L2). DFT is less reliable here:
   [self-interaction](self-interaction-error.md) can push the HOMO of a truly
   bound anion above zero (ωB97X-D4 gives +0.005 hartree for H⁻).
@@ -74,6 +74,8 @@ far above H₂'s own 4401 cm⁻¹). Nothing in the individual outputs warns abou
   once its electron is unbound (`doc/Plan.md` §2.2).
 - HOMO and LUMO energies are stored for every result (`homo`, `lumo` in the
   `result` table, in hartree).
+- Web app: the species page of an unbound anion explains why it has no
+  structure, e.g. [H₂⁻](app:s/2/-1/2).
 
 ## References
 

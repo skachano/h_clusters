@@ -29,7 +29,7 @@ names the target: **G**eometries, vibrational **F**requencies and
 
 ## What happened in this project
 
-The Phase 0 smoke test was H₃⁺, the simplest real cluster
+The Phase 0 smoke test was [H₃⁺](app:s/3/1/1), the simplest real cluster
 (`doc/Plan.md`, Phase 0 findings):
 
 | Method | Lowest structure | Linear vs triangle |

@@ -61,14 +61,14 @@ because the bottleneck moves with energy.
 
 - **Self-interaction error.** DFT underestimates barriers of hydrogen and
   proton transfer, systematically. It is the same error that erases the C₂ᵥ
-  H₅⁺ minimum ([self-interaction error](../pitfalls/self-interaction-error.md)),
+  [H₅⁺](app:s/5/1/1) minimum ([self-interaction error](../pitfalls/self-interaction-error.md)),
   so geometries from MP2 and energies from CCSD(T) are the safe choice.
 - **Changing spin.** If the cheapest products have a different total spin
   than the cluster, the two states live on different surfaces. The
   bottleneck is then the **minimum-energy crossing point** (MECP) of the two
   surfaces, not a saddle point on one of them.
 - **Breaking a covalent bond.** Breaking an H–H bond inside a core (H₂⁺,
-  H₃⁺) changes the electronic structure strongly, and a single-determinant
+  [H₃⁺](app:s/3/1/1)) changes the electronic structure strongly, and a single-determinant
   method can fail along the way. Check the T₁ and D₁ diagnostics of
   coupled cluster, or use CASSCF and NEVPT2 along the path.
 - **Light nuclei.** Hydrogen tunnels through barriers, and its zero-point
@@ -76,19 +76,19 @@ because the bottleneck moves with energy.
   height: Wigner or Eckart corrections are the simple estimates, instanton
   and ring-polymer methods the rigorous ones. In H₅⁺ the zero-point level
   already lies above the barrier for the proton shuttling between its two
-  H₂ ends ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
+  [H₂](app:s/2/0/1) ends ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
 
 ## Example: which channels would need what
 
 | Channel type | Example | Rearrangement? | Tool |
 |---|---|---|---|
-| Loss of a ligand | H₇⁺ → H₅⁺ + H₂, H⁻(H₂)ₖ → H⁻(H₂)ₖ₋₁ + H₂ | no | relaxed scan; expected to confirm $D_e$ |
+| Loss of a ligand | [H₇⁺](app:s/7/1/1) → H₅⁺ + H₂, H⁻(H₂)ₖ → H⁻(H₂)ₖ₋₁ + H₂ | no | relaxed scan; expected to confirm $D_e$ |
 | Van der Waals split | (H₂)₄ → (H₂)₃ + H₂ | no | relaxed scan |
-| Rearranging core | H₆⁺ → H₅⁺ + H (an H₃⁺ triangle must form) | yes | NEB → TS → IRC |
+| Rearranging core | [H₆⁺](app:s/6/1/2) → H₅⁺ + H (an H₃⁺ triangle must form) | yes | NEB → TS → IRC |
 | Spin change | high-spin cations to low-spin products | — | MECP |
 
 For H₆⁺ → H₅⁺ + H no barrier is expected, because the reverse reaction
-resembles H₂⁺ + H₂ → H₃⁺ + H, which has none
+resembles [H₂⁺](app:s/2/1/2) + H₂ → H₃⁺ + H, which has none
 ([fragmentation](fragmentation.md#products-versus-process-rearrangement-and-barriers)).
 That expectation is exactly what an NEB calculation would test.
 
@@ -102,6 +102,7 @@ That expectation is exactly what an NEB calculation would test.
   (RI-MP2) have analytic gradients; CCSD(T) single points would give the
   energies, as for every other energy in the project.
 - Plan: `doc/Plan.md`, Phase 8 (not yet scheduled).
+- Web app: the [Extensions](app:studies) page, "Barriers on the way out".
 
 ## References
 

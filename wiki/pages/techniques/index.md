@@ -4,7 +4,7 @@ What is done with a method once it can compute an energy.
 
 - [Geometry optimization](geometry-optimization.md): Newton steps, trust radii, restarts
 - [Frequencies and the Hessian](frequencies.md): normal modes, imaginary frequencies, saddle points
-- [Zero-point energy](zero-point-energy.md): why H₅⁺ loses a third of its binding
+- [Zero-point energy](zero-point-energy.md): why [H₅⁺](app:s/5/1/1) loses a third of its binding
 - [Thermochemistry](thermochemistry.md): enthalpy, entropy, free energy; is H₅⁺ stable at 298 K?
 - [Global structure search](structure-search.md): templates, random seeds, fingerprints, dissociation
 - [Point groups and symmetry](point-groups.md): D₃h, C₂ᵥ, D₂d; degenerate modes, symmetry numbers

@@ -87,8 +87,21 @@ without the campaign: `[H₃⁺](app:s/3/1/1)` opens the species page of H₃⁺
 `c/<campaign>/` for a campaign other than baseline:
 `app:c/demo/s/5/1/1`. Japanese pages open the app in Japanese. The hook
 `wiki/hooks/app_links.py` turns these into real addresses: the local dev
-server, or the app on GitHub Pages. These links are not checked, so open
-them once in the preview.
+server, or the app on GitHub Pages. A species route that is not a state of
+the app fails the strict build; other routes are not checked, so open them
+once in the preview.
+
+The first mention of each species on a page links to its page in the app.
+After writing a page, run
+
+```sh
+python3 wiki/tools/link_species.py wiki/pages/**/*.md
+```
+
+It adds the missing links (ground state, or the spin state named next to the
+formula: "triplet H₃⁺") and leaves headings, code, math and formulas inside
+larger ones, like H⁻(H₂)ₖ, alone. A "Web app:" bullet under "Where this
+appears in h_clusters" points to the view that shows the page's topic.
 
 ## Preview and check
 

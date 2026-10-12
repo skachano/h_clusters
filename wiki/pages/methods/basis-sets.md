@@ -54,8 +54,8 @@ Functions per hydrogen atom:
 | cc-pVTZ | 3s2p1d | 14 |
 | aug-cc-pVTZ | 4s3p2d | 23 |
 
-So an H₁₀ calculation in aug-cc-pVTZ has 230 basis functions. The real
-triplet H₃⁺ job quoted on the [Hartree–Fock page](hartree-fock.md#the-same-thing-in-orca)
+So an [H₁₀](app:s/10/0/1) calculation in aug-cc-pVTZ has 230 basis functions. The real
+triplet [H₃⁺](app:s/3/1/3) job quoted on the [Hartree–Fock page](hartree-fock.md#the-same-thing-in-orca)
 has 3 × 23 = 69.
 
 ## Example: the hydrogen atom
@@ -111,9 +111,11 @@ computing each fragment in the full basis of the complex.
   with its own small triple-ζ basis, without diffuse functions.
 - Diffuse functions are used for *all* species, not only anions, so that every
   charge state is treated the same way (`doc/Plan.md` §2).
-- Basis size changes answers: MP2 with aug-cc-pVDZ collapses H₅⁺ to D₂d,
+- Basis size changes answers: MP2 with aug-cc-pVDZ collapses [H₅⁺](app:s/5/1/1) to D₂d,
   aug-cc-pVTZ keeps C₂ᵥ.
 - A TZ → QZ → CBS convergence study is the optional level L4 (Plan, Phase 8).
+- Web app: the [Extensions](app:studies) page has the counterpoise
+  correction and the basis-set limit.
 
 ## References
 

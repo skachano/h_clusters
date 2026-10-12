@@ -77,7 +77,7 @@ their equilibrium geometry it typically gets roughly 80–90 %.
 ## Strengths and weaknesses
 
 - **No self-interaction error.** MP2 starts from HF orbitals, which are free
-  of it. This is why MP2 keeps H₅⁺'s C₂ᵥ H₃⁺·H₂ structure, which every DFT
+  of it. This is why MP2 keeps [H₅⁺](app:s/5/1/1)'s C₂ᵥ H₃⁺·H₂ structure, which every DFT
   level in the project turns into a shared-proton D₂d structure.
 - **Includes dispersion.** The double excitations describe correlated
   fluctuations of electrons on two molecules, which is what dispersion is.
@@ -94,7 +94,7 @@ their equilibrium geometry it typically gets roughly 80–90 %.
 - **Cost:** grows as $N^5$ with the number of basis functions; much cheaper
   with [RI](resolution-of-identity.md).
 
-How MP2 compares on the project's H₂ (aug-cc-pVTZ basis):
+How MP2 compares on the project's [H₂](app:s/2/0/1) (aug-cc-pVTZ basis):
 
 | | MP2 (L1M) | CCSD(T) (L2) | Exact |
 |---|---|---|---|
@@ -108,7 +108,7 @@ How MP2 compares on the project's H₂ (aug-cc-pVTZ basis):
   aug-cc-pVTZ basis. It optimizes every promoted structure (stage `mp2`);
   the best three per state get numerical frequencies (`mp2_freq`), because
   ORCA 6.1 has no analytic RI-MP2 Hessian.
-- One-electron species (H, H₂⁺) have nothing to correlate: L1M falls back to
+- One-electron species (H, [H₂⁺](app:s/2/1/2)) have nothing to correlate: L1M falls back to
   plain HF for them (`correlated=True` in `levels.py`).
 - Open-shell states run on a UHF reference.
 

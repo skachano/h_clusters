@@ -14,13 +14,13 @@ lengths are the most trustworthy witness of where the electrons are.
 
 ### Losing an electron: exact for the molecule, a model inside it
 
-For a **whole molecule** losing an electron is a real event: H₆ → H₆⁺ + e⁻
+For a **whole molecule** losing an electron is a real event: [H₆](app:s/6/0/1) → [H₆⁺](app:s/6/1/2) + e⁻
 changes the electron count from 6 to 5, costs a measurable energy (the
 ionization energy) and leaves an exact total charge of +1.
 
 **Inside** the molecule electrons have no owners. They are indistinguishable,
 and the wavefunction describes all of them at once, over the whole molecule.
-Nothing in nature says "this electron belongs to the central H₂". What can be
+Nothing in nature says "this electron belongs to the central [H₂](app:s/2/0/1)". What can be
 observed, or computed without arbitrary choices, is:
 
 - the **electron density**: how much electron there is at each point in
@@ -44,7 +44,7 @@ observed, or computed without arbitrary choices, is:
   Löwdin, Mulliken, natural (NPA) and Bader charges give different numbers,
   though usually the same trends.
 
-A label like "H₂⁺" is therefore a **formal** charge, a statement about
+A label like "[H₂⁺](app:s/2/1/2)" is therefore a **formal** charge, a statement about
 orbital bookkeeping, while "+0.81 on the outer H₂" is a **partial** charge,
 one way of dividing a shared density. They need not agree. Familiar
 example: ammonium is written NH₄⁺, yet its nitrogen carries a *negative*
@@ -78,7 +78,7 @@ They vary independently in practice:
 |---|---|---|
 | H atom | 0 | 1 |
 | H₂⁺ | +0.5 per atom | 0.5 per atom |
-| H₃⁺, H₅⁺ (closed shells) | +1 spread out | 0 everywhere |
+| [H₃⁺](app:s/3/1/1), [H₅⁺](app:s/5/1/1) (closed shells) | +1 spread out | 0 everywhere |
 | Neutral radicals, e.g. H₂·H | ≈ 0 everywhere | ≈ 1 on the lone H |
 | H₆⁺ central pair | +0.18 | 0.53 |
 | H₆⁺ outer H₂ (both) | +0.82 | 0.47 |
@@ -179,7 +179,7 @@ correlated method would likely put somewhat more of it on the central pair.
 
 - Löwdin charges, spin populations and bond orders: the bonds study,
   `worker/src/hclust/studies/bonds.py`; the atom and bond tables and the
-  "Highlight atoms" halos on each species page of the web app
+  "Highlight atoms" halos on each species page of the web app ([H₆⁺](app:s/6/1/2), for example)
 - Units of a cluster and their atoms (where H₆⁺ shows up as delocalized):
   `worker/src/hclust/analysis/units.py`
 - Plan: `doc/Plan.md`, Phase 8 (bonds study, units from fragmentation)

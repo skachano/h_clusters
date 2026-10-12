@@ -77,10 +77,10 @@ clearly ([self-interaction error](../pitfalls/self-interaction-error.md)):
 
 | Property | r²SCAN-3c (L0) | ωB97X-D4 (L1) | Reference |
 |---|---|---|---|
-| H₂⁺ bond length | 1.083 Å | 1.105 Å | 1.058 Å (HF, exact for one electron) |
+| [H₂⁺](app:s/2/1/2) bond length | 1.083 Å | 1.105 Å | 1.058 Å (HF, exact for one electron) |
 | H₂⁺ frequency | — | 2074 cm⁻¹ | 2322 cm⁻¹ |
 | Electron affinity of H | −1.57 eV (H⁻ unbound) | 0.20 eV | 0.73 eV (CCSD(T)), 0.754 exact |
-| H₅⁺ shape | D₂d, shared proton | D₂d, shared proton | C₂ᵥ H₃⁺·H₂ (MP2, CCSD(T)) |
+| [H₅⁺](app:s/5/1/1) shape | D₂d, shared proton | D₂d, shared proton | C₂ᵥ H₃⁺·H₂ (MP2, CCSD(T)) |
 
 (The r²SCAN-3c electron affinity also suffers from its small basis set, which
 has no diffuse functions; see [diffuse functions](../pitfalls/diffuse-functions.md).)
@@ -92,7 +92,7 @@ hartree, below the exact −0.5.
 ## Cost
 
 Like HF, formally $N^3$–$N^4$ in the number of basis functions, with tricks
-([RI](resolution-of-identity.md)) bringing it down. For H₁₀ in the pilot run,
+([RI](resolution-of-identity.md)) bringing it down. For [H₁₀](app:s/10/0/1) in the pilot run,
 an r²SCAN-3c gradient took 3 s and an ωB97X-D4 gradient 48 s on one core.
 
 ## Where this appears in h_clusters

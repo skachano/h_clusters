@@ -2,14 +2,16 @@
 import { useParams } from "react-router-dom";
 import { useBenchmark, type BenchmarkOut } from "../api/client";
 import { ParityChart } from "../components/charts/ParityChart";
+import { WikiLink } from "../components/WikiLink";
 import { pretty, signed } from "../lib/format";
+import type { WikiPage } from "../lib/wiki";
 import { CHARGE_COLOR } from "../lib/scales";
 import { useT } from "../i18n";
 import { chargeLabel } from "../i18n/terms";
 
 const LEVELS = [
-  { test: "L1", name: "ωB97X-D4/def2-TZVPPD" },
-  { test: "L1M", name: "RI-MP2/aug-cc-pVTZ" },
+  { test: "L1", name: "ωB97X-D4/def2-TZVPPD", wiki: "methods/dft" as WikiPage },
+  { test: "L1M", name: "RI-MP2/aug-cc-pVTZ", wiki: "methods/mp2" as WikiPage },
 ];
 
 export function BenchmarkView() {
@@ -18,22 +20,22 @@ export function BenchmarkView() {
   return (
     <div className="stack">
       <div>
-        <h1>{t("bench.title")}</h1>
+        <h1>{t("bench.title")}<WikiLink page="htc/method-ladder" /></h1>
         <p className="lede">{t("bench.lede")}</p>
       </div>
       <div className="cols-2">
-        {LEVELS.map((l) => <Panel key={l.test} campaign={campaign} test={l.test} name={l.name} />)}
+        {LEVELS.map((l) => <Panel key={l.test} campaign={campaign} test={l.test} name={l.name} wiki={l.wiki} />)}
       </div>
     </div>
   );
 }
 
-function Panel({ campaign, test, name }: { campaign: string; test: string; name: string }) {
+function Panel({ campaign, test, name, wiki }: { campaign: string; test: string; name: string; wiki: WikiPage }) {
   const b = useBenchmark(campaign, test);
   const t = useT();
   return (
     <div className="card stack" style={{ gap: 12 }}>
-      <h2>{name}</h2>
+      <h2>{name}<WikiLink page={wiki} /></h2>
       {b.isError && <p className="error">{String(b.error)}</p>}
       {b.isPending && <p className="loading">{t("common.loading")}</p>}
       {b.data && <PanelBody b={b.data} name={name} />}

@@ -40,7 +40,7 @@ the plan flags deviations above 10 %.
 
 ### When it's a feature
 
-Sometimes contamination is the price of the right physics. A stretched H₂ is
+Sometimes contamination is the price of the right physics. A stretched [H₂](app:s/2/0/1) is
 two H atoms with opposite spins. RHF can't describe that (its energy goes far
 too high), but a **broken-symmetry** UHF solution, with the α electron on one
 atom and the β on the other, gets the energy right while having ⟨S²⟩ ≈ 1:
@@ -62,10 +62,10 @@ The worst ⟨S²⟩ values at the UHF reference of RI-MP2 (L1M), baseline campai
 
 | State | ⟨S²⟩ | Exact | Deviation |
 |---|---|---|---|
-| H₃⁻ triplet | 2.200 | 2.00 | 10 % |
-| H₈⁺ doublet | 0.825 | 0.75 | 10 % |
-| H₄⁻ quartet | 3.891 | 3.75 | 4 % |
-| H₁₀⁺ quartet | 3.824 | 3.75 | 2 % |
+| [H₃⁻](app:s/3/-1/3) triplet | 2.200 | 2.00 | 10 % |
+| [H₈⁺](app:s/8/1/2) doublet | 0.825 | 0.75 | 10 % |
+| [H₄⁻](app:s/4/-1/4) quartet | 3.891 | 3.75 | 4 % |
+| [H₁₀⁺](app:s/10/1/4) quartet | 3.824 | 3.75 | 2 % |
 
 Most states are much cleaner. The two worst sit right at the plan's 10 %
 threshold, so their MP2 geometries deserve a second look. Their CCSD(T)

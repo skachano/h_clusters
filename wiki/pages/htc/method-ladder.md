@@ -14,7 +14,7 @@ cheap ones were.
 
 ### Cost against accuracy
 
-Costs in this project for one H₁₀ structure on one core (pilot, `doc/Plan.md`
+Costs in this project for one [H₁₀](app:s/10/0/1) structure on one core (pilot, `doc/Plan.md`
 Phase 4):
 
 | Rung | Method | Time | Use |
@@ -62,8 +62,8 @@ flowchart TD
 
 The ladder was redesigned twice by evidence:
 
-- **xTB demoted** to geometry proposer after it ranked H₃⁺ wrongly (Phase 0).
-- **A second geometry branch (MP2)** after every DFT level turned H₅⁺'s C₂ᵥ
+- **xTB demoted** to geometry proposer after it ranked [H₃⁺](app:s/3/1/1) wrongly (Phase 0).
+- **A second geometry branch (MP2)** after every DFT level turned [H₅⁺](app:s/5/1/1)'s C₂ᵥ
   structure into D₂d (Phase 3). The two branches have different blind
   spots ([self-interaction](../pitfalls/self-interaction-error.md) for DFT,
   basis-set sensitivity for MP2), and CCSD(T) on both decides.
@@ -85,6 +85,8 @@ at four levels and [H₂⁺ under DFT](../pitfalls/self-interaction-error.md#exa
   derivative support and scratch estimate.
 - `stages:` in `campaigns/baseline.yaml`: the ladder for this campaign.
 - `doc/Plan.md` §2: the method ladder table and its rationale.
+- Web app: the [Benchmark](app:benchmark) page shows how far each rung's
+  $D_e$ is from CCSD(T); the [Jobs](app:jobs) page shows the stages.
 
 ## References
 

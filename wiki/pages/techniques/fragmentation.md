@@ -16,14 +16,14 @@ fragment, which is why the campaign computes the whole grid of species.
 
 H_m^n can split into two pieces, H_a^p and H_(m−a)^(n−p), where the charges
 of the pieces add up to the total. Each piece must be a species the project
-computes (charge −1, 0 or +1). For H₅⁺ that gives four channels:
+computes (charge −1, 0 or +1). For [H₅⁺](app:s/5/1/1) that gives four channels:
 
 | Channel | Pieces |
 |---|---|
-| H₃⁺ + H₂ | the expected one: lose a solvating H₂ |
-| H₄⁺ + H | lose an atom |
-| H₄ + H⁺ | lose a bare proton |
-| H₃ + H₂⁺ | the charge goes to the H₂ |
+| [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) | the expected one: lose a solvating H₂ |
+| [H₄⁺](app:s/4/1/2) + H | lose an atom |
+| [H₄](app:s/4/0/1) + H⁺ | lose a bare proton |
+| [H₃](app:s/3/0/2) + [H₂⁺](app:s/2/1/2) | the charge goes to the H₂ |
 
 Each fragment can be in any computed spin state, and the plan uses the
 lowest-energy one (`doc/Plan.md` §2.2). Strictly, total spin is conserved
@@ -82,7 +82,7 @@ D_\text{frozen} = D_e + E_\text{relaxation} \;\ge\; D_e
 $$
 
 $D_e$ (and $D_0$, with zero-point energies at the relaxed minima) is the
-*adiabatic* cost, already credited with that relaxation. For H₆⁺ → H₅⁺ + H,
+*adiabatic* cost, already credited with that relaxation. For [H₆⁺](app:s/6/1/2) → H₅⁺ + H,
 where an H₃⁺ triangle must form that the cluster does not contain, the frozen
 cost would be much larger than the 0.30 eV of $D_e$.
 
@@ -142,7 +142,7 @@ finished too.
   `Verdict` table stores `d_min`, `d0_min`, the verdict and the weakest
   channel per state and level (`doc/Plan.md` §3.4).
 - The cation channels are the source of the odd–even alternation expected in
-  §1.2: H₅⁺, H₇⁺, H₉⁺ (an H₃⁺ core plus H₂ units) should be more stable than
+  §1.2: H₅⁺, [H₇⁺](app:s/7/1/1), [H₉⁺](app:s/9/1/1) (an H₃⁺ core plus H₂ units) should be more stable than
   their even neighbours.
 - The fragmentation tree and the units built on it (`analysis/units.py`)
   use $D_e$ and so assume every channel is barrierless; no dissociation
@@ -150,6 +150,8 @@ finished too.
 - The *structural* check that a single optimized structure hasn't fallen
   apart is separate: the 3.5 Å contact cutoff in
   [structure search](structure-search.md#how-this-project-does-it).
+- Web app: each species page lists its channels and draws its fragmentation
+  tree, e.g. [H₅⁺](app:s/5/1/1).
 
 ## References
 

@@ -2,6 +2,7 @@
 import { useParams } from "react-router-dom";
 import { useJobsSummary } from "../api/client";
 import { RawFiles } from "../components/RawFiles";
+import { WikiLink } from "../components/WikiLink";
 import { Histogram } from "../components/charts/Histogram";
 import { duration, pretty } from "../lib/format";
 import { useT } from "../i18n";
@@ -36,7 +37,7 @@ export function JobsView() {
           </div>
 
           <div className="card table-wrap">
-            <h2 style={{ marginBottom: 8 }}>{t("jobs.stages")}</h2>
+            <h2 style={{ marginBottom: 8 }}>{t("jobs.stages")}<WikiLink page="htc/selection-barriers" /></h2>
             <table>
               <thead>
                 <tr><th>{t("jobs.stage")}</th><th>{t("jobs.level")}</th>{STATUS_ORDER.map((k) => <th key={k} className="num">{statusName(t, k)}</th>)}<th className="num">{t("jobs.retried")}</th><th className="num">{t("jobs.median")}</th><th className="num">{t("jobs.cpuH")}</th></tr>
@@ -56,7 +57,7 @@ export function JobsView() {
           </div>
 
           <div>
-            <h2 style={{ marginBottom: 8 }}>{t("jobs.runTimes")}</h2>
+            <h2 style={{ marginBottom: 8 }}>{t("jobs.runTimes")}<WikiLink page="htc/resource-budgeting" /></h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 280px), 1fr))", gap: 16 }}>
               {s.stages.map((st) => (
                 <div className="card" key={st.stage} style={{ padding: 12 }}>
@@ -68,7 +69,7 @@ export function JobsView() {
           </div>
 
           <div className="card table-wrap">
-            <h2 style={{ marginBottom: 8 }}>{t("jobs.failures", { n: s.failures.length })}</h2>
+            <h2 style={{ marginBottom: 8 }}>{t("jobs.failures", { n: s.failures.length })}<WikiLink page="htc/provenance" /></h2>
             {s.failures.length === 0 ? <p className="muted">{t("jobs.noFailures")}</p> : (
               <table>
                 <thead><tr><th>{t("jobs.job")}</th><th>{t("th.state")}</th><th>{t("jobs.stage")}</th><th>{t("jobs.kind")}</th><th className="num">{t("jobs.attempts")}</th><th>{t("jobs.error")}</th><th>{t("jobs.files")}</th></tr></thead>

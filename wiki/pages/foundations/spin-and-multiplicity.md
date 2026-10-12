@@ -51,7 +51,7 @@ have 2, 4, … unpaired electrons; an odd $N$ always leaves at least one:
 - $N$ even: multiplicity 1, 3, 5, …, $N + 1$
 - $N$ odd: multiplicity 2, 4, 6, …, $N + 1$
 
-So H₃⁺ (2 electrons) can be a singlet or triplet, H₃ (3 electrons) a doublet
+So [H₃⁺](app:s/3/1/1) (2 electrons) can be a singlet or triplet, [H₃](app:s/3/0/2) (3 electrons) a doublet
 or quartet.
 
 ### Why spin changes the energy
@@ -61,7 +61,7 @@ Pauli principle: electrons with the same spin are kept apart (the exchange
 effect), and parallel spins can't share an orbital, so they must occupy
 higher ones. The two effects compete. In a chemical bond, pairing wins: two
 electrons share the bonding orbital, which is only possible with opposite
-spins. That's why most stable molecules, H₂ included, are singlets.
+spins. That's why most stable molecules, [H₂](app:s/2/0/1) included, are singlets.
 
 Examples from the campaign (CCSD(T)/aug-cc-pVTZ):
 
@@ -69,7 +69,7 @@ Examples from the campaign (CCSD(T)/aug-cc-pVTZ):
 |---|---|---|
 | H₂ | singlet, bound by 4.7 eV | triplet: no bond; the atoms fly apart in every optimization |
 | H₃⁺ | singlet triangle, −1.3417 hartree | triplet, −1.1155 hartree: 6.2 eV higher |
-| H⁻ | singlet, bound | triplet: above H + a free electron, so not a bound state |
+| [H⁻](app:s/1/-1/1) | singlet, bound | triplet: above H + a free electron, so not a bound state |
 
 ### ⟨S²⟩, a check on the wavefunction
 
@@ -84,11 +84,13 @@ signals a contaminated state ([spin contamination](../pitfalls/spin-contaminatio
   parity rule. The baseline campaign keeps the two lowest multiplicities of
   each species (`n_mult: 2` in `campaigns/baseline.yaml`), giving 56 states.
 - Every ORCA input states charge and multiplicity on the coordinate line,
-  e.g. `* xyz 1 3` for triplet H₃⁺. States with multiplicity > 1 run
+  e.g. `* xyz 1 3` for triplet [H₃⁺](app:s/3/1/3). States with multiplicity > 1 run
   unrestricted (`UHF`/`UKS`, see `engines/orca.py`).
 - ⟨S²⟩ is parsed from every output and stored in the `result` table (`s2`).
 - Fragments of a cluster may be in any spin state, so the fragmentation
   analysis needs both multiplicities of every species (`doc/Plan.md` §2.2).
+- Web app: each species page compares its two spin states, e.g.
+  [H₃⁺](app:s/3/1/1).
 
 ## References
 

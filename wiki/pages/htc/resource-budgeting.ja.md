@@ -30,7 +30,7 @@
 
 - **ワーカー: 12**、それぞれ 1 コアの ORCA 実行 (`%pal` ブロックがないので ORCA は 1 プロセスを使う)。マシンには 16 コアあるが、15 GB のメモリのうち空いているのは約 8 GB だけである。
 - **メモリ: ジョブあたり `maxcore_mb: 500`** (ORCA の `%maxcore`)。12 × 500 MB にオーバーヘッドを加えたもの。
-- **タイムアウト: 360 分**。H₁₀ の開殻 RI-MP2 の数値的振動数計算に足りる長さ。
+- **タイムアウト: 360 分**。[H₁₀](app:s/10/0/1) の開殻 RI-MP2 の数値的振動数計算に足りる長さ。
 - **スクラッチ: `/var/tmp/hclust` に `scratch_budget_gb: 150`** (`compose.yaml` の `SCRATCH_DIR` マウント)。各レベルは m = 10 でのスクラッチ使用量を宣言しており (`levels.py` の `scratch_gb_m10`: CCSD(T) 12.5 GB、RI-MP2 2 GB、ほかは 0.5 GB)、スケジューラは
 
 $$
@@ -52,6 +52,7 @@ ORCA は `scratch/<hash>` で実行され、終わったあとで小さな出力
 - `campaigns/baseline.yaml` の `resources:`、`worker/src/hclust/levels.py` の `Level.scratch_gb_m10`、`worker/src/hclust/runner.py` の `Runner.scratch_gb` と `_next_pending`。
 - `.env.example` の `SCRATCH_DIR` と `compose.yaml` の `/scratch` マウント。
 - 試行ごとの経過時間が記録される (`attempt` テーブルの `wall_s`): ベースラインではこれまでに 51 CPU 時間。
+- ウェブアプリ: [「ジョブ」](app:jobs)ページにステージとレベルごとの実行時間がある。
 
 ## 参考文献
 

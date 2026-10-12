@@ -16,6 +16,7 @@ import { multName, shapeName, verdictLabel } from "../i18n/terms";
 import { atomLabel, atomSummaries } from "../lib/atoms";
 import { HALO_FULL, haloStyle, halos as haloList, type Highlight } from "../lib/halos";
 import { bondStyle, MIN_BOND_ORDER, parseXyz } from "../lib/geometry";
+import type { WikiPage } from "../lib/wiki";
 import { VERDICT_FILL, VERDICT_INK } from "../lib/scales";
 
 type ChannelQ = "d_e" | "d_0" | "d_g";
@@ -129,7 +130,7 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
           )}
           {modes.data && (
             <div className="control">
-              <label htmlFor="mode">{t("sp.mode", { level: modes.data.level === "L1M" ? "RI-MP2" : "ωB97X-D4" })}</label>
+              <label htmlFor="mode">{t("sp.mode", { level: modes.data.level === "L1M" ? "RI-MP2" : "ωB97X-D4" })}<WikiLink page="techniques/frequencies" /></label>
               <select id="mode" value={modeIndex ?? ""} onChange={(e) => setModeIndex(e.target.value === "" ? null : Number(e.target.value))}>
                 <option value="">{t("common.none")}</option>
                 {modes.data.frequencies.map((f, i) => (
@@ -186,7 +187,7 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
               <p className="hint">{t("sp.isomerHint")}</p>
             </div>
             <div style={{ flex: "1 1 200px" }}>
-              <h3>{t("sp.spins")} <span className="unit">(eV)</span></h3>
+              <h3>{t("sp.spins")} <span className="unit">(eV)</span><WikiLink page="foundations/spin-and-multiplicity" /></h3>
               {s.multiplicities.some((x) => x.spin_gap != null) ? (
                 <LevelDiagram
                   ariaLabel={t("sp.spinsAria")}
@@ -250,7 +251,7 @@ function Units({ s }: { s: StateDetail }) {
   return (
     <div className="card stack" style={{ gap: 10 }}>
       <div>
-        <h2>{t("sp.units")}</h2>
+        <h2>{t("sp.units")}<WikiLink page="foundations/units-language-or-physics" /></h2>
         <p className="hint">{t("sp.unitsHint")}</p>
       </div>
       {levels.map(({ units: u, title, hint }) => u && (
@@ -342,19 +343,20 @@ function TreeNode({ label, tree, open = false }: { label: string; tree: Fragment
 
 function Properties({ s }: { s: StateDetail }) {
   const t = useT();
-  const rows: [string, string][] = [
-    [t("sp.pDe"), `${signed(s.d_e, 3, "eV")}${s.channel ? ` → ${pretty(s.channel)}` : ""}`],
-    [t("sp.pD0"), signed(s.d_0, 3, "eV")],
-    [t("sp.pDh", { T: s.temperature.toFixed(0) }), signed(s.d_h, 3, "eV")],
-    [t("sp.pDg", { T: s.temperature.toFixed(0), p: s.pressure.toPrecision(3) }), `${signed(s.d_g, 3, "eV")}${s.channel_g && s.channel_g !== s.channel ? ` → ${pretty(s.channel_g)}` : ""}`],
-    ...(s.charge === -1 ? [[t("sp.pDetach"), signed(s.detachment, 3, "eV")] as [string, string]] : []),
-    ...(s.charge === 0 ? [[t("sp.pIonize"), signed(s.ionization, 3, "eV")] as [string, string]] : []),
+  // Label, value, and the wiki page that explains the label.
+  const rows: [string, string, WikiPage?][] = [
+    [t("sp.pDe"), `${signed(s.d_e, 3, "eV")}${s.channel ? ` → ${pretty(s.channel)}` : ""}`, "techniques/fragmentation"],
+    [t("sp.pD0"), signed(s.d_0, 3, "eV"), "techniques/zero-point-energy"],
+    [t("sp.pDh", { T: s.temperature.toFixed(0) }), signed(s.d_h, 3, "eV"), "techniques/thermochemistry"],
+    [t("sp.pDg", { T: s.temperature.toFixed(0), p: s.pressure.toPrecision(3) }), `${signed(s.d_g, 3, "eV")}${s.channel_g && s.channel_g !== s.channel ? ` → ${pretty(s.channel_g)}` : ""}`, "techniques/thermochemistry"],
+    ...(s.charge === -1 ? [[t("sp.pDetach"), signed(s.detachment, 3, "eV"), "techniques/ionization-and-electron-affinity"] as [string, string, WikiPage]] : []),
+    ...(s.charge === 0 ? [[t("sp.pIonize"), signed(s.ionization, 3, "eV"), "techniques/ionization-and-electron-affinity"] as [string, string, WikiPage]] : []),
     ["HOMO / LUMO (HF)", `${fmt(s.homo, 2)} / ${fmt(s.lumo, 2)} eV`],
-    ["⟨S²⟩", s.s2 == null ? "–" : `${s.s2.toFixed(3)}${s.spin_contaminated ? t("sp.pContaminated") : ""}`],
-    [t("sp.pShape"), `${s.point_group ?? "–"} · ${shapeName(t, s.shape)}`],
+    ["⟨S²⟩", s.s2 == null ? "–" : `${s.s2.toFixed(3)}${s.spin_contaminated ? t("sp.pContaminated") : ""}`, "pitfalls/spin-contamination"],
+    [t("sp.pShape"), `${s.point_group ?? "–"} · ${shapeName(t, s.shape)}`, "techniques/point-groups"],
     [t("sp.pRg"), fmt(s.radius_of_gyration, 2, "Å")],
-    [t("sp.pEnergy"), fmt(s.energy, 6, "Eh")],
-    [t("sp.pZpe"), fmt(s.zpe == null ? null : s.zpe * 27.211386, 3, "eV")],
+    [t("sp.pEnergy"), fmt(s.energy, 6, "Eh"), "methods/coupled-cluster"],
+    [t("sp.pZpe"), fmt(s.zpe == null ? null : s.zpe * 27.211386, 3, "eV"), "techniques/zero-point-energy"],
   ];
   const ref = s.isomers[0];
   return (
@@ -362,8 +364,8 @@ function Properties({ s }: { s: StateDetail }) {
       <h2>{t("sp.properties")}</h2>
       <table>
         <tbody>
-          {rows.map(([k, v]) => (
-            <tr key={k}><th scope="row" style={{ fontWeight: 400 }}>{k}</th><td className="num" style={{ textAlign: "right" }}>{v}</td></tr>
+          {rows.map(([k, v, page]) => (
+            <tr key={k}><th scope="row" style={{ fontWeight: 400 }}>{page ? <WikiLink page={page}>{k}</WikiLink> : k}</th><td className="num" style={{ textAlign: "right" }}>{v}</td></tr>
           ))}
         </tbody>
       </table>
@@ -383,10 +385,17 @@ function NoStructure({ s }: { s: StateDetail }) {
   return (
     <div className="card">
       <h2>{t("sp.noStructure")}</h2>
-      <p className="lede">{why}{s.verdict === "unbound_electron" && <WikiLink page="pitfalls/unbound-anions" />}</p>
+      <p className="lede">{why}{WHY_WIKI[s.verdict] && <WikiLink page={WHY_WIKI[s.verdict]} />}</p>
     </div>
   );
 }
+
+// Where the wiki explains why a state has no structure.
+const WHY_WIKI: Record<string, WikiPage> = {
+  unbound_electron: "pitfalls/unbound-anions",
+  not_a_minimum: "techniques/frequencies",
+  dissociates: "techniques/structure-search",
+};
 
 const WHY = Object.fromEntries(
   ["unbound_electron", "not_a_minimum", "dissociates", "atom"].map((v) => [`sp.why.${v}`, true]),
@@ -429,7 +438,7 @@ function BondTable({ bonds, xyz }: { bonds: BondsOut; xyz: string }) {
   return (
     <details className="card">
       <summary>
-        <h2 style={{ display: "inline" }}>{t("sp.bondOrders")}</h2>{" "}
+        <h2 style={{ display: "inline" }}>{t("sp.bondOrders")}</h2><WikiLink page="foundations/electrons-charges-and-bond-lengths" />{" "}
         <span className="secondary">
           ({t(rows.length === 1 ? "sp.contacts.one" : "sp.contacts.other", { n: rows.length, x: MIN_BOND_ORDER, method: bonds.method })})
         </span>
@@ -458,7 +467,7 @@ function AtomTable({ atoms, method }: { atoms: ReturnType<typeof atomSummaries>;
   const open = atoms.some((a) => a.spin != null);
   return (
     <details className="card">
-      <summary><h2 style={{ display: "inline" }}>{t("sp.atoms")}</h2> <span className="secondary">({atoms.length}, {method})</span></summary>
+      <summary><h2 style={{ display: "inline" }}>{t("sp.atoms")}</h2><WikiLink page="foundations/electrons-charges-and-bond-lengths" /> <span className="secondary">({atoms.length}, {method})</span></summary>
       <p className="secondary">{t(open ? "sp.atomsAbout.open" : "sp.atomsAbout.closed")}</p>
       <table>
         <thead>

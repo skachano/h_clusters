@@ -7,7 +7,7 @@
 A [geometry optimization](geometry-optimization.md) only rolls downhill to
 the nearest minimum. To find the *lowest* minimum, and the other low-lying
 isomers, you have to start from many different places. For a 24-dimensional
-surface like H₁₀'s there is no way to try everything, so a global search
+surface like [H₁₀](app:s/10/0/1)'s there is no way to try everything, so a global search
 combines educated guesses, randomness and bookkeeping. In this project the
 shape of every cluster is unknown, so this search is the first stage of every
 calculation.
@@ -33,7 +33,7 @@ and a search's result is only as good as its starting points.
 A cheap method screens all candidates; only the best few are refined at
 expensive levels. This only works if the cheap method ranks structures
 roughly right, which isn't guaranteed ([xTB](../methods/xtb.md),
-[DFT](../methods/dft.md) for H₅⁺).
+[DFT](../methods/dft.md) for [H₅⁺](app:s/5/1/1)).
 
 ### Duplicates
 
@@ -58,8 +58,8 @@ flowchart LR
 **Seeds** (`worker/src/hclust/structures.py`):
 
 - Templates: `chain`, `ring`, `sphere` (points spread over a sphere, a
-  compact polyhedron), `h2_units` ((H₂)ₖ arrangements) and `h3_core` (an H₃⁺
-  triangle surrounded by H₂ units, the expected motif of H₅⁺, H₇⁺, H₉⁺).
+  compact polyhedron), `h2_units` ((H₂)ₖ arrangements) and `h3_core` (an [H₃⁺](app:s/3/1/1)
+  triangle surrounded by [H₂](app:s/2/0/1) units, the expected motif of H₅⁺, [H₇⁺](app:s/7/1/1), [H₉⁺](app:s/9/1/1)).
 - Random: atoms placed uniformly in a ball of radius 0.8·m^(1/3) + 0.4 Å,
   no two closer than 0.6 Å, and every atom within 1.6 Å of another so the
   start isn't already in pieces. The random generator takes an explicit seed,
@@ -117,6 +117,8 @@ A search inherits the blind spots of its screening method.
   --stage <name>` lists it.
 - ORCA's GOAT-EXPLORE with xTB is available as a seed source, but added no
   surviving structure in Phase 3 and is off in the baseline.
+- Web app: the isomers kept for each state are on its species page, e.g.
+  [H₅⁺](app:s/5/1/1).
 
 ## References
 

@@ -22,7 +22,7 @@ $$
 So the ZPE comes straight out of a [frequency calculation](frequencies.md).
 Light atoms vibrate fast ($\omega \propto 1/\sqrt{\mu}$), so their ZPE is
 large; the [isotope table](../foundations/born-oppenheimer.md#one-surface-for-all-isotopes)
-shows the effect for H₂ against D₂.
+shows the effect for [H₂](app:s/2/0/1) against D₂.
 
 What matters for stability is the **change** of ZPE in a process. Breaking
 a cluster into fragments turns some of its vibrations into free translations
@@ -43,8 +43,8 @@ ZPEs from RI-MP2/aug-cc-pVTZ harmonic frequencies, both at the MP2 geometries.
 
 | | Energy (hartree) | ZPE (hartree) | ZPE (eV) |
 |---|---|---|---|
-| H₅⁺ (C₂ᵥ) | −2.527957 | 0.035458 | 0.965 |
-| H₃⁺ | −1.341728 | 0.020718 | 0.564 |
+| [H₅⁺](app:s/5/1/1) (C₂ᵥ) | −2.527957 | 0.035458 | 0.965 |
+| [H₃⁺](app:s/3/1/1) | −1.341728 | 0.020718 | 0.564 |
 | H₂ | −1.172615 | 0.010291 | 0.280 |
 
 - $D_e$ = (−1.341728 − 1.172615) − (−2.527957) = 0.013614 hartree = **8.54 kcal/mol**
@@ -76,6 +76,9 @@ See [quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md).
 - Phase 8 goes beyond the harmonic ZPE: VPT2 for H₂, H₃⁺ and H₅⁺, and
   [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md) for the
   neutral clusters, where the harmonic $D_0 < 0$ turns out to be wrong.
+- Web app: compare the [grid by $D_e$](app:?q=d_e) with the
+  [grid by $D_0$](app:?q=d_0) to see which clusters ZPE unbinds; the
+  [Extensions](app:studies) page has the VPT2 and DMC studies.
 
 ## References
 

@@ -62,7 +62,7 @@ keeps growing.
 
 ### Rotating molecules
 
-H₂ can be treated as a **rigid rotor**: its axis is a unit vector, and its
+[H₂](app:s/2/0/1) can be treated as a **rigid rotor**: its axis is a unit vector, and its
 rotational energy $B\,j(j+1)$ is diffusion on a sphere with diffusion
 constant $B$ (59.3 cm⁻¹ for H₂). Each walker then carries positions and axes,
 and the potential may depend on orientation. When the potential is
@@ -95,13 +95,13 @@ potential says otherwise:
 
 | Cluster | Harmonic $D_0$ (meV) | Quantum $D_0$ (meV) | Well 10 % shallower | Verdict |
 |---|---|---|---|---|
-| H₃ = H₂·H | −8.3 | +0.0007 (exact) | −0.0002 | at threshold |
-| H₄ = (H₂)₂ | −13.4 | +0.238 (exact; DMC 0.231) | +0.167 | bound |
-| H₅ = (H₂)₂·H | −29.5 | +0.071 ± 0.004 | +0.041 | bound |
-| H₆ = (H₂)₃ | −36.8 | +0.62 ± 0.01 | +0.44 | bound |
-| H₇ = (H₂)₃·H | −54.8 | +0.10 ± 0.01 | +0.08 | bound |
-| H₈ = (H₂)₄ | −46.0 | +0.90 ± 0.02 | +0.72 | bound |
-| H₉ = (H₂)₄·H | −52.9 | +0.14 ± 0.02 | +0.10 | bound |
+| [H₃](app:s/3/0/2) = H₂·H | −8.3 | +0.0007 (exact) | −0.0002 | at threshold |
+| [H₄](app:s/4/0/1) = (H₂)₂ | −13.4 | +0.238 (exact; DMC 0.231) | +0.167 | bound |
+| [H₅](app:s/5/0/2) = (H₂)₂·H | −29.5 | +0.071 ± 0.004 | +0.041 | bound |
+| [H₆](app:s/6/0/1) = (H₂)₃ | −36.8 | +0.62 ± 0.01 | +0.44 | bound |
+| [H₇](app:s/7/0/2) = (H₂)₃·H | −54.8 | +0.10 ± 0.01 | +0.08 | bound |
+| [H₈](app:s/8/0/1) = (H₂)₄ | −46.0 | +0.90 ± 0.02 | +0.72 | bound |
+| [H₉](app:s/9/0/2) = (H₂)₄·H | −52.9 | +0.14 ± 0.02 | +0.10 | bound |
 
 - The harmonic estimate gets the **sign** wrong. It treats the soft
   intermolecular motions as stiff parabolas and overestimates their
@@ -117,7 +117,7 @@ without a trial function samples $\psi_0$, not $|\psi_0|^2$.
 
 ## Example: the anions, where orientation and three-body forces matter
 
-The singlet anions H₃⁻–H₉⁻ are H⁻ with one to four H₂ around it. Like the
+The singlet anions [H₃⁻](app:s/3/-1/1)–[H₉⁻](app:s/9/-1/1) are [H⁻](app:s/1/-1/1) with one to four H₂ around it. Like the
 neutral clusters they are bound in $D_e$ but not after harmonic ZPE. The ion
 changes two things:
 
@@ -129,7 +129,7 @@ changes two things:
   89 % of the wavefunction. Rotor DMC gives 6.82.
 - **Three-body forces.** The ion polarises every H₂ at once, and the energy is
   not a sum of pairs. CCSD(T) on whole clusters puts the non-additive part at
-  −23, −77 and −125 meV for H₅⁻, H₇⁻ and H₉⁻. The study tabulates the
+  −23, −77 and −125 meV for [H₅⁻](app:s/5/-1/1), [H₇⁻](app:s/7/-1/1) and H₉⁻. The study tabulates the
   three-body term (798 CCSD(T) jobs over distances, angles and H₂
   orientations). Pairs plus three-body then overbind by 4–14 %, because the
   four-body and higher terms are repulsive, while pairs alone underbind. The
@@ -179,7 +179,7 @@ Results, $D_0$ in meV for losing one H₂:
   DMC and the three-body table in `analysis/dmc.py`), run with
   `python -m hclust study dmc` or `dmc_anions`; reports in
   `data/studies/dmc@baseline.json` and `dmc_anions@baseline.json`
-- Web app: the Extensions page, "Quantum nuclear motion: diffusion Monte
+- Web app: the [Extensions](app:studies) page, "Quantum nuclear motion: diffusion Monte
   Carlo" and "Quantum nuclear motion of the anions H⁻(H₂)ₖ"
 - Plan: `doc/Plan.md`, Phase 8, DMC study and anion DMC
 

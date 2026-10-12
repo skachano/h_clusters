@@ -5,7 +5,7 @@
 
 A molecule's **point group** is the set of symmetry operations (rotations,
 reflections, inversions) that leave it looking unchanged. It is a compact
-name for its shape: "D₃h" says H₃⁺ is an equilateral triangle. Symmetry
+name for its shape: "D₃h" says [H₃⁺](app:s/3/1/1) is an equilateral triangle. Symmetry
 also has consequences: it makes some vibrations degenerate, sets the
 rotational entropy, and keeps an optimizer on a symmetric path.
 
@@ -28,10 +28,10 @@ group, and only a limited number of such groups exist.
 
 | Point group | Elements (main ones) | Example |
 |---|---|---|
-| D∞h | infinite-fold axis, $i$ | H₂, symmetric linear chains |
+| D∞h | infinite-fold axis, $i$ | [H₂](app:s/2/0/1), symmetric linear chains |
 | C∞v | infinite-fold axis, no $i$ | asymmetric linear chains |
 | D₃h | $C_3$, three $C_2$, $\sigma_h$ | H₃⁺: equilateral triangle |
-| C₂ᵥ | $C_2$, two $\sigma_v$ | H₅⁺ (MP2): an H₂ on one corner of H₃⁺, perpendicular to the triangle |
+| C₂ᵥ | $C_2$, two $\sigma_v$ | [H₅⁺](app:s/5/1/1) (MP2): an H₂ on one corner of H₃⁺, perpendicular to the triangle |
 | D₂d | $S_4$, $C_2$ axes, two $\sigma_d$ | H₅⁺ (DFT): a proton between two crossed H₂ |
 | T_d | tetrahedral | four points on a sphere |
 | C₁ | none ($E$ only) | no symmetry at all |
@@ -75,6 +75,8 @@ this project:
 - Duplicate detection doesn't use symmetry at all: the
   [distance fingerprint](structure-search.md#how-this-project-does-it) compares
   structures directly.
+- Web app: the [grid](app:) and each species page show the point group and
+  shape class of every structure.
 
 ## References
 

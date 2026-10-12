@@ -54,7 +54,7 @@ once from the CCSD amplitudes. The parentheses mean "perturbative".
 ### Two electrons: exact
 
 With two electrons there are no triple excitations, and CCSD is identical to
-full CI. So the project's CCSD(T) energies of H₂, H₃⁺ and H⁻ are exact
+full CI. So the project's CCSD(T) energies of [H₂](app:s/2/0/1), [H₃⁺](app:s/3/1/1) and [H⁻](app:s/1/-1/1) are exact
 *within the basis set*. Their remaining errors measure the basis alone:
 
 | Quantity (CCSD(T)/aug-cc-pVTZ) | Computed | Exact | Error |
@@ -84,9 +84,9 @@ in the plan.
 - **L2**, `CCSD(T) aug-cc-pVTZ` in `worker/src/hclust/levels.py`: single
   points on the minima from both geometry branches (stages `dft_ref` and
   `mp2_ref`); the lower energy decides the structure.
-- It settled the H₅⁺ question: C₂ᵥ (MP2 geometry) is 0.13 kcal/mol below
+- It settled the [H₅⁺](app:s/5/1/1) question: C₂ᵥ (MP2 geometry) is 0.13 kcal/mol below
   D₂d (DFT geometry), matching the literature.
-- Cost from the pilot: CCSD(T)/aVTZ on H₁₀ takes 13 min and **12 GB of
+- Cost from the pilot: CCSD(T)/aVTZ on [H₁₀](app:s/10/0/1) takes 13 min and **12 GB of
   scratch disk**, which is why the scheduler budgets disk space
   ([resource budgeting](../htc/resource-budgeting.md)).
 - One-electron species fall back to HF; CCSD(T) aborts with one electron.

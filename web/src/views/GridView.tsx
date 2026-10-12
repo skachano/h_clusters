@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { useGrid, type Conditions, type GridCell, type Quantity, type StateBrief } from "../api/client";
 import { ConditionsBar } from "../components/ConditionsBar";
 import { Thumbnail } from "../components/Thumbnail";
+import { WikiLink } from "../components/WikiLink";
 import { focusPoint, useTooltip } from "../components/Tooltip";
 import { QUANTITIES, formatP, formatT, useConditions, type ColorBy } from "../lib/conditions";
 import { fmt, pretty, signed, species } from "../lib/format";
@@ -162,6 +163,7 @@ function ScaleLegend({ colorBy, quantity, quantityLabel, conditions, entropy }: 
             {t(RUNG_LEGEND[r]!, { T: formatT(conditions.temperature), p: formatP(conditions.pressure) })}
           </span>
         ))}
+        <WikiLink page="techniques/fragmentation" anchor="verdicts" />
         {note}
       </div>
     );
@@ -201,15 +203,18 @@ function GridTable({ cells, quantity, colorBy, campaign, search, select, stale }
       <table style={{ whiteSpace: "nowrap" }}>
         <thead>
           <tr>
-            <th>{t("th.species")}</th><th>{t("grid.thGround")}</th><th>{t("th.verdict")}</th>
+            <th>{t("th.species")}</th>
+            <th><WikiLink page="foundations/spin-and-multiplicity">{t("grid.thGround")}</WikiLink></th>
+            <th><WikiLink page="techniques/fragmentation" anchor="verdicts">{t("th.verdict")}</WikiLink></th>
             {QUANTITIES.map((q) => (
               <th key={q.value} className="num">
                 <button type="button" className="column-pick" aria-pressed={q.value === quantity}
                   title={t(`q.${q.value}` as Key)} onClick={() => select(q.value)}>{q.label}</button>
               </th>
             ))}
-            <th>{t("grid.thChannel", { q: quantity === "d_g" ? "D_G" : "D_e" })}</th>
-            <th>{t("th.units")}</th><th>{t("th.pointGroup")}</th><th>{t("grid.thOther")}</th>
+            <th><WikiLink page="techniques/fragmentation">{t("grid.thChannel", { q: quantity === "d_g" ? "D_G" : "D_e" })}</WikiLink></th>
+            <th><WikiLink page="foundations/units-language-or-physics">{t("th.units")}</WikiLink></th>
+            <th><WikiLink page="techniques/point-groups">{t("th.pointGroup")}</WikiLink></th><th>{t("grid.thOther")}</th>
           </tr>
         </thead>
         <tbody>

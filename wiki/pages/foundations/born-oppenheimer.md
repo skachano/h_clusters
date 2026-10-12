@@ -49,7 +49,7 @@ vibrations, rigid rotation; see [thermochemistry](../techniques/thermochemistry.
 ### One surface for all isotopes
 
 Nuclear masses appear only in the second step. So within the Born–Oppenheimer
-approximation, H₂, HD and D₂ share **exactly the same** potential energy
+approximation, [H₂](app:s/2/0/1), HD and D₂ share **exactly the same** potential energy
 surface: the same bond length and the same well depth $D_e$. They differ only in how the nuclei move on it.
 Deuterium is twice as heavy, so it vibrates more slowly and has a smaller
 zero-point energy, which makes D₂ harder to break:

@@ -16,7 +16,7 @@ A Gaussian $e^{-\alpha r^2}$ with exponent $\alpha$ has a size of roughly
 $1/\sqrt{\alpha}$ bohr. Standard basis sets are fitted to neutral atoms;
 their smallest exponent on hydrogen is around 0.1, a size of about 3 bohr.
 A loosely bound electron, though, decays as $e^{-\kappa r}$ with
-$\kappa = \sqrt{2\,\text{EA}}$ in atomic units. For H⁻, with EA = 0.0277 hartree,
+$\kappa = \sqrt{2\,\text{EA}}$ in atomic units. For [H⁻](app:s/1/-1/1), with EA = 0.0277 hartree,
 $\kappa = 0.24$: the electron extends to about 4 bohr and beyond, well past
 what the basis can describe.
 

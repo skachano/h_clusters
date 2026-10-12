@@ -4,13 +4,22 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { useTrends, type TrendQuantity } from "../api/client";
 import { ConditionsBar } from "../components/ConditionsBar";
 import { LineChart } from "../components/charts/LineChart";
+import { WikiLink } from "../components/WikiLink";
 import { useConditions } from "../lib/conditions";
+import type { WikiPage } from "../lib/wiki";
 import { pretty, signed } from "../lib/format";
 import { CHARGE_COLOR, CHARGE_MARKER } from "../lib/scales";
 import { useT, type Key } from "../i18n";
 import { chargeLabel } from "../i18n/terms";
 
 const QUANTITIES: TrendQuantity[] = ["binding_per_atom", "d_e", "d_0", "d_g", "second_difference", "gap"];
+// The wiki page behind each quantity, where there is one.
+const QUANTITY_WIKI: Partial<Record<TrendQuantity, WikiPage>> = {
+  d_e: "techniques/fragmentation",
+  d_0: "techniques/zero-point-energy",
+  d_g: "techniques/thermochemistry",
+  gap: "methods/hartree-fock",
+};
 
 export function TrendsView() {
   const { campaign = "baseline" } = useParams();
@@ -52,7 +61,7 @@ export function TrendsView() {
         </div>
       </ConditionsBar>
       <div className={`card stack ${trends.isPlaceholderData ? "stale" : ""}`} style={{ gap: 8 }}>
-        <h2>{label(quantity)}</h2>
+        <h2>{label(quantity)}{QUANTITY_WIKI[quantity] && <WikiLink page={QUANTITY_WIKI[quantity]} />}</h2>
         <p className="hint">{t(`trend.${quantity}.about` as Key)}</p>
         {trends.isError && <p className="error">{String(trends.error)}</p>}
         {trends.data && !asTable && (

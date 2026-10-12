@@ -44,7 +44,7 @@ FCI: minimum R_e = 0.7349 Å, force constant k = 0.4771 hartree/bohr², harmonic
 
 実験の調和振動数は 4401 cm⁻¹ である。HF/STO-3G は 25 % 高すぎる。相関が欠けると結合が硬くなりすぎるのは HF のよく知られた傾向であり、小さな基底がそれに上乗せされる。aug-cc-pVTZ や def2-TZVPPD を使うこのプロジェクトのレベルははるかによい:
 
-| H₂ の調和振動数 | cm⁻¹ |
+| [H₂](app:s/2/0/1) の調和振動数 | cm⁻¹ |
 |---|---|
 | ωB97X-D4/def2-TZVPPD (L1) | 4441 |
 | RI-MP2/aug-cc-pVTZ (L1M) | 4517 |
@@ -52,9 +52,9 @@ FCI: minimum R_e = 0.7349 Å, force constant k = 0.4771 hartree/bohr², harmonic
 
 ## 例: H₃⁺ と H₅⁺
 
-H₃⁺ (L1) は 3 × 3 − 6 = 3 個のモードをもつ: **2743、2743、3368 cm⁻¹**。振動数の等しい 2 つは三角形の D₃h 対称性によって強いられた*縮退*モードであり ([点群](point-groups.md))、3368 cm⁻¹ は三角形の全対称な「呼吸」振動である。
+[H₃⁺](app:s/3/1/1) (L1) は 3 × 3 − 6 = 3 個のモードをもつ: **2743、2743、3368 cm⁻¹**。振動数の等しい 2 つは三角形の D₃h 対称性によって強いられた*縮退*モードであり ([点群](point-groups.md))、3368 cm⁻¹ は三角形の全対称な「呼吸」振動である。
 
-H₅⁺ は、振動数で構造を見分けられることを示している (`doc/Plan.md`、フェーズ 3):
+[H₅⁺](app:s/5/1/1) は、振動数で構造を見分けられることを示している (`doc/Plan.md`、フェーズ 3):
 
 | RI-MP2/aug-cc-pVTZ での H₅⁺ | 振動数 |
 |---|---|
@@ -65,11 +65,12 @@ DFT のレベルでは逆に D₂d 構造が極小になる。MP2 での D₂d �
 
 ## h_clusters での登場箇所 { #where-this-appears-in-h_clusters }
 
-- タスク `freq` と `optfreq` は `engines/orca.py` で `Freq` (解析的) か `NumFreq` (数値的、`analytic_hessian=False` のレベル用) を加える。L1 が ωB97X-D4 に切り替えられたのは解析的ヘッセ行列があるからである。H₁₀ で 231 秒、ωB97M-V の数値計算ではおよそ 2 時間かかる。
+- タスク `freq` と `optfreq` は `engines/orca.py` で `Freq` (解析的) か `NumFreq` (数値的、`analytic_hessian=False` のレベル用) を加える。L1 が ωB97X-D4 に切り替えられたのは解析的ヘッセ行列があるからである。[H₁₀](app:s/10/0/1) で 231 秒、ωB97M-V の数値計算ではおよそ 2 時間かかる。
 - 解析的ヘッセ行列の方程式 (CP-SCF) が収束しないとき、ランナーは最適化された構造から `NumFreq` で再試行する (エラー種別 `cpscf`)。
 - **鞍点は下り坂へ押し出される**: 結果に虚振動数があると、`worker/src/hclust/runner.py` の `displace_along_imaginary_mode()` が原子を最も大きな虚振動数のモードに沿って 0.1 Å 動かし (試行ごとに向きを交互に変える)、再最適化する。これで直線状の H₃⁺ の鎖が三角形になり (フェーズ 2)、MP2 の D₂d H₅⁺ 構造は 2 つとも C₂ᵥ になった (フェーズ 3)。3 回試行しても残る構造は鞍点 (`n_imag > 0`) として保存される。
 - `minima_only` や `when: minimum` のついたステージ (`campaigns/baseline.yaml`) は、虚振動数のない構造だけを次へ渡す。
 - 振動数と基準振動は結果ごとに保存される (`frequencies`、`modes`)。
+- ウェブアプリ: 各化学種ページの 3D ビューアーで基準振動をアニメーション表示できる。例: [H₃⁺](app:s/3/1/1)。
 
 ## 参考文献
 

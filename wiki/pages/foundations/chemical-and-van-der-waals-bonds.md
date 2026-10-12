@@ -16,7 +16,7 @@ what is hard in this project comes from the second kind.
 ### What counts as a van der Waals bond here
 
 In h_clusters a **unit** is a group of atoms joined by chemical bonds: an
-H₂, an H₃⁺ core, an H atom, an H⁻ ion. A van der Waals bond is the
+H₂, an H₃⁺ core, an H atom, an [H⁻](app:s/1/-1/1) ion. A van der Waals bond is the
 attraction *between* units that stay chemically intact. The code decides
 this in two ways:
 
@@ -24,7 +24,7 @@ this in two ways:
   unit; everything held together across larger gaps is a link between
   units.
 - **Bond order:** the Löwdin/Wiberg bond order counts the electron pairs
-  shared between two atoms. It is 1.00 for H₂, 0.50 for H₂⁺ and 4/9 for each
+  shared between two atoms. It is 1.00 for H₂, 0.50 for [H₂⁺](app:s/2/1/2) and 4/9 for each
   edge of H₃⁺, but nearly zero for a van der Waals contact. The 3D viewer
   draws bonds more transparent as their order falls, and the thumbnails show
   only bonds above 0.33.
@@ -39,7 +39,7 @@ this in two ways:
 | Distance | 0.74 Å (H₂), 0.87 Å (H₃⁺) | 3–3.5 Å between molecule centres |
 | Stiffness | stiff, high-frequency vibration (H₂: 4400 cm⁻¹) | very soft, large-amplitude motion |
 | Direction | a definite geometry | weakly directional: H₂ rotates almost freely in (H₂)ₖ |
-| Additivity | not additive: H₃ is not three H–H bonds | nearly pairwise additive |
+| Additivity | not additive: [H₃](app:s/3/0/2) is not three H–H bonds | nearly pairwise additive |
 
 The two energy scales differ by a factor of about a thousand, and so do the
 consequences of every approximation.
@@ -77,7 +77,7 @@ chemical binding:
    about 50 meV with H₂ pointing end-on at the ion, only about 6 meV
    averaged over orientations.
 4. **Cations H₃⁺(H₂)ₖ:** ion–molecule binding with real charge transfer;
-   the links between units have bond orders of 0.2–0.3. In H₅⁺ a proton is
+   the links between units have bond orders of 0.2–0.3. In [H₅⁺](app:s/5/1/1) a proton is
    shared between the two H₂ units, which is already partly chemical, at
    0.1–0.4 eV.
 
@@ -101,7 +101,7 @@ the weak pairs.
 
 - Units and the 1.15 Å cutoff: `worker/src/hclust/structures.py`
 - Bond orders: `worker/src/hclust/studies/bonds.py`; the per-structure bond
-  table and the 3D viewer in the web app
+  table and the 3D viewer in the [web app](app:s/5/1/1)
 - Pair potentials and their scans: `worker/src/hclust/studies/dmc.py`
 - Plan: `doc/Plan.md` §1.2 (what to expect) and the Phase 8 studies
 

@@ -47,7 +47,7 @@ From `resources:` in `campaigns/baseline.yaml` and the pilot measurements
 - **Memory: `maxcore_mb: 500`** per job (ORCA's `%maxcore`), 12 × 500 MB
   plus overhead.
 - **Timeout: 360 min**, long enough for open-shell RI-MP2 numerical
-  frequencies of H₁₀.
+  frequencies of [H₁₀](app:s/10/0/1).
 - **Scratch: `scratch_budget_gb: 150`** on `/var/tmp/hclust` (the
   `SCRATCH_DIR` mount in `compose.yaml`). Each level declares its scratch use
   at m = 10 (`scratch_gb_m10` in `levels.py`: 12.5 GB for CCSD(T), 2 GB for
@@ -85,6 +85,7 @@ data directory.
 - `SCRATCH_DIR` in `.env.example` and the `/scratch` mount in `compose.yaml`.
 - Wall time per attempt is recorded (`wall_s` in the `attempt` table): 51
   CPU-hours in the baseline so far.
+- Web app: the [Jobs](app:jobs) page shows the run times per stage and level.
 
 ## References
 

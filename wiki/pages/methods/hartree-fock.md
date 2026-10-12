@@ -7,7 +7,7 @@ Hartree–Fock (HF) is the simplest way to compute a molecule's electrons from
 first principles. Its one approximation: each electron moves in the *average*
 field of all the others, instead of reacting to where they actually are at
 each instant. That makes the problem solvable. HF recovers most of the total
-energy (96.5 % for H₂, over 99 % for molecules with heavier atoms), and it is the starting point for the more accurate
+energy (96.5 % for [H₂](app:s/2/0/1), over 99 % for molecules with heavier atoms), and it is the starting point for the more accurate
 methods (MP2, coupled cluster) in this project. DFT reuses the same
 machinery.
 
@@ -69,7 +69,7 @@ the ones that went in: a **self-consistent field** (SCF).
     In the HF energy, an electron's Coulomb repulsion with its own charge cloud
     is cancelled exactly by its own exchange term. DFT doesn't have this
     exact cancellation, and the leftover **self-interaction error** is why DFT
-    gets H₂⁺ badly wrong (`doc/Plan.md` §1.2). For a one-electron system HF has
+    gets [H₂⁺](app:s/2/1/2) badly wrong (`doc/Plan.md` §1.2). For a one-electron system HF has
     nothing to approximate, so it is exact within the basis set.
 
 ### Step 3: expand in a basis set
@@ -205,7 +205,7 @@ $$
 It is small compared with the total, but on the scale of chemistry it is
 large. For H₂ at 1.4 bohr in STO-3G it is −0.0206 hartree (−0.56 eV). In a
 complete basis it is −0.041 hartree (−1.1 eV), about a quarter of the bond
-energy. Weak binding, like H₂ molecules clustering around H₃⁺, comes almost
+energy. Weak binding, like H₂ molecules clustering around [H₃⁺](app:s/3/1/1), comes almost
 entirely from correlation (dispersion), so HF alone can't describe most of
 this project's clusters. MP2 and coupled cluster add correlation on top of
 HF.
@@ -229,7 +229,7 @@ $$
 
 RHF always mixes the two in equal amounts. Near equilibrium that is
 acceptable. At long distance, two neutral atoms should be 100 % covalent, but
-RHF stays 50 % H⁺ + H⁻, which costs a lot of energy. Full CI fixes this by
+RHF stays 50 % H⁺ + [H⁻](app:s/1/-1/1), which costs a lot of energy. Full CI fixes this by
 mixing in the doubly excited configuration $\sigma_u^2$. Since $\sigma_u
 \propto \phi_A - \phi_B$, it contains the same ionic terms but the covalent
 terms with the opposite sign, so subtracting it cancels the ionic part.

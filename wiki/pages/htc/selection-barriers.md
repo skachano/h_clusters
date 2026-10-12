@@ -5,7 +5,7 @@
 
 Most steps of a workflow act on one structure at a time: optimize this,
 compute frequencies for that. A **selection** acts on a whole group: "the
-best three structures of H₇⁺". It can't start until every member of the
+best three structures of [H₇⁺](app:s/7/1/1)". It can't start until every member of the
 group is known, so it is a **barrier**: a point where independent jobs must
 all finish before the workflow continues. Barriers are where ranking,
 deduplication and filtering happen, and where most of the workflow's
@@ -24,8 +24,8 @@ A barrier must wait for *failures* too: a job that is still retrying might
 turn out to be the best structure. "Final state" means done, dissociated or
 failed, with no retries left.
 
-Barriers are per **state** here, not global: H₃⁺'s selection doesn't wait for
-H₁₀⁻. That keeps the pool of workers busy. Small species pass their barriers
+Barriers are per **state** here, not global: [H₃⁺](app:s/3/1/1)'s selection doesn't wait for
+[H₁₀⁻](app:s/10/-1/2). That keeps the pool of workers busy. Small species pass their barriers
 early and their expensive stages start while large ones are still in
 pre-optimization.
 

@@ -5,6 +5,11 @@ calculations compute, how the methods work, and where they fail. Every page
 ties back to something the h_clusters pipeline actually does, so concepts can
 be checked against real results.
 
+The results themselves are in the [web app](app:): every species H_m^n with
+its structures, fragmentation channels and stability. Species named in these
+pages link to their page there, like [H₅⁺](app:s/5/1/1); the app links back
+here from the terms it uses.
+
 ## Sections
 
 | Section | Covers |

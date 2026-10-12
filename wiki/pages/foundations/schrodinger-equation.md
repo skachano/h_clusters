@@ -7,7 +7,7 @@ Every number this project computes is an approximate solution of one
 equation. The Schrödinger equation says which energies a system of electrons
 and nuclei can have, and what the electrons are doing in each of them. It
 can be solved exactly only for one-electron systems such as the H atom and
-H₂⁺; every method in this wiki is a different way to approximate it for
+[H₂⁺](app:s/2/1/2); every method in this wiki is a different way to approximate it for
 everything else.
 
 ## Idea
@@ -73,7 +73,7 @@ other one, so the equation doesn't split into one-electron pieces.
 |---|---|---|
 | H atom | 1 | Yes, on paper: $E_n = -\frac{1}{2n^2}$ hartree, so $E_1 = -0.5$ hartree = −13.6 eV |
 | H₂⁺ (nuclei held fixed) | 1 | Yes, numerically to any precision |
-| H₂, H⁻, H₃⁺, … | ≥ 2 | No. Only approximations, some of them very good |
+| [H₂](app:s/2/0/1), [H⁻](app:s/1/-1/1), [H₃⁺](app:s/3/1/1), … | ≥ 2 | No. Only approximations, some of them very good |
 
 ### The variational principle
 

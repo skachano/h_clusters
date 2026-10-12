@@ -63,6 +63,7 @@ stateDiagram-v2
 
 - `worker/src/hclust/runner.py` の `Runner.run`、`_recover`、`_requeue`、`requeue_failed`。コマンドは `worker/src/hclust/cli.py` にある。
 - `attempt` テーブル: ベースラインではこれまでに 2,274 回の試行が記録され、操作は `restart` (372)、`displace` (71)、`scf` (1) である。
+- ウェブアプリ: [「ジョブ」](app:jobs)ページに、失敗したジョブとその試行回数が並ぶ。
 
 ## 参考文献
 

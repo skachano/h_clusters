@@ -49,7 +49,7 @@ and it largely cancels in energy differences.
 
 ## Example: why L1M uses it
 
-From the Phase 4 pilot on H₁₀, MP2/aug-cc-pVTZ gradients on one core
+From the Phase 4 pilot on [H₁₀](app:s/10/0/1), MP2/aug-cc-pVTZ gradients on one core
 (`doc/Plan.md`, Phase 4):
 
 | MP2 gradient | Time |

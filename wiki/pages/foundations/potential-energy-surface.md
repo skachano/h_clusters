@@ -8,7 +8,7 @@ A molecule's energy depends on where its nuclei are. The **potential energy
 surface** (PES) is that function: energy versus nuclear positions. Shapes of
 molecules are its valleys, chemical reactions are paths between valleys, and
 falling apart is a slope that levels out. Almost every question this project
-asks ("what shape is H₅⁺?", "is H₃ stable?") is a question about a PES.
+asks ("what shape is [H₅⁺](app:s/5/1/1)?", "is [H₃](app:s/3/0/2) stable?") is a question about a PES.
 
 ## Idea
 
@@ -37,9 +37,9 @@ for a linear molecule).
 
 | Species | Atoms | PES dimensions |
 |---|---|---|
-| H₂ | 2 | 1 (a curve: the bond length) |
-| H₃⁺ | 3 | 3 |
-| H₁₀ | 10 | 24 |
+| [H₂](app:s/2/0/1) | 2 | 1 (a curve: the bond length) |
+| [H₃⁺](app:s/3/1/1) | 3 | 3 |
+| [H₁₀](app:s/10/0/1) | 10 | 24 |
 
 H₂ is the only case you can draw. Everything below is easiest to picture on a
 curve, then imagine in more dimensions.
@@ -181,7 +181,7 @@ even at absolute zero.
 Each combination of charge and spin multiplicity is a different set of
 electrons, so it has its own PES. Two hydrogen atoms with paired spins (the
 singlet) attract and form H₂. With parallel spins (the triplet) the curve has
-essentially no well, only a tiny van der Waals dip: the atoms repel. A "species" in this project, such as H₄⁺ in
+essentially no well, only a tiny van der Waals dip: the atoms repel. A "species" in this project, such as [H₄⁺](app:s/4/1/2) in
 the doublet state, is one surface.
 
 ## Example: the H₂ curve, computed two ways
@@ -271,6 +271,8 @@ appear or vanish.
   [point groups](../techniques/point-groups.md), names for the two shapes'
   symmetry. This is exactly why the project has more than
   one geometry level.
+- Web app: the [grid](app:?q=d_e) shows each species' weakest channel by $D_e$;
+  [switched to $D_0$](app:?q=d_0) it shows which clusters stay bound once ZPE is included.
 
 ## References
 

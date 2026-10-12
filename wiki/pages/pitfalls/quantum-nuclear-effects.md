@@ -21,7 +21,7 @@ for the weak clusters).
 Within [Born–Oppenheimer](../foundations/born-oppenheimer.md#step-two-the-nuclei),
 nuclei have their own wavefunction on the PES. A heavy nucleus has a
 compact wavefunction, close to a point at the minimum. A proton's spreads
-over a sizable region: in H₂ the ground-state bond length fluctuates by
+over a sizable region: in [H₂](app:s/2/0/1) the ground-state bond length fluctuates by
 about ±0.1 Å.
 
 Consequences that grow as the mass drops:
@@ -38,7 +38,7 @@ Consequences that grow as the mass drops:
 
 ### H₅⁺: a molecule without a structure
 
-At CCSD(T), H₅⁺'s C₂ᵥ structure (H₃⁺·H₂) is 0.13 kcal/mol below the D₂d one (a
+At CCSD(T), [H₅⁺](app:s/5/1/1)'s C₂ᵥ structure (H₃⁺·H₂) is 0.13 kcal/mol below the D₂d one (a
 proton shared by two H₂), which is the barrier for the proton to move from
 one H₂ to the other. H₅⁺'s zero-point energy is about 22 kcal/mol. The barrier
 is far below the ZPE, so the central proton isn't localized on one side: in
@@ -52,9 +52,9 @@ Split into familiar units, H₅⁺ has two standard descriptions, and the
 literature uses both:
 
 - **H₃⁺·H₂: the structure at the minimum.** The C₂ᵥ minimum is an H₂
-  attached side-on to one corner of an H₃⁺ triangle. This is how H₅⁺ appears
+  attached side-on to one corner of an [H₃⁺](app:s/3/1/1) triangle. This is how H₅⁺ appears
   as the first member of the H₃⁺(H₂)ₙ series in cluster chemistry,
-  astrochemistry and the classic infrared spectra of H₅⁺, H₇⁺ and H₉⁺: H₂
+  astrochemistry and the classic infrared spectra of H₅⁺, [H₇⁺](app:s/7/1/1) and [H₉⁺](app:s/9/1/1): H₂
   ligands added around an H₃⁺ core, with the first shell complete at H₉⁺,
   one H₂ on each corner. The project's cheapest dissociation channel agrees:
   H₅⁺ → H₃⁺ + H₂ costs 0.37 eV.
@@ -121,6 +121,7 @@ whose $j = 0$ ground state is spherical.
   [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md)).
 - Reporting both ΔE and ΔE₀, and the separate `bound_with_zpe` verdict, keep
   the harmonic ZPE's influence visible rather than hidden in one number.
+- Web app: the VPT2 and DMC studies are on the [Extensions](app:studies) page.
 
 ## References
 

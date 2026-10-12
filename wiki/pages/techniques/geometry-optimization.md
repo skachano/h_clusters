@@ -50,7 +50,7 @@ parabola is a poor model.
 
 ## Example: H₂ by Newton–Raphson
 
-[`h2_mp2_opt_freq.py`](#the-code) optimizes the toy H₂ from a stretched start,
+[`h2_mp2_opt_freq.py`](#the-code) optimizes the toy [H₂](app:s/2/0/1) from a stretched start,
 R = 2.0 bohr, with numerical derivatives. Plain Newton fails:
 
 ```text
@@ -94,7 +94,7 @@ convergence is the hallmark of Newton's method.
 ## Pitfalls
 
 - **Local, not global.** The optimizer stops in whatever valley it starts in.
-  A linear H₃⁺ chain stays linear if nothing breaks its symmetry.
+  A linear [H₃⁺](app:s/3/1/1) chain stays linear if nothing breaks its symmetry.
 - **Stuck on saddle points.** If the start has symmetry, the gradient keeps
   it, and the optimizer can converge to a saddle point. Only
   [frequencies](frequencies.md) tell.
@@ -116,7 +116,7 @@ convergence is the hallmark of Newton's method.
 - When an optimization runs out of cycles, the runner **restarts** it from
   its last geometry (`_next_action` in `worker/src/hclust/runner.py`, at most
   3 attempts). In the baseline campaign so far, 372 attempts ended in a
-  restart. In Phase 3, 16 of 21 H₅⁺ pre-optimizations needed one.
+  restart. In Phase 3, 16 of 21 [H₅⁺](app:s/5/1/1) pre-optimizations needed one.
 - Every optimized structure is stored with its parent job, so the chain from
   seed to final geometry stays traceable (`structure` table).
 

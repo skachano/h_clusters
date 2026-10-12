@@ -3,7 +3,7 @@
 !!! info "Prerequisites"
     [DFT](../methods/dft.md), [MP2](../methods/mp2.md)
 
-Two neutral, non-polar molecules such as two H₂ still attract each other
+Two neutral, non-polar molecules such as two [H₂](app:s/2/0/1) still attract each other
 weakly at long range. This **dispersion** (or London, or van der Waals)
 attraction comes from correlated motion of electrons on the two molecules.
 Hartree–Fock has no correlation, and standard DFT functionals only describe
@@ -45,7 +45,7 @@ coefficients depend on each atom's environment and charge.
 
 The plan expects neutral H_m beyond H₂ to be only weak van der Waals
 complexes of H₂ units (plus an H atom for odd m) (`doc/Plan.md` §1.2). The
-binding is tiny. In the baseline campaign at CCSD(T)/aug-cc-pVTZ, neutral H₃
+binding is tiny. In the baseline campaign at CCSD(T)/aug-cc-pVTZ, neutral [H₃](app:s/3/0/2)
 (H₂·H) lies only about 0.04 kcal/mol (under 2 meV) below H₂ + H. At RI-MP2 the complex
 is linear, with the H atom 3.32 Å from the end of the H₂. Without dispersion, such complexes don't exist: the
 fragments drift apart during optimization.

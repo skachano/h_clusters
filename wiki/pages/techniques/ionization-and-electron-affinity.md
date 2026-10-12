@@ -40,7 +40,7 @@ For single atoms adiabatic and vertical are the same.
 ### Koopmans' theorem
 
 In Hartree–Fock, $-\varepsilon_\text{HOMO}$ approximates the ionization energy,
-ignoring how the other electrons relax once one is gone. For H₂ in STO-3G it
+ignoring how the other electrons relax once one is gone. For [H₂](app:s/2/0/1) in STO-3G it
 gives 15.7 eV ([Hartree–Fock](../methods/hartree-fock.md#example-h2-from-scratch)).
 
 ## Examples from the campaign
@@ -55,11 +55,11 @@ CCSD(T)/aug-cc-pVTZ (L2):
 | EA(H): −0.499821 − (−0.526562) | 0.728 eV | 0.754 eV |
 
 The ZPE correction for H₂ uses the harmonic frequencies, 4401 cm⁻¹ (H₂) and
-2322 cm⁻¹ (H₂⁺): H₂⁺'s weaker bond vibrates more slowly, so ionizing loses
+2322 cm⁻¹ (H₂⁺): [H₂⁺](app:s/2/1/2)'s weaker bond vibrates more slowly, so ionizing loses
 half the difference, 0.13 eV. Measured ionization energies always refer to
 the vibrational ground states.
 
-**H⁻: an electron affinity that methods disagree on.** H⁻ has two electrons
+**[H⁻](app:s/1/-1/1): an electron affinity that methods disagree on.** H⁻ has two electrons
 around one proton, and the second is held only by correlation. Different
 levels give (from the H and H⁻ energies at each level):
 
@@ -75,7 +75,7 @@ DFT's [self-interaction error](../pitfalls/self-interaction-error.md) and,
 for L0, the lack of [diffuse functions](../pitfalls/diffuse-functions.md)
 both weaken the binding.
 
-**H₂⁻: a negative electron affinity.** At CCSD(T), H₂⁻ is 0.057 hartree
+**[H₂⁻](app:s/2/-1/2): a negative electron affinity.** At CCSD(T), H₂⁻ is 0.057 hartree
 (1.6 eV) *above* H₂ + a free electron. The extra electron isn't bound; real
 H₂⁻ exists only as a short-lived resonance. The calculation still returns a
 number, because a finite basis set can't let the electron escape
@@ -90,6 +90,8 @@ number, because a finite basis set can't let the electron escape
   whole species grid is computed.
 - E(H⁺) = 0 by definition (`doc/Plan.md` §1.1).
 - EA(H) is one of the Phase 1 anchor regression tests (`worker/tests/test_anchors.py`).
+- Web app: the [Extensions](app:studies) page compares vertical and
+  adiabatic electron removal.
 
 ## References
 

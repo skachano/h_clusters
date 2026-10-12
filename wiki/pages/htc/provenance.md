@@ -99,6 +99,8 @@ completed calculation kept.
   `worker/src/hclust/runner.py`; the commands in `worker/src/hclust/cli.py`.
 - The `attempt` table: 2,274 attempts recorded in the baseline so far, with
   actions `restart` (372), `displace` (71) and `scf` (1).
+- Web app: the [Jobs](app:jobs) page lists the failed jobs with their
+  attempts.
 
 ## References
 

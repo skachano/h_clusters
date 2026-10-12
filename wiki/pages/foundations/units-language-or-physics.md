@@ -4,7 +4,7 @@
     [Chemical and van der Waals bonds](chemical-and-van-der-waals-bonds.md),
     [Electrons, charge, spin and bond lengths](electrons-charges-and-bond-lengths.md)
 
-We describe clusters as made of units: (H₂)₄ is "four H₂", H₇⁺ is "H₃⁺ with
+We describe clusters as made of units: (H₂)₄ is "four [H₂](app:s/2/0/1)", [H₇⁺](app:s/7/1/1) is "[H₃⁺](app:s/3/1/1) with
 two H₂". Physics has no "unit" observable, so every such decomposition is a
 description. But some descriptions are forced on us by the physics and some
 are not. This page says how to tell them apart.
@@ -84,15 +84,15 @@ pieces cost 4.6 eV to separate. H₃⁺ is simply the unit.
 The ion clusters lie in between, and the answer degrades gradually:
 
 - **H₃⁺(H₂)ₙ:** largely physical. The H₃⁺ core keeps its identity, H₂ comes
-  off one at a time, and the shell closing at H₉⁺ appears in mass spectra.
+  off one at a time, and the shell closing at [H₉⁺](app:s/9/1/1) appears in mass spectra.
   But the links cost 0.2–0.4 eV, with real charge transfer, so the
   separation of scales is only about tenfold.
-- **H₅⁺:** two legitimate descriptions, H₃⁺·H₂ at the minimum and H₂·H⁺·H₂
+- **[H₅⁺](app:s/5/1/1):** two legitimate descriptions, H₃⁺·H₂ at the minimum and H₂·H⁺·H₂
   in the ground state, because the proton's zero-point motion crosses the
   barrier between them
   ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
   The decomposition depends on which question you ask.
-- **H₆⁺ (doublet):** "H₃⁺ + H₂ + H" (what it falls apart into) and
+- **[H₆⁺](app:s/6/1/2) (doublet):** "H₃⁺ + H₂ + H" (what it falls apart into) and
   "H₂·H₂⁺·H₂" (what its pieces resemble) are both defensible and neither is
   complete: the hole is delocalised
   ([electrons, charge, spin and bond lengths](electrons-charges-and-bond-lengths.md)).
@@ -115,9 +115,9 @@ that no unique answer exists.
   gaps (1 eV: covalent cores and ligands; 0.013 eV: ion clusters whole), and
   the count of equally good atom assignments that flags delocalisation:
   `worker/src/hclust/analysis/units.py`; the Units card and fragmentation tree
-  on each species page of the web app.
+  on each species page of the web app ([H₉⁻](app:s/9/-1/1), for example).
 - The distance-based groups (1.15 Å) and Löwdin bond orders, shown alongside.
-- An exploratory comparison with units chosen by resemblance to free H₂, H₂⁺
+- An exploratory comparison with units chosen by resemblance to free H₂, [H₂⁺](app:s/2/1/2)
   and H₃⁺ (bond lengths, spin) agreed for the neutral clusters, the anions
   and the odd cations, and disagreed for the even and high-spin cations
   (`doc/Plan.md`, Phase 8); it is not in the app.

@@ -37,7 +37,7 @@
 | cc-pVTZ | 3s2p1d | 14 |
 | aug-cc-pVTZ | 4s3p2d | 23 |
 
-したがって aug-cc-pVTZ での H₁₀ の計算には 230 個の基底関数がある。[ハートリー–フォック法のページ](hartree-fock.md#the-same-thing-in-orca)で引用した実際の三重項 H₃⁺ のジョブには 3 × 23 = 69 個ある。
+したがって aug-cc-pVTZ での [H₁₀](app:s/10/0/1) の計算には 230 個の基底関数がある。[ハートリー–フォック法のページ](hartree-fock.md#the-same-thing-in-orca)で引用した実際の三重項 [H₃⁺](app:s/3/1/3) のジョブには 3 × 23 = 69 個ある。
 
 ## 例: 水素原子 { #example-the-hydrogen-atom }
 
@@ -75,8 +75,9 @@ HF のエネルギーは基底の大きさに対して速く収束する。相�
 
 - L1 は def2-TZVPPD、L1M と L2 は aug-cc-pVTZ を使う ([RI](resolution-of-identity.md) 用の対応する補助基底も)。r²SCAN-3c (L0) は分散関数をもたない独自の小さな三重ζ基底と一体になっている。
 - 分散関数はアニオンだけでなく*すべての*化学種に使い、どの電荷状態も同じように扱われるようにしている (`doc/Plan.md` §2)。
-- 基底の大きさで答えが変わる: aug-cc-pVDZ の MP2 は H₅⁺ を D₂d に崩すが、aug-cc-pVTZ では C₂ᵥ が保たれる。
+- 基底の大きさで答えが変わる: aug-cc-pVDZ の MP2 は [H₅⁺](app:s/5/1/1) を D₂d に崩すが、aug-cc-pVTZ では C₂ᵥ が保たれる。
 - TZ → QZ → CBS の収束の調査は任意レベル L4 である (計画、フェーズ 8)。
+- ウェブアプリ: カウンターポイズ補正と基底関数の極限は[「追加計算」](app:studies)ページにある。
 
 ## 参考文献
 

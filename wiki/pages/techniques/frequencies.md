@@ -71,7 +71,7 @@ missing correlation makes bonds too stiff, a well-known HF trend, and the tiny
 basis adds more. The project's levels with aug-cc-pVTZ or def2-TZVPPD do far
 better:
 
-| H₂ harmonic frequency | cm⁻¹ |
+| [H₂](app:s/2/0/1) harmonic frequency | cm⁻¹ |
 |---|---|
 | ωB97X-D4/def2-TZVPPD (L1) | 4441 |
 | RI-MP2/aug-cc-pVTZ (L1M) | 4517 |
@@ -79,12 +79,12 @@ better:
 
 ## Example: H₃⁺ and H₅⁺
 
-H₃⁺ (L1) has 3 × 3 − 6 = 3 modes: **2743, 2743 and 3368 cm⁻¹**. The pair
+[H₃⁺](app:s/3/1/1) (L1) has 3 × 3 − 6 = 3 modes: **2743, 2743 and 3368 cm⁻¹**. The pair
 with identical frequencies is a *degenerate* mode, forced by the triangle's
 D₃h symmetry ([point groups](point-groups.md)); 3368 cm⁻¹ is the symmetric
 "breathing" of the triangle.
 
-H₅⁺ shows how frequencies tell structures apart (`doc/Plan.md`, Phase 3):
+[H₅⁺](app:s/5/1/1) shows how frequencies tell structures apart (`doc/Plan.md`, Phase 3):
 
 | H₅⁺ at RI-MP2/aug-cc-pVTZ | Frequencies |
 |---|---|
@@ -99,7 +99,7 @@ turns it into C₂ᵥ.
 
 - Tasks `freq` and `optfreq` add `Freq` (analytic) or `NumFreq` (numerical,
   for levels with `analytic_hessian=False`) in `engines/orca.py`. L1 was
-  switched to ωB97X-D4 because it has an analytic Hessian: 231 s for H₁₀,
+  switched to ωB97X-D4 because it has an analytic Hessian: 231 s for [H₁₀](app:s/10/0/1),
   against about 2 h numerically with ωB97M-V.
 - When the analytic Hessian's equations (CP-SCF) don't converge, the runner
   retries with `NumFreq` from the optimized geometry (error kind `cpscf`).
@@ -112,6 +112,8 @@ turns it into C₂ᵥ.
 - Stages with `minima_only` or `when: minimum` (`campaigns/baseline.yaml`)
   only pass on structures with no imaginary frequencies.
 - Frequencies and normal modes are stored per result (`frequencies`, `modes`).
+- Web app: the 3D viewer on each species page animates the normal modes, e.g.
+  [H₃⁺](app:s/3/1/1).
 
 ## References
 
