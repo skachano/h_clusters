@@ -18,7 +18,7 @@ const QUANTITY_WIKI: Partial<Record<TrendQuantity, WikiPage>> = {
   d_e: "techniques/fragmentation",
   d_0: "techniques/zero-point-energy",
   d_g: "techniques/thermochemistry",
-  gap: "methods/hartree-fock",
+  gap: "foundations/homo-and-lumo",
 };
 
 export function TrendsView() {

@@ -351,7 +351,7 @@ function Properties({ s }: { s: StateDetail }) {
     [t("sp.pDg", { T: s.temperature.toFixed(0), p: s.pressure.toPrecision(3) }), `${signed(s.d_g, 3, "eV")}${s.channel_g && s.channel_g !== s.channel ? ` → ${pretty(s.channel_g)}` : ""}`, "techniques/thermochemistry"],
     ...(s.charge === -1 ? [[t("sp.pDetach"), signed(s.detachment, 3, "eV"), "techniques/ionization-and-electron-affinity"] as [string, string, WikiPage]] : []),
     ...(s.charge === 0 ? [[t("sp.pIonize"), signed(s.ionization, 3, "eV"), "techniques/ionization-and-electron-affinity"] as [string, string, WikiPage]] : []),
-    ["HOMO / LUMO (HF)", `${fmt(s.homo, 2)} / ${fmt(s.lumo, 2)} eV`],
+    ["HOMO / LUMO (HF)", `${fmt(s.homo, 2)} / ${fmt(s.lumo, 2)} eV`, "foundations/homo-and-lumo"],
     ["⟨S²⟩", s.s2 == null ? "–" : `${s.s2.toFixed(3)}${s.spin_contaminated ? t("sp.pContaminated") : ""}`, "pitfalls/spin-contamination"],
     [t("sp.pShape"), `${s.point_group ?? "–"} · ${shapeName(t, s.shape)}`, "techniques/point-groups"],
     [t("sp.pRg"), fmt(s.radius_of_gyration, 2, "Å")],

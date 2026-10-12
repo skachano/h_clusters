@@ -74,6 +74,7 @@ plugins:
             Units: 単位
             Chemical and van der Waals bonds: 化学結合とファンデルワールス結合
             Electrons, charge, spin and bond lengths: 電子、電荷、スピン、結合長
+            HOMO and LUMO: HOMO と LUMO
             'Units: language or physics?': 'ユニット: 言葉か物理か'
             Hartree–Fock: ハートリー–フォック法
             Density functional theory: 密度汎関数理論
@@ -154,6 +155,7 @@ nav:
       - Potential energy surface: foundations/potential-energy-surface.md
       - Chemical and van der Waals bonds: foundations/chemical-and-van-der-waals-bonds.md
       - Electrons, charge, spin and bond lengths: foundations/electrons-charges-and-bond-lengths.md
+      - HOMO and LUMO: foundations/homo-and-lumo.md
       - 'Units: language or physics?': foundations/units-language-or-physics.md
       - Spin and multiplicity: foundations/spin-and-multiplicity.md
       - Units: foundations/units.md

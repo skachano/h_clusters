@@ -27,7 +27,7 @@ $$
 
 ### クープマンスの定理
 
-ハートリー–フォック法では $-\varepsilon_\text{HOMO}$ がイオン化エネルギーを近似する。1 個が去ったあとに他の電子が緩和することは無視している。STO-3G の [H₂](app:s/2/0/1) では 15.7 eV を与える ([ハートリー–フォック法](../methods/hartree-fock.md#example-h2-from-scratch))。
+ハートリー–フォック法では $-\varepsilon_\text{HOMO}$ がイオン化エネルギーを近似する。1 個が去ったあとに他の電子が緩和することは無視している。STO-3G の [H₂](app:s/2/0/1) では 15.7 eV を与える ([ハートリー–フォック法](../methods/hartree-fock.md#example-h2-from-scratch))。キャンペーン全体でのこの見積もりの精度: [HOMO と LUMO](../foundations/homo-and-lumo.md#examples-from-the-campaign)。
 
 ## キャンペーンからの例 { #examples-from-the-campaign }
 

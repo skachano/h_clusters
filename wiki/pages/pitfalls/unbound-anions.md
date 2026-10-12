@@ -60,7 +60,9 @@ far above H₂'s own 4401 cm⁻¹). Nothing in the individual outputs warns abou
   the unbound triplet [H⁻](app:s/1/-1/3). Bound singlet [H⁻](app:s/1/-1/1) has a negative HOMO with HF
   orbitals (−0.05 hartree at L1M and L2). DFT is less reliable here:
   [self-interaction](self-interaction-error.md) can push the HOMO of a truly
-  bound anion above zero (ωB97X-D4 gives +0.005 hartree for H⁻).
+  bound anion above zero (ωB97X-D4 gives +0.005 hartree for H⁻). The
+  campaign turns this into a flag
+  ([HOMO and LUMO](../foundations/homo-and-lumo.md#the-unbound-anion-flag)).
 - **Strong basis dependence**: the energy keeps falling as diffuse functions
   are added.
 - **Odd geometries or frequencies** unlike those of the neutral.

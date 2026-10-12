@@ -42,6 +42,7 @@ For single atoms adiabatic and vertical are the same.
 In Hartree–Fock, $-\varepsilon_\text{HOMO}$ approximates the ionization energy,
 ignoring how the other electrons relax once one is gone. For [H₂](app:s/2/0/1) in STO-3G it
 gives 15.7 eV ([Hartree–Fock](../methods/hartree-fock.md#example-h2-from-scratch)).
+How good the estimate is across the campaign: [HOMO and LUMO](../foundations/homo-and-lumo.md#examples-from-the-campaign).
 
 ## Examples from the campaign
 

@@ -10,6 +10,7 @@ import { themeParam, type Theme } from "./themeChoice";
 export const WIKI_PAGES = [
   "foundations/chemical-and-van-der-waals-bonds",
   "foundations/electrons-charges-and-bond-lengths",
+  "foundations/homo-and-lumo",
   "foundations/spin-and-multiplicity",
   "foundations/units-language-or-physics",
   "htc/method-ladder",
