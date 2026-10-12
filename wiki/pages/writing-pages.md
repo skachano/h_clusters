@@ -81,6 +81,15 @@ collapsed block):
 `[Hartree–Fock](../methods/hartree-fock.md)`. A strict build reports broken
 links.
 
+**Links into the web app** start with `app:` followed by the app's route
+without the campaign: `[H₃⁺](app:s/3/1/1)` opens the species page of H₃⁺
+(size, charge, multiplicity), `app:trends` the trends, `app:` the grid. Add
+`c/<campaign>/` for a campaign other than baseline:
+`app:c/demo/s/5/1/1`. Japanese pages open the app in Japanese. The hook
+`wiki/hooks/app_links.py` turns these into real addresses: the local dev
+server, or the app on GitHub Pages. These links are not checked, so open
+them once in the preview.
+
 ## Preview and check
 
 ```sh

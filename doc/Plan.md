@@ -1189,7 +1189,15 @@ the same structures):**
     changes D_G, a deep link loads, no request returns 404.
 - **Not included:** live recomputation at arbitrary T and p (would need the
   thermochemistry ported to TypeScript), per-file raw-output links (the
-  archive is one download), the wiki (could be published alongside later).
+  archive is one download).
+- **Later addition: the wiki on the same site.** The workflow also builds the
+  wiki (the `docs` image, `build --strict`) into `/<repo>/wiki/`, Japanese
+  under `wiki/ja/`. The two link to each other: wiki pages write
+  `[H₃⁺](app:s/3/1/1)`, which `wiki/hooks/app_links.py` turns into the app's
+  route (`APP_URL`: the dev server, or `/<repo>/#/` on Pages; Japanese pages
+  add `?lang=ja`, which the app applies and drops); the app links to pages
+  through `web/src/lib/wiki.ts` (`<WikiLink page=…/>`), whose page list a
+  Vitest test checks against `wiki/pages`.
 - **As built** (the plan above held, with these differences):
   - Export of the baseline: 14,441 files, **62.7 MB** in 2.5 min
     (`site-data.tar.gz` 7.6 MB). More than estimated: every grid and species

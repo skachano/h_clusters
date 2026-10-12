@@ -1,7 +1,8 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useCampaigns } from "./api/client";
 import { useLang, type Lang } from "./i18n";
+import { wikiUrl } from "./lib/wiki";
 
 // Each language named in itself, so a reader who cannot read the current one finds theirs.
 const LANGS: { code: Lang; label: string; name: string }[] = [
@@ -48,6 +49,14 @@ function Shell() {
   const location = useLocation();
   const [theme, setTheme] = useTheme();
   const { lang, setLang, t } = useLang();
+  // Links from the Japanese wiki carry ?lang=ja: switch, then drop it from the address.
+  const [params, setParams] = useSearchParams();
+  const asked = params.get("lang");
+  useEffect(() => {
+    if (asked === null) return;
+    if (LANGS.some((l) => l.code === asked)) setLang(asked as Lang);
+    setParams((p) => { p.delete("lang"); return p; }, { replace: true });
+  }, [asked, setLang, setParams]);
   const keep = location.search; // T, p, quantity follow you between views
   const link = (path: string) => `/c/${campaign}${path}${keep}`;
 
@@ -61,6 +70,7 @@ function Shell() {
           <NavLink to={link("/benchmark")}>{t("nav.benchmark")}</NavLink>
           <NavLink to={link("/studies")}>{t("nav.studies")}</NavLink>
           <NavLink to={link("/jobs")}>{t("nav.jobs")}</NavLink>
+          <a href={wikiUrl("index", lang)} title={t("nav.wikiTitle")}>{t("nav.wiki")}</a>
         </nav>
         {/* One group: when the row is full, these move under the navigation together instead of
             leaving the last item (the language buttons) alone on a line of its own. */}

@@ -1,4 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
+import { WIKI_PAGES, wikiUrl } from "./wiki";
 import { act, renderHook } from "@testing-library/react";
 import { useThemeVersion } from "./theme";
 import { niceExtent, ticks } from "../components/charts/frame";
@@ -180,5 +183,17 @@ describe("chart frame", () => {
   it("pads an extent to ticks and includes zero", () => {
     expect(niceExtent([0.3, 4.6], 0)).toEqual([0, 5]);
     expect(niceExtent([-2.45, -2.3], 0, 4)).toEqual([-3, 0]);
+  });
+});
+
+describe("wiki links", () => {
+  it("point at pages that exist in both languages", () => {
+    const pages = resolve(__dirname, "../../../wiki/pages");
+    for (const page of WIKI_PAGES)
+      for (const suffix of [".md", ".ja.md"]) expect(existsSync(`${pages}/${page}${suffix}`), `${page}${suffix}`).toBe(true);
+  });
+  it("follow MkDocs' directory URLs, Japanese under ja/", () => {
+    expect(wikiUrl("index", "en", undefined, "/h_clusters/wiki/")).toBe("/h_clusters/wiki/");
+    expect(wikiUrl("methods/basis-sets", "ja", "names", "/w/")).toBe("/w/ja/methods/basis-sets/#names");
   });
 });

@@ -7,6 +7,10 @@ validation:
 # Snippets and charts included from here; rebuild the live preview when they change.
 watch:
   - examples
+  - hooks
+# `app:` links open the web app (see "Writing pages").
+hooks:
+  - hooks/app_links.py
 
 theme:
   name: material
@@ -54,6 +58,7 @@ plugins:
             Pitfalls: 落とし穴
             High-throughput computing: ハイスループット計算
             Writing pages: ページの書き方
+            Open the app: アプリを開く
             Schrödinger equation: シュレーディンガー方程式
             Born–Oppenheimer approximation: ボルン–オッペンハイマー近似
             Potential energy surface: ポテンシャルエネルギー曲面
@@ -181,3 +186,4 @@ nav:
       - Selection barriers: htc/selection-barriers.md
       - Resource budgeting: htc/resource-budgeting.md
   - Writing pages: writing-pages.md
+  - Open the app: "app:"

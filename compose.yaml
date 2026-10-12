@@ -50,6 +50,7 @@ services:
     volumes:
       - ./web:/app
       - ./api/openapi.json:/api/openapi.json:ro  # npm run gen:api reads ../api/openapi.json
+      - ./wiki/pages:/wiki/pages:ro  # the tests check that the app's wiki links exist
       - /app/node_modules  # the image's, not the host's
     ports:
       - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-5173}:5173"

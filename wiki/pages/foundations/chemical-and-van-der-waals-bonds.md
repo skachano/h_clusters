@@ -4,8 +4,8 @@
     [Potential energy surface](potential-energy-surface.md),
     [Missing dispersion](../pitfalls/dispersion.md)
 
-Hydrogen clusters contain two very different kinds of "bond". Inside H₂ or
-H₃⁺ the atoms share electrons: a **chemical (covalent) bond**, worth
+Hydrogen clusters contain two very different kinds of "bond". Inside [H₂](app:s/2/0/1) or
+[H₃⁺](app:s/3/1/1) the atoms share electrons: a **chemical (covalent) bond**, worth
 electronvolts. Between whole H₂ molecules nothing is shared, and the units
 are held together only by the weak attraction of their separate electron
 clouds: a **van der Waals bond**, about a thousand times weaker. Most of

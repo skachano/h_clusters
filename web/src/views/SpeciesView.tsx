@@ -6,6 +6,7 @@ import { fetchApi, useBonds, useModes, useStateDetail, type BondsOut, type State
 import { ConditionsBar, Segmented } from "../components/ConditionsBar";
 import { MoleculeViewer } from "../components/MoleculeViewer";
 import { RawFiles } from "../components/RawFiles";
+import { WikiLink } from "../components/WikiLink";
 import { DivergingBars } from "../components/charts/DivergingBars";
 import { LevelDiagram } from "../components/charts/LevelDiagram";
 import { useConditions } from "../lib/conditions";
@@ -159,7 +160,7 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
           <h2>{t("sp.isomersAndSpins")}</h2>
           <div className="row" style={{ gap: 24 }}>
             <div style={{ flex: "1 1 340px", minWidth: 0 }}>
-              <h3>{t("sp.isomers")}</h3>
+              <h3>{t("sp.isomers")}<WikiLink page="techniques/structure-search" /></h3>
               {/* one line per cell: in a narrow column Japanese would break between every character */}
               <div className="table-wrap"><table style={{ whiteSpace: "nowrap" }}>
                 <thead><tr><th className="num">ΔE (eV)</th><th>{t("th.groups")}</th><th>{t("th.pointGroup")}</th><th>{t("sp.geometry")}</th><th><span className="sr-only">{t("view.label")}</span></th></tr></thead>
@@ -229,7 +230,7 @@ function Channels({ s }: { s: StateDetail }) {
     <div className="card stack" style={{ gap: 10 }}>
       <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-end" }}>
         <div>
-          <h2>{t("sp.channels")}</h2>
+          <h2>{t("sp.channels")}<WikiLink page="techniques/fragmentation" /></h2>
           <p className="hint">{t("sp.channelsHint")}</p>
         </div>
         <Segmented<ChannelQ> label={t("sp.energy")} value={q} onChange={setQ}
@@ -283,7 +284,7 @@ function FragmentTree({ s }: { s: StateDetail }) {
   return (
     <div className="card stack" style={{ gap: 10 }}>
       <div>
-        <h2>{t("sp.tree")}</h2>
+        <h2>{t("sp.tree")}<WikiLink page="techniques/fragmentation" /></h2>
         <p className="hint">{t("sp.treeHint")}</p>
       </div>
       {root ? <TreeNode label={root} tree={tree} open /> : <p className="muted">{t("sp.noChannels")}</p>}
@@ -382,7 +383,7 @@ function NoStructure({ s }: { s: StateDetail }) {
   return (
     <div className="card">
       <h2>{t("sp.noStructure")}</h2>
-      <p className="lede">{why}</p>
+      <p className="lede">{why}{s.verdict === "unbound_electron" && <WikiLink page="pitfalls/unbound-anions" />}</p>
     </div>
   );
 }

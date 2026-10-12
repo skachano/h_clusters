@@ -1,11 +1,12 @@
 # Static site on GitHub Pages (doc/Plan.md, Phase 9): the web app built in static mode, plus
-# the data exported by scripts/publish-data.sh into the newest "data-*" release.
+# the data exported by scripts/publish-data.sh into the newest "data-*" release, plus the
+# wiki under /<repo>/wiki/ (Japanese under wiki/ja/).
 name: Pages
 
 on:
   push:
     branches: [main]
-    paths: ["web/**", ".github/workflows/pages.yml"]
+    paths: ["web/**", "wiki/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -59,6 +60,16 @@ jobs:
           npm run build
           tar -xzf /tmp/site-data.tar.gz -C dist
           test -f dist/data/manifest.json
+
+      # The docs image of compose.yaml (pinned MkDocs Material + i18n). Its app: links point
+      # at the app's hash routes on this site.
+      - name: Build the wiki
+        if: steps.data.outputs.tag != ''
+        run: |
+          docker build -t hclust-docs wiki
+          docker run --rm -e APP_URL=/${{ github.event.repository.name }}/#/ \
+            -v "$PWD/wiki:/docs" -v "$PWD/web/dist:/out" hclust-docs build --strict -d /out/wiki
+          test -f web/dist/wiki/index.html && test -f web/dist/wiki/ja/index.html
 
       - uses: actions/configure-pages@v5
         if: steps.data.outputs.tag != ''

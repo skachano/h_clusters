@@ -2,6 +2,8 @@
 import { useParams } from "react-router-dom";
 import { useStudies, useStudy } from "../api/client";
 import { pretty } from "../lib/format";
+import { type WikiPage } from "../lib/wiki";
+import { WikiLink } from "../components/WikiLink";
 import { en } from "../i18n/en";
 import { useT, type Key, type T } from "../i18n";
 import { verdictLabel } from "../i18n/terms";
@@ -54,6 +56,18 @@ function cell(value: unknown, t: T): string {
   return pretty(String(value));
 }
 
+// The wiki page that explains what each study computes.
+const STUDY_WIKI: Record<string, WikiPage> = {
+  vertical: "techniques/ionization-and-electron-affinity",
+  counterpoise: "methods/basis-sets",
+  anharmonic: "techniques/zero-point-energy",
+  bonds: "foundations/chemical-and-van-der-waals-bonds",
+  basis: "methods/basis-sets",
+  dmc: "methods/diffusion-monte-carlo",
+  dmc_anions: "methods/diffusion-monte-carlo",
+  barriers: "techniques/transition-states",
+};
+
 function StudyCard({ campaign, name }: { campaign: string; name: string }) {
   const study = useStudy(campaign, name);
   const t = useT();
@@ -70,7 +84,7 @@ function StudyCard({ campaign, name }: { campaign: string; name: string }) {
   const columns = [...Object.keys(spec).filter((k) => keys.includes(k)), ...keys.filter((k) => !(k in spec))];
   return (
     <section className="card stack" style={{ gap: 8 }} aria-labelledby={`study-${name}`}>
-      <h2 id={`study-${name}`}>{title}</h2>
+      <h2 id={`study-${name}`}>{title}{STUDY_WIKI[name] && <WikiLink page={STUDY_WIKI[name]} />}</h2>
       {about && <p className="hint" style={{ maxWidth: "80ch" }}>{about}</p>}
       {study.isError && <p className="error">{String(study.error)}</p>}
       {rows.length > 0 && (
