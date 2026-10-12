@@ -114,7 +114,7 @@ phase-space theory predicts such branching ratios.
 To find barriers, compute the minimum-energy path: relaxed scans along the
 leaving fragment's distance, or a nudged-elastic-band (NEB) search between
 the cluster and the separated products, with accurate single points along
-the way.
+the way ([transition states and barriers](transition-states.md)).
 
 ## Example: H₅⁺
 

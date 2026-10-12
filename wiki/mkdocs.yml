@@ -77,6 +77,7 @@ plugins:
             Global structure search: 大域的構造探索
             Point groups and symmetry: 点群と対称性
             Fragmentation channels: 解離チャネル
+            Transition states and barriers: 遷移状態と障壁
             Ionization energy and electron affinity: イオン化エネルギーと電子親和力
             Self-interaction error: 自己相互作用誤差
             Missing dispersion: 分散力の欠如
@@ -162,6 +163,7 @@ nav:
       - Global structure search: techniques/structure-search.md
       - Point groups and symmetry: techniques/point-groups.md
       - Fragmentation channels: techniques/fragmentation.md
+      - Transition states and barriers: techniques/transition-states.md
       - Ionization energy and electron affinity: techniques/ionization-and-electron-affinity.md
   - Pitfalls:
       - pitfalls/index.md

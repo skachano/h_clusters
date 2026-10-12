@@ -9,4 +9,5 @@
 - [大域的構造探索](structure-search.md): テンプレート、ランダムな初期構造、指紋、解離
 - [点群と対称性](point-groups.md): D₃h、C₂ᵥ、D₂d。縮退した振動、対称数
 - [解離チャネル](fragmentation.md): 最も弱い壊れ方と安定性の判定
+- [遷移状態と障壁](transition-states.md): NEB、鞍点、IRC。出ていく道が生成物より高く登るとき
 - [イオン化エネルギーと電子親和力](ionization-and-electron-affinity.md): 電子を失うこと、得ること
