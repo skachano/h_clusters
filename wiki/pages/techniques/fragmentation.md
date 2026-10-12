@@ -67,6 +67,55 @@ flowchart LR
 - `bound`: $D_\text{min} > 0$.
 - `bound_with_zpe`: $D_{0,\min} > 0$ as well.
 
+### Products versus process: rearrangement and barriers
+
+A channel's $D_e$ compares two end points: the cluster at its minimum and
+the products, each relaxed to its own minimum.
+
+**Rearrangement is already included, and it lowers the cost.** Energy does
+not depend on the path, so however the atoms rearrange on the way out, only
+the end points count. Relaxing into the products' own structures always
+releases energy compared with pulling the pieces apart frozen:
+
+$$
+D_\text{frozen} = D_e + E_\text{relaxation} \;\ge\; D_e
+$$
+
+$D_e$ (and $D_0$, with zero-point energies at the relaxed minima) is the
+*adiabatic* cost, already credited with that relaxation. For H₆⁺ → H₅⁺ + H,
+where an H₃⁺ triangle must form that the cluster does not contain, the frozen
+cost would be much larger than the 0.30 eV of $D_e$.
+
+**What $D_e$ misses: a barrier on the way out.** If the minimum-energy path
+rises above the products' energy (a *reverse barrier*), the real threshold is
+the top of the path:
+
+$$
+E_\text{threshold} = \max\big(D_e,\ E_\text{TS} - E_\text{cluster}\big)
+$$
+
+"Which decomposition is cheapest to *achieve*" is the channel with the
+lowest threshold, not the lowest $D_e$; collision-induced dissociation
+experiments measure exactly these thresholds.
+
+- **No barrier:** ion–molecule and van der Waals splits, such as
+  H₃⁺(H₂)ₙ → H₃⁺(H₂)ₙ₋₁ + H₂. The products attract all the way out and
+  nothing has to rearrange, so the threshold equals $D_0$.
+- **Possibly a barrier:** splits that need rearrangement. For H₆⁺ → H₅⁺ + H
+  none is expected: the reverse resembles H₂⁺ + H₂ → H₃⁺ + H, the barrierless
+  ion–molecule reaction that forms H₃⁺ in interstellar clouds. That is an
+  expectation, not a calculation.
+
+**Thresholds are not the whole story either.** Just above threshold the
+cheapest channel dominates; at higher energies, a channel whose transition
+region is "loose" (more floppy states) can outcompete it. RRKM or
+phase-space theory predicts such branching ratios.
+
+To find barriers, compute the minimum-energy path: relaxed scans along the
+leaving fragment's distance, or a nudged-elastic-band (NEB) search between
+the cluster and the separated products, with accurate single points along
+the way.
+
 ## Example: H₅⁺
 
 CCSD(T)/aug-cc-pVTZ energies from the baseline campaign (lowest structure of
@@ -95,6 +144,9 @@ finished too.
 - The cation channels are the source of the odd–even alternation expected in
   §1.2: H₅⁺, H₇⁺, H₉⁺ (an H₃⁺ core plus H₂ units) should be more stable than
   their even neighbours.
+- The fragmentation tree and the units built on it (`analysis/units.py`)
+  use $D_e$ and so assume every channel is barrierless; no dissociation
+  path has been computed yet.
 - The *structural* check that a single optimized structure hasn't fallen
   apart is separate: the 3.5 Å contact cutoff in
   [structure search](structure-search.md#how-this-project-does-it).
@@ -103,4 +155,6 @@ finished too.
 
 - M. Okumura, L. I. Yeh, Y. T. Lee, *J. Chem. Phys.* **88**, 79 (1988):
   infrared spectra of H₃⁺(H₂)ₙ clusters.
+- T. Baer, W. L. Hase, *Unimolecular Reaction Dynamics: Theory and
+  Experiments* (Oxford, 1996): thresholds, RRKM and phase-space theory.
 - `doc/Plan.md` §1 (question 3) and §2.2.

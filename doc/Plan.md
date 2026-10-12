@@ -1120,6 +1120,14 @@ the same structures):**
   - Web: the grid's units are the 1 eV ones; the species page has a Units
     card (both levels, atoms per unit, delocalisation) and the fragmentation
     tree; the isomer table keeps the distance groups ("bonded").
+  - Exploratory, not in the app (`data/_match.py`): units chosen by
+    resemblance to free H, H⁺, H⁻, H₂, H₂⁺, H₃⁺ (bond lengths first, then
+    spin, charge, and bond order cut between units; weights chosen by hand).
+    Agrees with the 1 eV units for the neutral clusters, the anions and the
+    odd cations; the even and high-spin cations match an H₂⁺ core instead
+    (H₆⁺ (2) = H₂·H₂⁺·H₂, the textbook picture). Scores have a gap only
+    between the neutral clusters (≤ 0.44) and all ions (3.3–10.8), so there
+    is no natural cutoff for "one delocalised unit".
 - Not done (still open): multiplicities `all_upto: 3`, framework port,
   bigger m, per-atom/per-bond energy decomposition (LED/EDA).
 
