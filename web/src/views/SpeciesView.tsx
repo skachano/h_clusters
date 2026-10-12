@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchApi, useBonds, useModes, useStateDetail, type BondsOut, type StateDetail } from "../api/client";
-import { ConditionsBar, Segmented } from "../components/ConditionsBar";
+import { fetchApi, useBonds, useModes, useStateDetail, type BondsOut, type Conditions, type StateDetail } from "../api/client";
+import { ConditionSliders, ConditionsBar, Segmented } from "../components/ConditionsBar";
 import { MoleculeViewer } from "../components/MoleculeViewer";
 import { RawFiles } from "../components/RawFiles";
 import { WikiLink } from "../components/WikiLink";
@@ -57,12 +57,14 @@ export function SpeciesView() {
       <ConditionsBar conditions={conditions} update={update} />
       {detail.isError && <p className="error">{t("sp.error", { error: String(detail.error) })}</p>}
       {detail.isPending && <p className="loading">{t("common.loading")}</p>}
-      {s && <Detail s={s} stale={detail.isPlaceholderData} />}
+      {s && <Detail s={s} stale={detail.isPlaceholderData} conditions={conditions} update={update} />}
     </div>
   );
 }
 
-function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
+type Update = (changes: Record<string, string | number | null>) => void;
+
+function Detail({ s, stale, conditions, update }: { s: StateDetail; stale: boolean; conditions: Conditions; update: Update }) {
   const [structureId, setStructureId] = useState<number | null>(s.structure_id ?? null);
   useEffect(() => setStructureId(s.structure_id ?? null), [s.structure_id]);
   const isomer = s.isomers.find((i) => i.structure_id === structureId) ?? s.isomers[0];
@@ -156,7 +158,7 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
       </div>
 
       <div className="cols-2">
-        <Channels s={s} />
+        <Channels s={s} conditions={conditions} update={update} />
         <div className="card stack" style={{ gap: 10 }}>
           <h2>{t("sp.isomersAndSpins")}</h2>
           <div className="row" style={{ gap: 24 }}>
@@ -222,7 +224,7 @@ function distinctIsomers(isomers: Isomer[]): { isomer: Isomer; count: number }[]
   return [...groups.values()];
 }
 
-function Channels({ s }: { s: StateDetail }) {
+function Channels({ s, conditions, update }: { s: StateDetail; conditions: Conditions; update: Update }) {
   const [q, setQ] = useState<ChannelQ>("d_e");
   const t = useT();
   const bars = s.channels.map((c) => ({ key: c.split, label: c.split, sublabel: c.limit !== c.split ? c.limit : undefined, value: c[q] ?? null }));
@@ -234,8 +236,15 @@ function Channels({ s }: { s: StateDetail }) {
           <h2>{t("sp.channels")}<WikiLink page="techniques/fragmentation" /></h2>
           <p className="hint">{t("sp.channelsHint")}</p>
         </div>
-        <Segmented<ChannelQ> label={t("sp.energy")} value={q} onChange={setQ}
-          options={[{ value: "d_e", label: "D_e" }, { value: "d_0", label: "D₀" }, { value: "d_g", label: "D_G" }]} />
+        <div className="stack" style={{ gap: 10, alignItems: "flex-start" }}>
+          <Segmented<ChannelQ> label={t("sp.energy")} value={q} onChange={setQ}
+            options={[{ value: "d_e", label: "D_e" }, { value: "d_0", label: "D₀" }, { value: "d_g", label: "D_G" }]} />
+          {q === "d_g" && (
+            <div className="row" style={{ alignItems: "flex-end", gap: "12px 20px" }}>
+              <ConditionSliders conditions={conditions} update={update} idPrefix="channels-" />
+            </div>
+          )}
+        </div>
       </div>
       {bars.length ? <DivergingBars bars={bars} unit="eV" highlight={weakest?.key} /> : <p className="muted">{t("sp.noChannels")}</p>}
     </div>

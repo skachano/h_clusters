@@ -112,26 +112,36 @@ describe("GridView", () => {
     expect(screen.getByText(/D_G \(eV\): falls apart/)).toBeInTheDocument(); // value legend
   });
 
-  it("the verdict follows the selected D, and T and p dim when they do not matter", async () => {
+  it("the verdict follows the selected D, and T and p hide when they do not matter", async () => {
     const { unmount } = renderAt("/c/mini?q=d_e");
     await screen.findByRole("gridcell", { name: /^H3\+ \(1\): bound \(D_e > 0\)/ });
-    expect(document.getElementById("temperature")?.closest(".control")).toHaveClass("dim");
+    expect(document.getElementById("temperature")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Reset" })).not.toBeInTheDocument();
     unmount();
     renderAt("/c/mini?q=d_g&T=20&p=0.001");
     await screen.findByRole("gridcell", { name: /^H3\+ \(1\): holds together at T and p/ });
     expect(screen.getByText("holds together at 20.0 K, 1.0e-3 atm (D_G > 0)")).toBeInTheDocument();
-    expect(document.getElementById("temperature")?.closest(".control")).not.toHaveClass("dim");
+    expect(document.getElementById("temperature")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    expect(await screen.findByText("holds together at 298 K, 1.00 atm (D_G > 0)")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reset" })).toBeDisabled();
   });
 
-  it("the table shows every D, follows both switches, and picks D from its headings", async () => {
-    renderAt("/c/mini?q=d_e&color=value");
+  it("the table shows every D, coloured, with only T and p, and picks D from its headings", async () => {
+    renderAt("/c/mini?q=d_e");
     await screen.findByRole("gridcell", { name: /^H3\+/ });
     fireEvent.click(screen.getByRole("button", { name: "Table" }));
+    expect(screen.queryByRole("group", { name: "Colour by" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Dissociation energy" })).not.toBeInTheDocument();
+    expect(document.getElementById("temperature")).toBeInTheDocument(); // D_H, D_G need T and p
+    expect(document.getElementById("pressure")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Colour key")).not.toBeInTheDocument();
     const table = screen.getByRole("table");
     expect(within(table).getByRole("button", { name: "D_e" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(table).getByText("bound (D_e > 0)")).toBeInTheDocument();
+    expect(within(table).getByText("bound (D_e > 0)")).toHaveStyle({ background: "var(--ord-2)" });
     expect(within(table).getByLabelText("D_e 0.169 eV")).toHaveStyle({ background: "var(--div-pos-2)" });
-    expect(within(table).getAllByText("+0.150").length).toBeGreaterThan(0); // D_G alongside
+    expect(within(table).getAllByText("+0.150")[0]).toHaveStyle({ background: "var(--div-pos-2)" }); // D_G coloured too
 
     fireEvent.click(within(table).getByRole("button", { name: "D_G" }));
     expect(await within(table).findByText("holds together at T and p (D_G > 0)")).toBeInTheDocument();
@@ -174,6 +184,16 @@ describe("SpeciesView", () => {
     expect(atoms.getAllByText("+0.333")).toHaveLength(3);
     expect(atoms.getAllByText("0.888")).toHaveLength(3); // 2 × 0.444
     expect(atoms.queryByText("Spin")).toBeNull(); // closed shell
+  });
+
+  it("the channels card shows T and p only for D_G", async () => {
+    renderAt("/c/mini/s/3/1/1");
+    const card = within((await screen.findByText("Ways to fall apart")).closest(".card") as HTMLElement);
+    expect(document.getElementById("channels-temperature")).toBeNull();
+    fireEvent.click(card.getByRole("button", { name: "D_G" }));
+    expect(document.getElementById("channels-temperature")).toBeInTheDocument();
+    expect(document.getElementById("channels-pressure")).toBeInTheDocument();
+    expect(card.getByRole("button", { name: "Reset" })).toBeDisabled();
   });
 });
 

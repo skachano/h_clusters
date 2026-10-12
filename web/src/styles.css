@@ -206,8 +206,12 @@ select {
   background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 5px 8px;
 }
 .hint { font-size: 12px; color: var(--text-muted); }
-.control.dim { opacity: 0.5; }
-.control.dim:hover, .control.dim:focus-within { opacity: 0.8; }
+button.reset {
+  background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px;
+  cursor: pointer; color: var(--text-secondary);
+}
+button.reset:hover:not(:disabled) { background: var(--surface-2); color: var(--text-primary); }
+button.reset:disabled { opacity: 0.5; cursor: default; }
 th button.column-pick {
   font: inherit; color: var(--text-secondary); background: none; border: 1px solid transparent;
   border-radius: 6px; padding: 2px 6px; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px;
@@ -217,7 +221,6 @@ th button.column-pick[aria-pressed="true"] {
   color: var(--text-primary); background: var(--surface-2); font-weight: 600; text-decoration: none;
 }
 td.picked { font-weight: 600; }
-.verdict-cell { display: inline-flex; align-items: center; gap: 6px; }
 
 /* tables */
 table { border-collapse: collapse; width: 100%; }

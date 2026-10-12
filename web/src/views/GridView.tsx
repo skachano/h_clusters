@@ -26,6 +26,15 @@ export function GridView() {
 
   const cells = new Map<string, GridCell>();
   for (const c of grid.data?.cells ?? []) cells.set(`${c.m},${c.charge}`, c);
+  const viewSwitch = (
+    <div className="control">
+      <span className="label">{t("view.label")}</span>
+      <div className="segmented" role="group" aria-label={t("view.label")}>
+        <button type="button" aria-pressed={!asTable} onClick={() => setAsTable(false)}>{t("view.grid")}</button>
+        <button type="button" aria-pressed={asTable} onClick={() => setAsTable(true)}>{t("view.table")}</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="stack">
@@ -35,17 +44,14 @@ export function GridView() {
           {t("grid.ledeBefore")}H<sub>m</sub><sup>n</sup>{t("grid.ledeAfter")}
         </p>
       </div>
-      <ConditionsBar conditions={conditions} quantity={quantity} colorBy={colorBy} update={update}>
-        <div className="control">
-          <span className="label">{t("view.label")}</span>
-          <div className="segmented" role="group" aria-label={t("view.label")}>
-            <button type="button" aria-pressed={!asTable} onClick={() => setAsTable(false)}>{t("view.grid")}</button>
-            <button type="button" aria-pressed={asTable} onClick={() => setAsTable(true)}>{t("view.table")}</button>
-          </div>
-        </div>
-      </ConditionsBar>
-      <ScaleLegend colorBy={colorBy} quantity={quantity} quantityLabel={qLabel} conditions={conditions}
-        entropy={quantity === "d_h" && (grid.data?.cells ?? []).some((c) => c.ground && entropyLimited(c.ground, quantity))} />
+      {/* The table shows every D and both colourings at once, so it keeps only T and p (for D_H and D_G). */}
+      {asTable ? <ConditionsBar conditions={conditions} update={update}>{viewSwitch}</ConditionsBar> : (
+        <>
+          <ConditionsBar conditions={conditions} quantity={quantity} colorBy={colorBy} update={update}>{viewSwitch}</ConditionsBar>
+          <ScaleLegend colorBy={colorBy} quantity={quantity} quantityLabel={qLabel} conditions={conditions}
+            entropy={quantity === "d_h" && (grid.data?.cells ?? []).some((c) => c.ground && entropyLimited(c.ground, quantity))} />
+        </>
+      )}
 
       {grid.isError && <p className="error">{t("grid.error", { error: String(grid.error) })}</p>}
       {grid.isPending && <p className="loading">{t("common.loading")}</p>}
@@ -69,7 +75,7 @@ export function GridView() {
         </div>
       )}
       {grid.data && asTable && (
-        <GridTable cells={grid.data.cells} quantity={quantity} colorBy={colorBy} campaign={campaign} search={search}
+        <GridTable cells={grid.data.cells} quantity={quantity} campaign={campaign} search={search}
           select={(q) => update({ q })} stale={grid.isPlaceholderData} />
       )}
       {tip.node}
@@ -192,12 +198,13 @@ function ScaleLegend({ colorBy, quantity, quantityLabel, conditions, entropy }: 
   );
 }
 
-function GridTable({ cells, quantity, colorBy, campaign, search, select, stale }: {
-  cells: GridCell[]; quantity: Quantity; colorBy: ColorBy; campaign: string; search: string;
+function GridTable({ cells, quantity, campaign, search, select, stale }: {
+  cells: GridCell[]; quantity: Quantity; campaign: string; search: string;
   select: (q: Quantity) => void; stale: boolean;
 }) {
   const t = useT();
   const qLabel = QUANTITIES.find((q) => q.value === quantity)?.label ?? quantity;
+  const entropy = quantity === "d_h" && cells.some((c) => c.ground && entropyLimited(c.ground, quantity));
   return (
     <div className={`card table-wrap ${stale ? "stale" : ""}`}>
       <table style={{ whiteSpace: "nowrap" }}>
@@ -227,11 +234,8 @@ function GridTable({ cells, quantity, colorBy, campaign, search, select, stale }
               <tr key={`${c.m},${c.charge}`}>
                 <td>{species(c.m, c.charge)}</td>
                 <td><Link to={`/c/${campaign}/s/${c.m}/${c.charge}/${g.mult}${search ? `?${search}` : ""}`}>{pretty(g.label)}</Link></td>
-                <td>
-                  <span className="verdict-cell">
-                    {colorBy === "verdict" && <span className="swatch" style={{ background: VERDICT_FILL[r], border: "1px solid var(--border)" }} />}
-                    {verdictLabel(t, r)}{entropyLimited(g, quantity) ? " *" : ""}
-                  </span>
+                <td style={{ background: VERDICT_FILL[r], color: VERDICT_INK[r] }}>
+                  {verdictLabel(t, r)}{entropyLimited(g, quantity) ? " *" : ""}
                 </td>
                 {QUANTITIES.map((q) => {
                   const v = g[q.value];
@@ -240,7 +244,7 @@ function GridTable({ cells, quantity, colorBy, campaign, search, select, stale }
                   return (
                     <td key={q.value} className={`num${picked ? " picked" : ""}`}
                       aria-label={picked ? `${qLabel} ${fmt(v, 3, "eV")}` : undefined}
-                      style={picked && colorBy === "value" ? { background: step.fill, color: step.ink } : undefined}>
+                      style={{ background: step.fill, color: step.ink }}>
                       {signed(v, 3)}
                     </td>
                   );
@@ -254,7 +258,7 @@ function GridTable({ cells, quantity, colorBy, campaign, search, select, stale }
           })}
         </tbody>
       </table>
-      <p className="hint" style={{ position: "sticky", left: 0, margin: "8px 0 0" }}>{t("grid.tableCaption")}</p>
+      <p className="hint" style={{ position: "sticky", left: 0, margin: "8px 0 0" }}>{t("grid.tableCaption")}{entropy ? ` ${t("legend.entropy")}` : ""}</p>
     </div>
   );
 }
