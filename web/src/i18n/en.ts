@@ -313,6 +313,9 @@ export const en = {
   "st.dmc": "Quantum nuclear motion: diffusion Monte Carlo",
   "st.dmc.about":
     "Are the neutral van der Waals clusters bound once the nuclei move quantum mechanically? Each H₂ is a rigid sphere (para-H₂, J = 0) and the potential a sum of isotropic H₂–H₂ and H–H₂ pair potentials from our own counterpoise-corrected CCSD(T)/aug-cc-pVTZ scans. DMC gives the exact ground state on that potential, so the quantum D₀ replaces the harmonic estimate; the dimers are solved exactly (DMC as a check). Every cluster is also solved on a potential 10 % shallower: “bound” must survive it, otherwise “at threshold”. The walker spread is a convergence diagnostic (it keeps growing when a cluster falls apart), not the cluster size. Left out: H₂ anisotropy beyond the average, three-body forces.",
+  "st.dmc_anions": "Quantum nuclear motion of the anions H⁻(H₂)ₖ",
+  "st.dmc_anions.about":
+    "The singlet anions H₃⁻–H₉⁻ are bound in D_e but not after harmonic ZPE, like the neutral clusters. Here the H₂ units are rigid rotors: the ion's pull on the H₂ quadrupole makes the H⁻–H₂ well about 50 meV deep end-on but only 6 meV averaged over orientations, so H₂ rotation cannot be averaged away. Potential: CCSD(T)/aug-cc-pVTZ counterpoise scans of H⁻–H₂ (distance and angle; its Legendre components V₀, V₂, V₄), the neutral study's H₂–H₂ curve, and a three-body term tabulated from CCSD(T) on H⁻(H₂)₂ over distance, angle and H₂ orientation (attractive end-on, repulsive side-on). H₃⁻ is solved exactly (coupled channels; DMC as a check). CCSD(T) at the model's minima shows pairs alone underbind the larger anions and pairs plus three-body overbind them by 4–14 % (four-body terms are repulsive), so D₀ is bracketed by DMC with and without the three-body term; “bound” must hold for both and on a 10 % shallower well. “D₀, H₂ as spheres” is the isotropic model of the neutral study, for comparison.",
   "col.state": "State",
   "col.kind": "Kind",
   "col.vertical_ev": "Vertical (eV)",
@@ -357,9 +360,16 @@ export const en = {
   "col.dmc_verdict": "Quantum verdict",
   "col.method": "Method",
   "col.dmc_check_mev": "D₀ DMC check (meV)",
+  "col.total_model_mev": "Total binding, model (meV)",
+  "col.total_ccsdt_mev": "Total binding, CCSD(T) (meV)",
+  "col.three_body_mev": "Three-body (meV)",
+  "col.d0_isotropic_mev": "D₀, H₂ as spheres (meV)",
+  "col.d0_pairs_only_mev": "D₀, pairs only (meV)",
   "dmcv.bound": "bound",
   "dmcv.threshold": "at threshold",
   "dmcv.unbound": "unbound",
+  "dmcm.exact (radial)": "exact (radial)",
+  "dmcm.exact (coupled channels)": "exact (coupled channels)",
   "col.unit": "Units",
 } as const;
 

@@ -142,11 +142,17 @@ def start_geometry(k: int, a: int, analyses: list[StateAnalysis]) -> np.ndarray:
 
 def classical_minimum(masses_kind: list[str], pots: dict[str, PairPotential], start: np.ndarray) -> float:
     """Lowest pair-sum energy (Eh) reached by gradient descent from `start` (the model's D_e)."""
-    pair = [(i, j, pots["H2-H2" if masses_kind[i] == masses_kind[j] == "H2" else "H-H2"])
-            for i, j in combinations(range(len(start)), 2)]
+    pair = {(i, j): pots["H2-H2" if masses_kind[i] == masses_kind[j] == "H2" else "H-H2"]
+            for i, j in combinations(range(len(start)), 2)}
+    return minimise(pair, start)[0]
 
+
+def minimise(pair: dict[tuple[int, int], Callable], start: np.ndarray,
+             many_body: Callable | None = None) -> tuple[float, np.ndarray]:
+    """(lowest energy in Eh, its positions) by gradient descent from `start` (bohr)."""
     def energy(x):
-        return sum(float(p(np.array([np.linalg.norm(x[i] - x[j])]))[0]) for i, j, p in pair)
+        e = sum(float(p(np.array([np.linalg.norm(x[i] - x[j])]))[0]) for (i, j), p in pair.items())
+        return e if many_body is None else e + float(many_body(x[None], None)[0])
 
     x, e, step = start.copy(), energy(start), 0.2
     for _ in range(3000):
@@ -163,7 +169,7 @@ def classical_minimum(masses_kind: list[str], pots: dict[str, PairPotential], st
             step *= 0.5
             if step < 1e-5:
                 break
-    return e
+    return e, x
 
 
 def run(session: Session, campaign: str, analyses: list[StateAnalysis], workers: int,

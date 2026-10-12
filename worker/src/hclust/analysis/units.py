@@ -2,7 +2,7 @@
 
 A distance cutoff alone mislabels the ion clusters (H6+ came out as three H2), and bond orders
 form a continuum with no gap to cut in. Energies have gaps: a split costs <= 0.01 eV between
-neutral van der Waals units, 0.02-0.4 eV between an ion and its ligands, and >= 2.8 eV inside
+neutral van der Waals units, 0.05-0.4 eV between an ion and its ligands, and >= 2.8 eV inside
 the covalent cores (H2, H2+, H3+). So:
 
 - The *fragmentation tree* of a state: every binary channel (H_m^q -> H_a^p + H_b^r, spin

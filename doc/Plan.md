@@ -870,8 +870,9 @@ Verdicts per state:
 
 **Findings:**
 - **Zero-point energy decides most weak complexes.** Every neutral cluster
-  (D_e 0.001–0.010 eV) and every H⁻(H₂)ₖ anion (0.016–0.115 eV) is bound
-  in D_e and unbound in D₀: the physics caveat of §1.2, now quantified.
+  (D_e 0.001–0.010 eV) and every H⁻(H₂)ₖ anion (0.016–0.115 eV; 0.049–0.090
+  eV after the H₅⁻/H₇⁻ reruns of Phase 8) is bound in D_e and unbound in D₀:
+  the physics caveat of §1.2, now quantified.
 - **The ion clusters survive ZPE:** H₅⁺ (D₀ 0.24 eV), H₇⁺ (0.10), H₉⁺
   (0.11) and the even H₄⁺–H₁₀⁺ (0.03–0.24 eV). D₀ is not monotonic
   (H₉⁺ ≥ H₇⁺) although D_e is: harmonic ZPE of floppy modes is the weak
@@ -1048,6 +1049,24 @@ the same structures):**
   0.60. Mayer orders (kept for comparison) dip below zero with these diffuse
   bases. Per atom: Löwdin charge and spin, Mayer free valence (≈ 0.99 on
   the radical H of doublet H₃).
+- **Web:** the 3D viewer draws bonds either by distance (now our 1.15 Å rule:
+  3Dmol's own guess only bonded H–H between 0.71 and 0.99 Å and dropped the
+  1.04–1.06 Å bonds of H₂⁺ and the H₂⁺ cores of H₆⁺/H₈⁺/H₁₀⁺) or by bond
+  order (one cylinder per bond, thickness ∝ √order, opacity 0.75·(e^{3·order} − 1)/(e³ − 1): weak links almost transparent, none solid;
+  below 0.03 not drawn; legend). Hovering a bond or an atom shows its
+  numbers; the same data is in atom and bond tables. "Highlight atoms"
+  (none / charge / spin) draws a see-through halo per atom: colour = sign
+  (red/blue for charge, orange/green for spin), size and opacity = magnitude
+  on one fixed scale for all species (charge ±0.5, spin ±1), so neutral
+  clusters stay plain while e.g. H⁻ in H₃⁻ glows red; atoms turn grey so only
+  halos carry colour. It shows that the unpaired electron of H₆⁺ is spread
+  over all six atoms (0.27 on each central H, 0.12 on each outer one).
+  Grid thumbnails draw bonds with Löwdin order > 0.33 (served with the grid,
+  one query), the distance rule only as a fallback: H₅⁺/H₇⁺/H₉⁺ now read as an
+  H₃⁺ triangle with separate H₂ units (links 0.2–0.3), and so do the anions:
+  their H⁻ links are 0.24–0.31 at the MP2 reference geometries (H₅⁻ and H₇⁻
+  were ≈ 0.4 at the ωB97X-D4 geometries used before the reruns of the anion
+  DMC note, and were drawn as bonds). Small clusters are zoomed in (3Dmol fits at least a 5 Å box).
 - **Quantum nuclear motion (DMC study, 2026-10-12).** The neutral H₃–H₉ are
   `bound` (D_e > 0) but not with harmonic ZPE; harmonic ZPE is poor for their
   floppy intermolecular motion, so `studies/dmc.py` solves the nuclear problem.
@@ -1077,24 +1096,55 @@ the same structures):**
     on a model potential: three-body forces and H₂ anisotropy are left out.
   - DMC without a trial function samples ψ, not |ψ|², so the walker spread is a
     convergence diagnostic (it grows when a cluster falls apart), not a size.
- (now our 1.15 Å rule:
-  3Dmol's own guess only bonded H–H between 0.71 and 0.99 Å and dropped the
-  1.04–1.06 Å bonds of H₂⁺ and the H₂⁺ cores of H₆⁺/H₈⁺/H₁₀⁺) or by bond
-  order (one cylinder per bond, thickness ∝ √order, opacity 0.75·(e^{3·order} − 1)/(e³ − 1): weak links almost transparent, none solid;
-  below 0.03 not drawn; legend). Hovering a bond or an atom shows its
-  numbers; the same data is in atom and bond tables. "Highlight atoms"
-  (none / charge / spin) draws a see-through halo per atom: colour = sign
-  (red/blue for charge, orange/green for spin), size and opacity = magnitude
-  on one fixed scale for all species (charge ±0.5, spin ±1), so neutral
-  clusters stay plain while e.g. H⁻ in H₃⁻ glows red; atoms turn grey so only
-  halos carry colour. It shows that the unpaired electron of H₆⁺ is spread
-  over all six atoms (0.27 on each central H, 0.12 on each outer one).
-  Grid thumbnails draw bonds with Löwdin order > 0.33 (served with the grid,
-  one query), the distance rule only as a fallback: H₅⁺/H₇⁺/H₉⁺ now read as an
-  H₃⁺ triangle with separate H₂ units (links 0.2–0.3), while the anions' H⁻
-  links (≈ 0.4 with ωB97X-D4, likely overstated by self-interaction error)
-  are drawn as bonds. Small clusters are
-  zoomed in (3Dmol fits at least a 5 Å box).
+- **Anion DMC (2026-10-12).** The singlet anions H⁻(H₂)ₖ, k = 1–4, are
+  `bound` in D_e but not with harmonic ZPE either; `studies/dmc_anions.py`.
+  Unlike the neutral clusters, H₂ orientation and three-body forces matter.
+  - Potential, CCSD(T)/aug-cc-pVTZ with counterpoise: H⁻–H₂ at the three
+    Gauss–Legendre angles gives V₀ + V₂P₂ + V₄P₄. Isotropic well −6.15 meV at
+    4.54 Å; collinear −52.5 meV. Tails: V₀ ~ C₄/R⁴ (C₄ = 2.73 ≈ α/2 = 2.71),
+    V₂ ~ R⁻³ (charge–quadrupole).
+  - H₂ as rigid rotors (B = 59.3 cm⁻¹, para, j = 0 asymptote): rotor DMC,
+    where each axis diffuses on the sphere. The dimer H₃⁻ is solved exactly by
+    coupled channels (J = 0, j ≤ 8): D₀ = 6.825 meV, j = 0 weight 0.889;
+    rotor DMC gives 6.816. Treating H₂ as a sphere gives only 3.44 meV.
+  - Three-body: the CCSD(T) non-additive energy at the model minima is
+    −23 / −77 / −125 meV (H₅⁻ / H₇⁻ / H₉⁻), attractive and large. A
+    point-dipole induction model gave the wrong sign, so the term is tabulated
+    instead (798 jobs: R 2.9–4.6 Å × angle 60–180° × end/side/mixed H₂
+    orientation), fitted as a + b[P₂(c₁)+P₂(c₂)] + d·P₂(c₁)P₂(c₂), with
+    exponential decay beyond the grid. Off-grid checks agree within 0.1 meV.
+    The four-body and higher terms are repulsive, so pairs plus three-body
+    overbinds at the minima: model / CCSD(T) total binding 125.9/121.5,
+    230.2/210.8, 341.2/299.4 meV (4–14 %). Pairs alone underbind. The two
+    models bracket the true potential.
+  - Results, D₀ (meV) for losing one H₂ (DMC: 2,000 walkers, dt = 10 a.u.,
+    100,000 steps). "10 % shallower" scales pairs + three-body by 0.9;
+    "harmonic" is the campaign's D₀, after the reruns in the last point:
+
+    | | harmonic | pairs only | pairs + three-body | 10 % shallower | H₂ as spheres |
+    |---|---|---|---|---|---|
+    | H₃⁻ | −13.9 | 6.83 (exact) | 6.83 (exact) | 5.52 | 3.44 |
+    | H₅⁻ | −28 | 7.27 | 8.63 ± 0.05 | 6.81 | 4.14 |
+    | H₇⁻ | −39 | 7.83 | 10.92 ± 0.11 | 8.61 | 4.73 |
+    | H₉⁻ | −46 | 7.85 | 12.65 ± 0.23 | 9.75 | 5.25 |
+
+  - Reading: all four anions are **bound** with quantum ZPE in every variant,
+    by 7–13 meV (80–150 K), 10–100 times the neutral clusters. H₂
+    orientation doubles D₀ (H₂ aligns with the field of the ion). Binding per
+    H₂ grows with k, but only through the three-body term: pairs alone give
+    ~7.8 meV from k = 3. Harmonic ZPE is wrong by 20–60 meV.
+  - Found on the way, and fixed: the campaign's MP2 branch had ended H₅⁻ and
+    H₇⁻ in shallow saddles (one mode at −34 cm⁻¹; three at −30 to −57 cm⁻¹,
+    after three displacements), so `mp2_ref` (`when: minimum`) never ran.
+    Their references were CCSD(T) at ωB97X-D4 geometries with H⁻–H 2.07 and
+    2.12 Å (delocalisation error pulls H₂ in), 43 and 12 meV above CCSD(T)
+    at the model minima. One L1M optfreq each, seeded from the model minima
+    (structure origin `seed:dmc_model`), found true minima (lowest mode
+    130 cm⁻¹; H⁻–H 2.66 and 2.48 Å). Their CCSD(T) is 49.6 and 22.5 meV below
+    the old references, slightly below the model minima too. After
+    `hclust analyze` (17/17 anchors): D_e H₅⁻ 0.066, H₇⁻ 0.088, H₉⁻ 0.090 eV
+    (were 0.016, 0.115, 0.112); harmonic D₀ −0.028, −0.039 eV (were −0.136,
+    −0.118). The study was re-run to refresh its campaign columns.
 - **Units from fragmentation (2026-10-12).** The 1.15 Å rule called H₆⁺ (2)
   "three H₂", although its links (1.22 Å, Löwdin 0.35) are as strong as its
   central bond (1.05 Å, 0.39); bond orders give no gap to cut in either (ion
@@ -1107,12 +1157,11 @@ the same structures):**
     threshold, in every order, until nothing cheaper is left; distinct
     endpoints are all kept. Electron detachment never splits a unit (H⁻'s
     0.75 eV would). Cheapest splits in the baseline: neutral van der Waals
-    ≤ 0.0105 eV, ions ≥ 0.016 eV (H₅⁻ → H₃⁻ + H₂, at a DFT geometry that
-    understates it), covalent cores ≥ 2.79 eV (H₂⁺). Two thresholds in the
-    gaps: **1 eV**, covalent cores and ligands (H₇⁺ = H₃⁺ + 2 H₂, H₉⁻ =
-    4 H₂ + H⁻); **0.013 eV**, ion clusters whole and van der Waals units
-    apart (H₇⁺, but 4 H₂ for H₈). Every state has a single endpoint at both;
-    the 0.013 eV gap is narrow.
+    ≤ 0.0105 eV, ions ≥ 0.048 eV (H₁₀⁺ (4); 0.016 eV for H₅⁻ before its
+    reruns in the anion DMC note), covalent cores ≥ 2.79 eV (H₂⁺). Two
+    thresholds in the gaps: **1 eV**, covalent cores and ligands (H₇⁺ =
+    H₃⁺ + 2 H₂, H₉⁻ = 4 H₂ + H⁻); **0.013 eV**, ion clusters whole and van der Waals units
+    apart (H₇⁺, but 4 H₂ for H₈). Every state has a single endpoint at both.
   - **Atoms:** the partition with the units' sizes that keeps the most
     Löwdin bond order inside units (distance as a fallback); charged units of
     equal size take the group with the closest atomic charge. Partitions

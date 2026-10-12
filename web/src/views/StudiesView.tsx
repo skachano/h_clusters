@@ -21,10 +21,11 @@ const COLUMNS: Record<string, Record<string, Key | { symbol: string }>> = {
   field: { state: "col.state", channel: "col.channel", F0: { symbol: "F = 0" }, "F0.005": { symbol: "0.005" }, "F0.01": { symbol: "0.01" }, "F0.02": { symbol: "0.02" }, alpha_au: { symbol: "α_zz (a.u.)" } },
   bonds: { state: "col.state", structure_id: "col.structure_id", units: "col.units", weakest_in_unit: "col.weakest_in_unit", strongest_in_unit: "col.strongest_in_unit", strongest_link: "col.strongest_link" },
   dmc: { state: "col.state", channel: "col.channel", d_e_ccsdt_mev: "col.d_e_ccsdt_mev", d_e_model_mev: "col.d_e_model_mev", d0_harmonic_mev: "col.d0_harmonic_mev", d0_dmc_mev: "col.d0_dmc_mev", d0_dmc_err_mev: "col.d0_dmc_err_mev", d0_shallow_mev: "col.d0_shallow_mev", dmc_verdict: "col.dmc_verdict", method: "col.method", dmc_check_mev: "col.dmc_check_mev", spread_angstrom: "col.spread_angstrom", size_growth: "col.size_growth", exact_r_angstrom: "col.exact_r_angstrom" },
+  dmc_anions: { state: "col.state", channel: "col.channel", d_e_ccsdt_mev: "col.d_e_ccsdt_mev", d_e_model_mev: "col.d_e_model_mev", total_model_mev: "col.total_model_mev", total_ccsdt_mev: "col.total_ccsdt_mev", three_body_mev: "col.three_body_mev", d0_harmonic_mev: "col.d0_harmonic_mev", d0_isotropic_mev: "col.d0_isotropic_mev", d0_pairs_only_mev: "col.d0_pairs_only_mev", d0_dmc_mev: "col.d0_dmc_mev", d0_dmc_err_mev: "col.d0_dmc_err_mev", d0_shallow_mev: "col.d0_shallow_mev", dmc_verdict: "col.dmc_verdict", method: "col.method", dmc_check_mev: "col.dmc_check_mev", spread_angstrom: "col.spread_angstrom", size_growth: "col.size_growth", exact_r_angstrom: "col.exact_r_angstrom" },
   basis: { item: "col.item", channel: "col.channelGeometry", avtz: "col.avtz", cbs: "col.cbs", change: "col.change", unit: "col.unit" },
 };
 
-const ORDER = ["vertical", "counterpoise", "anharmonic", "dmc", "basis", "bonds", "solvent", "field"];
+const ORDER = ["vertical", "counterpoise", "anharmonic", "dmc", "dmc_anions", "basis", "bonds", "solvent", "field"];
 
 export function StudiesView() {
   const { campaign = "baseline" } = useParams();
@@ -89,7 +90,7 @@ function StudyCard({ campaign, name }: { campaign: string; name: string }) {
       {study.isError && <p className="error">{String(study.error)}</p>}
       {rows.length > 0 && (
         <div className="table-wrap">
-          <table>
+          <table className="study-table">
             <thead>
               <tr>{columns.map((c) => <th key={c} className={typeof rows[0][c] === "number" ? "num" : undefined}>{header(c)}</th>)}</tr>
             </thead>
@@ -97,7 +98,8 @@ function StudyCard({ campaign, name }: { campaign: string; name: string }) {
               {rows.map((r, i) => (
                 <tr key={i}>
                   {columns.map((c) => <td key={c} className={typeof r[c] === "number" ? "num" : undefined}>{c === "verdict" && typeof r[c] === "string" && `verdict.${r[c]}` in en ? verdictLabel(t, r[c] as Verdict)
-                    : c === "dmc_verdict" && `dmcv.${r[c]}` in en ? t(`dmcv.${r[c]}` as Key) : cell(r[c], t)}</td>)}
+                    : c === "dmc_verdict" && `dmcv.${r[c]}` in en ? t(`dmcv.${r[c]}` as Key)
+                    : c === "method" && `dmcm.${r[c]}` in en ? t(`dmcm.${r[c]}` as Key) : cell(r[c], t)}</td>)}
                 </tr>
               ))}
             </tbody>

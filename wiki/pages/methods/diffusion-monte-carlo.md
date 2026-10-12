@@ -115,13 +115,58 @@ potential says otherwise:
 The walker spread is a convergence diagnostic, not the cluster size: DMC
 without a trial function samples $\psi_0$, not $|\psi_0|^2$.
 
+## Example: the anions, where orientation and three-body forces matter
+
+The singlet anions H₃⁻–H₉⁻ are H⁻ with one to four H₂ around it. Like the
+neutral clusters they are bound in $D_e$ but not after harmonic ZPE. The ion
+changes two things:
+
+- **Orientation.** The H⁻–H₂ interaction is strongly anisotropic: −52.5 meV
+  end-on, −6.15 meV averaged over angles. So H₂ is a rotating rigid rotor
+  here (rotor DMC), not a sphere. For H₃⁻ the exact answer comes from a
+  coupled-channel calculation (the rotor states $j = 0, 2, 4, \ldots$ coupled
+  by the anisotropy): $D_0 = 6.83$ meV, with the free-rotor $j = 0$ state
+  89 % of the wavefunction. Rotor DMC gives 6.82.
+- **Three-body forces.** The ion polarises every H₂ at once, and the energy is
+  not a sum of pairs. CCSD(T) on whole clusters puts the non-additive part at
+  −23, −77 and −125 meV for H₅⁻, H₇⁻ and H₉⁻. The study tabulates the
+  three-body term (798 CCSD(T) jobs over distances, angles and H₂
+  orientations). Pairs plus three-body then overbind by 4–14 %, because the
+  four-body and higher terms are repulsive, while pairs alone underbind. The
+  truth lies between the two models.
+
+Results, $D_0$ in meV for losing one H₂:
+
+| Cluster | Harmonic | Pairs only | Pairs + three-body | 10 % shallower | H₂ as spheres | Verdict |
+|---|---|---|---|---|---|---|
+| H₃⁻ = H⁻·H₂ | −13.9 | 6.83 (exact) | 6.83 (exact) | 5.52 | 3.44 | bound |
+| H₅⁻ = H⁻(H₂)₂ | −28 | 7.27 | 8.63 ± 0.05 | 6.81 | 4.14 | bound |
+| H₇⁻ = H⁻(H₂)₃ | −39 | 7.83 | 10.92 ± 0.11 | 8.61 | 4.73 | bound |
+| H₉⁻ = H⁻(H₂)₄ | −46 | 7.85 | 12.65 ± 0.23 | 9.75 | 5.25 | bound |
+
+- All four anions are bound, in every variant, by 7–13 meV (80–150 K): ten to
+  a hundred times more than the neutral clusters.
+- Orientation doubles the binding: H₂ lines up with the ion's field, which a
+  sphere cannot do.
+- With pairs alone, each further H₂ is bound by about the same 7.8 meV; the
+  growth with size comes from the three-body term, whose exact size is the
+  main uncertainty.
+- The study also exposed a gap in the campaign. For H₅⁻ and H₇⁻ the MP2
+  optimisations had stopped at shallow saddle points, so their reference
+  energies came from DFT geometries with H⁻ too close to H₂ (2.1 Å instead
+  of 2.5–2.7 Å, see
+  [self-interaction error](../pitfalls/self-interaction-error.md)). Restarted
+  from the DMC model's minima, MP2 found true minima 50 and 23 meV lower in
+  CCSD(T) energy; the harmonic column uses those.
+
 ## Limitations
 
 - The potential is the weak point, not DMC: the aug-cc-pVTZ basis and the
   orientation averaging make the well depths uncertain by about 10 %, which
   is why every cluster is also solved on a shallower well.
-- Three-body forces are left out for the neutral clusters; they are small
-  for dispersion-bound H₂, but not around an ion.
+- Three-body forces are left out for the neutral clusters, where they are
+  small. For the anions they are large and only bracketed: pairs alone
+  underbind, pairs plus three-body overbind.
 - A time step of 10 a.u. biases cluster energies by a few percent; halving
   it from 20 a.u. changed no verdict.
 
@@ -129,10 +174,14 @@ without a trial function samples $\psi_0$, not $|\psi_0|^2$.
 
 - Solver: `worker/src/hclust/analysis/dmc.py` (DMC, exact radial solver,
   pair potentials); tests in `worker/tests/test_dmc.py`
-- Study: `worker/src/hclust/studies/dmc.py`, run with
-  `python -m hclust study dmc`; report in `data/studies/dmc@baseline.json`
-- Web app: the Extensions page, "Quantum nuclear motion: diffusion Monte Carlo"
-- Plan: `doc/Plan.md`, Phase 8, DMC study
+- Studies: `worker/src/hclust/studies/dmc.py` (neutral) and
+  `worker/src/hclust/studies/dmc_anions.py` (anions; coupled channels, rotor
+  DMC and the three-body table in `analysis/dmc.py`), run with
+  `python -m hclust study dmc` or `dmc_anions`; reports in
+  `data/studies/dmc@baseline.json` and `dmc_anions@baseline.json`
+- Web app: the Extensions page, "Quantum nuclear motion: diffusion Monte
+  Carlo" and "Quantum nuclear motion of the anions H⁻(H₂)ₖ"
+- Plan: `doc/Plan.md`, Phase 8, DMC study and anion DMC
 
 ## References
 

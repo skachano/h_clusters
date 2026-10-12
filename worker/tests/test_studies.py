@@ -250,3 +250,47 @@ def test_dmc_isotropic_averages():
     assert curves["H2-H2"] == [(3.4, pytest.approx((1 + 4 * 2 + 2 * 3 + 2 * 4) / 9))]
     assert curves["H-H2"] == [(3.4, pytest.approx(-0.25))]  # weights sum to one
     assert sum(w for _, w in study.COS_THETA) == pytest.approx(1)
+
+
+def test_dmc_anion_scan_and_legendre_components():
+    from hclust.studies import dmc as neutral
+    from hclust.studies import dmc_anions as study
+
+    jobs = study.scan_jobs()
+    assert sum(k.startswith("A|") for k in jobs) == len(study.DISTANCES) * 3 * 3
+    assert jobs["HH|T|3.40|AB"].hash == neutral.scan_jobs()["HH|T|3.40|AB"].hash  # reused
+    ab, h2, ion = (jobs[f"A|0|3.40|{p}"] for p in ("AB", "A", "B"))
+    assert (ab.state.charge, h2.state.charge, ion.state.charge) == (-1, 0, -1)
+    assert ion.ghosts == (0, 1) and "%mdci" in ion.render()  # H(-) has two electrons
+    # V(theta) = V0 + V2 P2 + V4 P4 is recovered at the three angles
+    v0, v2, v4 = -1.0, 0.3, -0.05
+    energies = {}
+    for i, (c, _) in enumerate(neutral.COS_THETA):
+        v = v0 + v2 * (3 * c * c - 1) / 2 + v4 * (35 * c ** 4 - 30 * c * c + 3) / 8
+        energies |= {f"A|{i}|3.40|AB": v, f"A|{i}|3.40|A": 0.0, f"A|{i}|3.40|B": 0.0}
+    curves = study.anion_curves(energies)
+    assert [curves[lam][0][1] for lam in (0, 2, 4)] == pytest.approx([v0, v2, v4])
+    # V0 is the same Gauss-Legendre average as the neutral study's
+    assert sum(w * (v0 + v2 * (3 * c * c - 1) / 2 + v4 * (35 * c ** 4 - 30 * c * c + 3) / 8)
+               for c, w in neutral.COS_THETA) == pytest.approx(v0)
+
+
+def test_dmc_anion_three_body_scan():
+    from hclust.studies import dmc_anions as study
+
+    jobs = study.triple_jobs()
+    diagonal = len(study.TRIPLE_R) * len(study.TRIPLE_ANGLES)
+    assert len(jobs) == (3 * diagonal + 2 * len(study.TRIPLE_ODD)) * 7  # cluster, 3 units, 3 pairs
+    end, side, mixed = (jobs[f"{study.triple_prefix(o, 3.1, 3.1, 120.0)}|AB"].geometry.coords
+                        for o in ("end", "side", "mixed"))
+    ion = end[4]
+    assert np.linalg.norm(ion) == pytest.approx(0)
+    for coords, kinds in ((end, ("end", "end")), (side, ("side", "side")), (mixed, ("end", "side"))):
+        for i, kind in enumerate(kinds):
+            axis = coords[2 * i + 1] - coords[2 * i]
+            centre = (coords[2 * i + 1] + coords[2 * i]) / 2
+            cos = abs(axis @ centre) / (np.linalg.norm(axis) * np.linalg.norm(centre))
+            assert cos == pytest.approx(1.0 if kind == "end" else 0.0, abs=1e-9)
+            assert np.linalg.norm(centre) == pytest.approx(3.1)
+    pair = jobs[f"{study.triple_prefix('end', 3.1, 3.1, 120.0)}|pair|h2.0|ion"]
+    assert pair.state.charge == -1 and pair.ghosts == (2, 3)

@@ -226,6 +226,8 @@ th { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 tbody tr:hover { background: var(--surface-2); }
 .table-wrap { overflow-x: auto; }
+.study-table td { white-space: nowrap; }
+.study-table th { min-width: 5em; }
 
 .badge {
   display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 999px;
