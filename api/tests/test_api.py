@@ -123,3 +123,13 @@ def test_study_reports(client):
     assert out["rows"][0]["vertical_ev"] == 1.2
     assert client.get("/api/campaigns/mini/studies/nope").status_code == 404
     assert client.get("/api/campaigns/mini/studies/..%2Fhclust").status_code == 404
+
+
+def test_units_and_fragmentation(client):
+    s = client.get("/api/campaigns/mini/states/3/1/1").json()
+    assert s["units"] == "H3+" and s["cluster_units"] == "H3+"  # a covalent core: 4.6 eV to split
+    assert s["core_units"]["alternatives"] == ["H3+"] and s["core_units"]["groups"] == [[0, 1, 2]]
+    first = s["fragmentation"]["H3+"][0]
+    assert first["split"] == "H+ + H2" and first["d_e"] == pytest.approx(0.17 * 27.211386, rel=1e-4)
+    grid = client.get("/api/campaigns/mini/grid").json()
+    assert {c["species"]: c["ground"]["units"] for c in grid["cells"]}["H2"] == "H2"

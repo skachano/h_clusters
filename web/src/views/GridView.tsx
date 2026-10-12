@@ -93,7 +93,7 @@ function Cell({ m, charge, cell, colorBy, quantity, quantityLabel, campaign, sea
     <div>
       <div className="tt-value">{pretty(g.label)} · {verdictLabel(t, g.verdict)}</div>
       <div className="tt-label">{quantityLabel} {signed(cell.value, 3, "eV")}{g.channel ? ` → ${pretty(quantity === "d_g" ? g.channel_g ?? g.channel : g.channel)}` : ""}</div>
-      {g.composition && <div className="tt-label">{t("grid.units", { units: g.composition })}{g.point_group ? ` · ${g.point_group}` : ""}</div>}
+      {g.units && <div className="tt-label">{t("grid.units", { units: pretty(g.units) })}{g.point_group ? ` · ${g.point_group}` : ""}</div>}
       {cell.states.length > 1 && (
         <div className="tt-label" style={{ marginTop: 4 }}>
           {cell.states.map((s) => `${multName(t, s.mult)}: ${verdictShort(t, s.verdict)}`).join(" · ")}
@@ -175,7 +175,7 @@ function GridTable({ cells, quantityLabel, campaign, search }: { cells: GridCell
               <td>{verdictLabel(t, c.ground.verdict)}</td>
               <td className="num">{signed(c.value, 3)}</td>
               <td>{c.ground.channel ? pretty(c.ground.channel) : "–"}</td>
-              <td>{c.ground.composition ?? "–"}</td>
+              <td>{c.ground.units ? pretty(c.ground.units) : "–"}</td>
               <td>{c.ground.point_group ?? "–"}</td>
               <td className="secondary">{c.states.filter((s) => s.mult !== c.ground!.mult).map((s) => `${s.mult}: ${verdictShort(t, s.verdict)}`).join(", ")}</td>
             </tr>

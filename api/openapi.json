@@ -1199,6 +1199,41 @@
         ],
         "title": "FailureOut"
       },
+      "FragmentChannel": {
+        "properties": {
+          "split": {
+            "type": "string",
+            "title": "Split",
+            "description": "binary split into fragment states, e.g. 'H5+ + H'"
+          },
+          "parts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Parts",
+            "description": "the fragment states (labels, keys of `fragmentation`)"
+          },
+          "electron": {
+            "type": "boolean",
+            "title": "Electron",
+            "description": "electron detachment: the second fragment is e-"
+          },
+          "d_e": {
+            "type": "number",
+            "title": "D E",
+            "description": "eV, fragments at their own best energies minus the state"
+          }
+        },
+        "type": "object",
+        "required": [
+          "split",
+          "parts",
+          "electron",
+          "d_e"
+        ],
+        "title": "FragmentChannel"
+      },
       "GridCell": {
         "properties": {
           "m": {
@@ -1845,7 +1880,32 @@
                 "type": "null"
               }
             ],
-            "title": "Composition"
+            "title": "Composition",
+            "description": "bonded units by distance (1.15 Å) in the best structure"
+          },
+          "units": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Units",
+            "description": "covalent cores and ligands: the pieces left after every split cheaper than 1 eV, e.g. 'H3+ + 2 H2'"
+          },
+          "cluster_units": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cluster Units",
+            "description": "the pieces left after every split cheaper than 0.013 eV: ion clusters whole, van der Waals units apart"
           }
         },
         "type": "object",
@@ -2022,7 +2082,32 @@
                 "type": "null"
               }
             ],
-            "title": "Composition"
+            "title": "Composition",
+            "description": "bonded units by distance (1.15 Å) in the best structure"
+          },
+          "units": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Units",
+            "description": "covalent cores and ligands: the pieces left after every split cheaper than 1 eV, e.g. 'H3+ + 2 H2'"
+          },
+          "cluster_units": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cluster Units",
+            "description": "the pieces left after every split cheaper than 0.013 eV: ion clusters whole, van der Waals units apart"
           },
           "campaign": {
             "type": "string",
@@ -2174,6 +2259,37 @@
             },
             "type": "array",
             "title": "Channels"
+          },
+          "core_units": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UnitsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ion_cluster_units": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UnitsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fragmentation": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/FragmentChannel"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Fragmentation",
+            "description": "state label -> its channels, cheapest first; states reached through splits cheaper than 1 eV are expanded, the root is the state's own label"
           },
           "isomers": {
             "items": {
@@ -2341,6 +2457,80 @@
           "series"
         ],
         "title": "TrendsOut"
+      },
+      "UnitsOut": {
+        "properties": {
+          "threshold": {
+            "type": "number",
+            "title": "Threshold",
+            "description": "eV: every split cheaper than this is made"
+          },
+          "alternatives": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Alternatives",
+            "description": "distinct sets of units reached; one unless the orders of splitting disagree"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Units",
+            "description": "the units of the first alternative, in the order of `groups`"
+          },
+          "groups": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Groups",
+            "description": "atoms (0-based, XYZ order) of each unit in the best structure; None without a structure"
+          },
+          "equivalent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equivalent",
+            "description": "atom assignments as good as `groups`; > 1 means the units are delocalised over the structure"
+          },
+          "by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By",
+            "description": "'bond order' (Löwdin, from the bonds study) or 'distance'"
+          }
+        },
+        "type": "object",
+        "required": [
+          "threshold",
+          "alternatives",
+          "units"
+        ],
+        "title": "UnitsOut"
       },
       "ValidationError": {
         "properties": {

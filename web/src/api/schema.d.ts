@@ -433,6 +433,29 @@ export interface components {
             /** Attempts */
             attempts: number;
         };
+        /** FragmentChannel */
+        FragmentChannel: {
+            /**
+             * Split
+             * @description binary split into fragment states, e.g. 'H5+ + H'
+             */
+            split: string;
+            /**
+             * Parts
+             * @description the fragment states (labels, keys of `fragmentation`)
+             */
+            parts: string[];
+            /**
+             * Electron
+             * @description electron detachment: the second fragment is e-
+             */
+            electron: boolean;
+            /**
+             * D E
+             * @description eV, fragments at their own best energies minus the state
+             */
+            d_e: number;
+        };
         /** GridCell */
         GridCell: {
             /** M */
@@ -658,8 +681,21 @@ export interface components {
             point_group?: string | null;
             /** Shape */
             shape?: string | null;
-            /** Composition */
+            /**
+             * Composition
+             * @description bonded units by distance (1.15 Å) in the best structure
+             */
             composition?: string | null;
+            /**
+             * Units
+             * @description covalent cores and ligands: the pieces left after every split cheaper than 1 eV, e.g. 'H3+ + 2 H2'
+             */
+            units?: string | null;
+            /**
+             * Cluster Units
+             * @description the pieces left after every split cheaper than 0.013 eV: ion clusters whole, van der Waals units apart
+             */
+            cluster_units?: string | null;
         };
         /** StateDetail */
         StateDetail: {
@@ -718,8 +754,21 @@ export interface components {
             point_group?: string | null;
             /** Shape */
             shape?: string | null;
-            /** Composition */
+            /**
+             * Composition
+             * @description bonded units by distance (1.15 Å) in the best structure
+             */
             composition?: string | null;
+            /**
+             * Units
+             * @description covalent cores and ligands: the pieces left after every split cheaper than 1 eV, e.g. 'H3+ + 2 H2'
+             */
+            units?: string | null;
+            /**
+             * Cluster Units
+             * @description the pieces left after every split cheaper than 0.013 eV: ion clusters whole, van der Waals units apart
+             */
+            cluster_units?: string | null;
             /** Campaign */
             campaign: string;
             /**
@@ -772,6 +821,15 @@ export interface components {
             radius_of_gyration?: number | null;
             /** Channels */
             channels: components["schemas"]["ChannelOut"][];
+            core_units?: components["schemas"]["UnitsOut"] | null;
+            ion_cluster_units?: components["schemas"]["UnitsOut"] | null;
+            /**
+             * Fragmentation
+             * @description state label -> its channels, cheapest first; states reached through splits cheaper than 1 eV are expanded, the root is the state's own label
+             */
+            fragmentation?: {
+                [key: string]: components["schemas"]["FragmentChannel"][];
+            };
             /** Isomers */
             isomers: components["schemas"]["IsomerOut"][];
             /** Multiplicities */
@@ -830,6 +888,39 @@ export interface components {
             unit: string;
             /** Series */
             series: components["schemas"]["TrendSeries"][];
+        };
+        /** UnitsOut */
+        UnitsOut: {
+            /**
+             * Threshold
+             * @description eV: every split cheaper than this is made
+             */
+            threshold: number;
+            /**
+             * Alternatives
+             * @description distinct sets of units reached; one unless the orders of splitting disagree
+             */
+            alternatives: string[];
+            /**
+             * Units
+             * @description the units of the first alternative, in the order of `groups`
+             */
+            units: string[];
+            /**
+             * Groups
+             * @description atoms (0-based, XYZ order) of each unit in the best structure; None without a structure
+             */
+            groups?: number[][] | null;
+            /**
+             * Equivalent
+             * @description atom assignments as good as `groups`; > 1 means the units are delocalised over the structure
+             */
+            equivalent?: number | null;
+            /**
+             * By
+             * @description 'bond order' (Löwdin, from the bonds study) or 'distance'
+             */
+            by?: string | null;
         };
         /** ValidationError */
         ValidationError: {

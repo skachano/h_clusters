@@ -16,6 +16,7 @@ from sqlmodel import Session, select
 from hclust.analysis.fragments import Asymptotes, StateEnergy, Verdict, species_label
 from hclust.analysis.shape import radius_of_gyration, shape_class
 from hclust.analysis.thermo import rrho
+from hclust.analysis.units import CLUSTER_EV, CORE_EV, FragmentationTree, assign_atoms, key_label, units_label
 from hclust.analysis.verdicts import PROTON, StateAnalysis, StateData, evaluate, load
 from hclust.db import Attempt, Campaign, Job, JobResult, StateRow, Structure, StudyResult
 from hclust.structures import composition
@@ -96,7 +97,22 @@ def campaign_exists(session: Session, name: str) -> bool:
 # --------------------------------------------------------------------------- states
 
 
-def brief(a: StateAnalysis) -> schemas.StateBrief:
+def fragmentation_tree(analyses: list[StateAnalysis]) -> FragmentationTree:
+    """From the best energy of every state, plus the bare proton (E = 0)."""
+    bests = [x.best for x in analyses if x.best is not None]
+    if not any((b.m, b.charge) == (1, 1) for b in bests):
+        bests.append(StateEnergy(1, 1, 1, 0.0))
+    return FragmentationTree(bests)
+
+
+def units_label_of(tree: FragmentationTree | None, a: StateAnalysis, threshold: float) -> str | None:
+    key = (a.state.m, a.state.charge, a.state.mult)
+    if tree is None or key not in tree.energy:
+        return None
+    return " | ".join(units_label(e) for e in tree.endpoints(key, threshold))
+
+
+def brief(a: StateAnalysis, tree: FragmentationTree | None = None) -> schemas.StateBrief:
     d = {q: ev(v[0]) if v else None for q, v in a.d.items()}
     ref = a.reference
     return schemas.StateBrief(
@@ -109,7 +125,40 @@ def brief(a: StateAnalysis) -> schemas.StateBrief:
         point_group=a.point_group,
         shape=shape_class(ref.geometry) if ref else None,
         composition=composition(ref.geometry) if ref else None,
+        units=units_label_of(tree, a, CORE_EV), cluster_units=units_label_of(tree, a, CLUSTER_EV),
     )
+
+
+def units(session: Session, tree: FragmentationTree, a: StateAnalysis, threshold: float) -> schemas.UnitsOut | None:
+    """The units at `threshold`, mapped onto the atoms of the state's best structure."""
+    key = (a.state.m, a.state.charge, a.state.mult)
+    if key not in tree.energy:
+        return None
+    found = tree.endpoints(key, threshold)
+    first = found[0]
+    out = schemas.UnitsOut(threshold=threshold, alternatives=[units_label(e) for e in found],
+                           units=[key_label(k) for k in first])
+    ref = a.reference
+    if ref is None or len(first) == 1:
+        if ref is not None:
+            out.groups, out.equivalent, out.by = [list(range(len(ref.geometry)))], 1, None
+        return out
+    n = len(ref.geometry)
+    b = bonds(session, ref.structure_id)
+    if b is not None and b.loewdin:
+        weights = np.zeros((n, n))
+        for x in b.loewdin:
+            weights[x.i, x.j] = weights[x.j, x.i] = x.order
+        charges = np.array([x.charge for x in b.atoms]) if b.atoms else None
+        out.by = "bond order"
+    else:  # no bond orders: closeness, ~1 at an H2 bond length and falling off over 0.25 Å
+        r = ref.geometry.distance_matrix()
+        weights = np.exp(-np.maximum(r - 0.74, 0) / 0.25)
+        np.fill_diagonal(weights, 0)
+        charges, out.by = None, "distance"
+    assignment = assign_atoms(first, weights, charges)
+    out.groups, out.equivalent = [list(g) for g in assignment.groups], assignment.equivalent
+    return out
 
 
 def ground_states(analyses: list[StateAnalysis], data: list[StateData]) -> dict[tuple[int, int], StateAnalysis]:
@@ -160,6 +209,7 @@ def grid(store: Store, session: Session, campaign: str, temperature: float, pres
     analyses = store.analyses(session, campaign, temperature, pressure)
     _, data = store.data(session, campaign)
     ground = ground_states(analyses, data)
+    tree = fragmentation_tree(analyses)
     thumbnail_bonds = strong_bonds(session, [g.reference.structure_id for g in ground.values() if g.reference])
     cells = []
     for (m, charge), g in sorted(ground.items()):
@@ -167,10 +217,10 @@ def grid(store: Store, session: Session, campaign: str, temperature: float, pres
                         key=lambda a: a.state.mult)
         value = ev(g.d[QUANTITY_KEY[quantity]][0]) if g.d.get(QUANTITY_KEY[quantity]) else None
         cells.append(schemas.GridCell(
-            m=m, charge=charge, species=species_label(m, charge), ground=brief(g), value=value,
+            m=m, charge=charge, species=species_label(m, charge), ground=brief(g, tree), value=value,
             xyz=g.reference.geometry.to_xyz() if g.reference else None,
             bonds=thumbnail_bonds.get(g.reference.structure_id) if g.reference else None,
-            survives=None if value is None else value > 0, states=[brief(a) for a in states],
+            survives=None if value is None else value > 0, states=[brief(a, tree) for a in states],
         ))
     return schemas.GridOut(campaign=campaign, temperature=temperature, pressure=pressure,
                            quantity=quantity, cells=cells)
@@ -209,8 +259,14 @@ def state_detail(store: Store, session: Session, campaign: str, m: int, charge: 
     same_species = sorted((x for x in analyses if (x.state.m, x.state.charge) == (m, charge)),
                           key=lambda x: x.state.mult)
     thermo = a.best.thermo if a.best else None
+    tree = fragmentation_tree(analyses)
+    key = (m, charge, mult)
+    fragmentation = {label: [schemas.FragmentChannel(**c) for c in chans]
+                     for label, chans in tree.tree(key, CORE_EV).items()} if key in tree.energy else {}
     return schemas.StateDetail(
-        **brief(a).model_dump(), campaign=campaign, temperature=temperature, pressure=pressure,
+        **brief(a, tree).model_dump(),
+        core_units=units(session, tree, a, CORE_EV), ion_cluster_units=units(session, tree, a, CLUSTER_EV),
+        fragmentation=fragmentation, campaign=campaign, temperature=temperature, pressure=pressure,
         energy=a.best.energy if a.best else None, zpe=thermo.zpe if thermo else None,
         geometry_level=ref.geometry_level if ref else None,
         xyz=ref.geometry.to_xyz() if ref else None,
@@ -219,7 +275,7 @@ def state_detail(store: Store, session: Session, campaign: str, m: int, charge: 
         s2=ref.s2 if ref else None, spin_contaminated=a.spin_contaminated,
         detachment=ev(a.detachment), ionization=ev(a.ionization),
         radius_of_gyration=radius_of_gyration(ref.geometry) if ref else None,
-        channels=channels, isomers=isomers, multiplicities=[brief(x) for x in same_species],
+        channels=channels, isomers=isomers, multiplicities=[brief(x, tree) for x in same_species],
     )
 
 

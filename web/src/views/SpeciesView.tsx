@@ -149,6 +149,11 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
       )}
 
       <div className="cols-2">
+        <Units s={s} />
+        <FragmentTree s={s} />
+      </div>
+
+      <div className="cols-2">
         <Channels s={s} />
         <div className="card stack" style={{ gap: 10 }}>
           <h2>{t("sp.isomersAndSpins")}</h2>
@@ -157,7 +162,7 @@ function Detail({ s, stale }: { s: StateDetail; stale: boolean }) {
               <h3>{t("sp.isomers")}</h3>
               {/* one line per cell: in a narrow column Japanese would break between every character */}
               <div className="table-wrap"><table style={{ whiteSpace: "nowrap" }}>
-                <thead><tr><th className="num">ΔE (eV)</th><th>{t("th.units")}</th><th>{t("th.pointGroup")}</th><th>{t("sp.geometry")}</th><th><span className="sr-only">{t("view.label")}</span></th></tr></thead>
+                <thead><tr><th className="num">ΔE (eV)</th><th>{t("th.groups")}</th><th>{t("th.pointGroup")}</th><th>{t("sp.geometry")}</th><th><span className="sr-only">{t("view.label")}</span></th></tr></thead>
                 <tbody>
                   {distinctIsomers(s.isomers).map(({ isomer: i, count }) => {
                     const selected = i.structure_id === (isomer?.structure_id ?? null);
@@ -232,6 +237,105 @@ function Channels({ s }: { s: StateDetail }) {
       </div>
       {bars.length ? <DivergingBars bars={bars} unit="eV" highlight={weakest?.key} /> : <p className="muted">{t("sp.noChannels")}</p>}
     </div>
+  );
+}
+
+function Units({ s }: { s: StateDetail }) {
+  const t = useT();
+  const levels = [
+    { units: s.core_units, title: t("sp.coreUnits"), hint: "sp.coreUnitsHint" as const },
+    { units: s.ion_cluster_units, title: t("sp.clusterUnits"), hint: "sp.clusterUnitsHint" as const },
+  ];
+  return (
+    <div className="card stack" style={{ gap: 10 }}>
+      <div>
+        <h2>{t("sp.units")}</h2>
+        <p className="hint">{t("sp.unitsHint")}</p>
+      </div>
+      {levels.map(({ units: u, title, hint }) => u && (
+        <div key={title} className="stack" style={{ gap: 4 }}>
+          <h3>{title} <span className="unit">({t(hint, { x: String(u.threshold) })})</span></h3>
+          <p className="lede" style={{ margin: 0 }}>{pretty(u.alternatives[0])}</p>
+          {u.alternatives.length > 1 && <p className="hint">{t("sp.alternatives", { list: u.alternatives.map(pretty).join(" | ") })}</p>}
+          {u.groups && u.groups.length > 1 && (
+            <ul className="secondary" style={{ margin: 0, paddingLeft: 18 }}>
+              {u.units.map((unit, i) => (
+                <li key={i}>{pretty(unit)}: {t("sp.unitAtoms", { atoms: u.groups![i].map((a) => `H${a + 1}`).join(", ") })}</li>
+              ))}
+            </ul>
+          )}
+          {u.equivalent != null && u.equivalent > 1 && <p className="hint">{t("sp.delocalised", { n: String(u.equivalent) })}</p>}
+          {u.groups && u.groups.length > 1 && u.by && (
+            <p className="hint">{u.by === "bond order" ? t("sp.placedByOrder") : t("sp.placedByDistance")}</p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+type Fragmentation = NonNullable<StateDetail["fragmentation"]>;
+
+function FragmentTree({ s }: { s: StateDetail }) {
+  const t = useT();
+  const tree = s.fragmentation ?? {};
+  const root = Object.keys(tree)[0];
+  return (
+    <div className="card stack" style={{ gap: 10 }}>
+      <div>
+        <h2>{t("sp.tree")}</h2>
+        <p className="hint">{t("sp.treeHint")}</p>
+      </div>
+      {root ? <TreeNode label={root} tree={tree} open /> : <p className="muted">{t("sp.noChannels")}</p>}
+    </div>
+  );
+}
+
+const TREE_OPEN_EV = 1;
+
+/** The channels of one state; cheap ones open into their fragments' channels. */
+function TreeNode({ label, tree, open = false }: { label: string; tree: Fragmentation; open?: boolean }) {
+  const t = useT();
+  const channels = tree[label] ?? [];
+  const cheap = channels.filter((c) => c.d_e < TREE_OPEN_EV);
+  const rest = channels.filter((c) => c.d_e >= TREE_OPEN_EV);
+  if (!channels.length) return null;
+  const row = (c: Fragmentation[string][number], leaf = false) => (
+    <span className={`row${leaf ? " leaf-row" : ""}`} style={{ gap: 8, justifyContent: "space-between" }}>
+      <span>{pretty(c.split)}</span>
+      <span className="num secondary">{signed(c.d_e, 3, "eV")}</span>
+    </span>
+  );
+  return (
+    <ul className="tree" style={{ listStyle: "none", margin: 0, paddingLeft: open ? 0 : 16 }}>
+      {cheap.map((c) => (
+        <li key={c.split}>
+          {c.electron ? row(c, true) : (
+            <details open={open && c === cheap[0]}>
+              <summary>{row(c)}</summary>
+              <div style={{ paddingLeft: 12, borderLeft: "1px solid var(--border)" }}>
+                {c.parts.map((p) => (
+                  <div key={p}>
+                    <span className="secondary">{pretty(p)}{!tree[p]?.length && <span className="muted"> · {t("sp.treeLeaf")}</span>}</span>
+                    <TreeNode label={p} tree={tree} />
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
+        </li>
+      ))}
+      {rest.length > 0 && (
+        <li>
+          <details>
+            <summary className="secondary">{t(rest.length === 1 ? "sp.treeMore.one" : "sp.treeMore.other", { n: String(rest.length) })}</summary>
+            <ul style={{ listStyle: "none", margin: 0, paddingLeft: 16 }}>
+              {rest.map((c) => <li key={c.split}>{row(c, true)}</li>)}
+            </ul>
+          </details>
+        </li>
+      )}
+    </ul>
   );
 }
 

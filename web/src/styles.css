@@ -267,3 +267,11 @@ a.periodic-cell:hover { text-decoration: none; transform: translateY(-1px); box-
   line-height: 1.5;
 }
 
+
+/* Fragmentation tree: a caret before each expandable channel, on the same line */
+.tree summary { display: flex; align-items: baseline; gap: 6px; cursor: pointer; list-style: none; }
+.tree summary::-webkit-details-marker { display: none; }
+.tree summary::before { content: "▸"; color: var(--text-secondary); width: 0.8em; flex: none; }
+.tree details[open] > summary::before { content: "▾"; }
+.tree summary > .row { flex: 1; }
+.tree .leaf-row { padding-left: calc(0.8em + 6px); }

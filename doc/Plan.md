@@ -1095,6 +1095,31 @@ the same structures):**
   links (≈ 0.4 with ωB97X-D4, likely overstated by self-interaction error)
   are drawn as bonds. Small clusters are
   zoomed in (3Dmol fits at least a 5 Å box).
+- **Units from fragmentation (2026-10-12).** The 1.15 Å rule called H₆⁺ (2)
+  "three H₂", although its links (1.22 Å, Löwdin 0.35) are as strong as its
+  central bond (1.05 Å, 0.39); bond orders give no gap to cut in either (ion
+  links 0.18–0.47 overlap the weakest bonds inside units, and ωB97X-D4
+  overstates the anions'). Energies do have gaps. `analysis/units.py`:
+  - **Fragmentation tree:** every spin-allowed binary channel of a state with
+    its D_e, fragments at their own best energies, recursively (a DAG; the
+    API expands splits below 1 eV).
+  - **Units at a threshold:** split along every channel cheaper than the
+    threshold, in every order, until nothing cheaper is left; distinct
+    endpoints are all kept. Electron detachment never splits a unit (H⁻'s
+    0.75 eV would). Cheapest splits in the baseline: neutral van der Waals
+    ≤ 0.0105 eV, ions ≥ 0.016 eV (H₅⁻ → H₃⁻ + H₂, at a DFT geometry that
+    understates it), covalent cores ≥ 2.79 eV (H₂⁺). Two thresholds in the
+    gaps: **1 eV**, covalent cores and ligands (H₇⁺ = H₃⁺ + 2 H₂, H₉⁻ =
+    4 H₂ + H⁻); **0.013 eV**, ion clusters whole and van der Waals units
+    apart (H₇⁺, but 4 H₂ for H₈). Every state has a single endpoint at both;
+    the 0.013 eV gap is narrow.
+  - **Atoms:** the partition with the units' sizes that keeps the most
+    Löwdin bond order inside units (distance as a fallback); charged units of
+    equal size take the group with the closest atomic charge. Partitions
+    within 0.02 are counted: H₆⁺ (2) = H₃⁺ + H₂ + H has 2, i.e. delocalised.
+  - Web: the grid's units are the 1 eV ones; the species page has a Units
+    card (both levels, atoms per unit, delocalisation) and the fragmentation
+    tree; the isomer table keeps the distance groups ("bonded").
 - Not done (still open): multiplicities `all_upto: 3`, framework port,
   bigger m, per-atom/per-bond energy decomposition (LED/EDA).
 

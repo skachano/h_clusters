@@ -43,7 +43,11 @@ class StateBrief(BaseModel):
     structure_id: int | None = None
     point_group: str | None = None
     shape: str | None = None
-    composition: str | None = None
+    composition: str | None = Field(None, description="bonded units by distance (1.15 Å) in the best structure")
+    units: str | None = Field(None, description="covalent cores and ligands: the pieces left after every "
+                              "split cheaper than 1 eV, e.g. 'H3+ + 2 H2'")
+    cluster_units: str | None = Field(None, description="the pieces left after every split cheaper than "
+                                      "0.013 eV: ion clusters whole, van der Waals units apart")
 
 
 class GridCell(BaseModel):
@@ -74,6 +78,25 @@ class ChannelOut(BaseModel):
     d_g: float | None
 
 
+class FragmentChannel(BaseModel):
+    split: str = Field(description="binary split into fragment states, e.g. 'H5+ + H'")
+    parts: list[str] = Field(description="the fragment states (labels, keys of `fragmentation`)")
+    electron: bool = Field(description="electron detachment: the second fragment is e-")
+    d_e: float = Field(description="eV, fragments at their own best energies minus the state")
+
+
+class UnitsOut(BaseModel):
+    threshold: float = Field(description="eV: every split cheaper than this is made")
+    alternatives: list[str] = Field(description="distinct sets of units reached; one unless the "
+                                    "orders of splitting disagree")
+    units: list[str] = Field(description="the units of the first alternative, in the order of `groups`")
+    groups: list[list[int]] | None = Field(None, description="atoms (0-based, XYZ order) of each unit in the "
+                                           "best structure; None without a structure")
+    equivalent: int | None = Field(None, description="atom assignments as good as `groups`; > 1 means "
+                                   "the units are delocalised over the structure")
+    by: str | None = Field(None, description="'bond order' (Löwdin, from the bonds study) or 'distance'")
+
+
 class IsomerOut(BaseModel):
     structure_id: int
     ref_job_id: int
@@ -100,6 +123,11 @@ class StateDetail(StateBrief, Conditions):
     ionization: float | None = Field(None, description="eV to the lowest cation + e- limit")
     radius_of_gyration: float | None = Field(None, description="Å")
     channels: list[ChannelOut]
+    core_units: UnitsOut | None = None
+    ion_cluster_units: UnitsOut | None = None
+    fragmentation: dict[str, list[FragmentChannel]] = Field(
+        default_factory=dict, description="state label -> its channels, cheapest first; states reached "
+        "through splits cheaper than 1 eV are expanded, the root is the state's own label")
     isomers: list[IsomerOut]
     multiplicities: list[StateBrief]
 

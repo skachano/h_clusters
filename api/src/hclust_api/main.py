@@ -60,7 +60,8 @@ def create_app(db_path: Path | None = None, jobs_root: Path | None = None) -> Fa
     def states(session: SessionDep, store: StoreDep, campaign: str,
                temperature: Temperature = 298.15, pressure: Pressure = 1.0):
         analyses = store.analyses(session, campaign_or_404(session, campaign), temperature, pressure)
-        return [service.brief(a) for a in analyses]
+        tree = service.fragmentation_tree(analyses)
+        return [service.brief(a, tree) for a in analyses]
 
     @app.get("/api/campaigns/{campaign}/states/{m}/{charge}/{mult}", response_model=schemas.StateDetail)
     def state(session: SessionDep, store: StoreDep, campaign: str, m: int, charge: int, mult: int,
