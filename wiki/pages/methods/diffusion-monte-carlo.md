@@ -140,15 +140,15 @@ Results, $D_0$ in meV for losing one [H₂](app:s/2/0/1):
 | Cluster | Harmonic | Pairs only | Pairs + three-body | 10 % shallower | [H₂](app:s/2/0/1) as spheres | Verdict |
 |---|---|---|---|---|---|---|
 | [H₃⁻](app:s/3/-1/1) = [H⁻·H₂](app:s/3/-1/1) | −13.9 | 6.83 (exact) | 6.83 (exact) | 5.52 | 3.44 | bound |
-| [H₅⁻](app:s/5/-1/1) = [H⁻(H₂)₂](app:s/5/-1/1) | −28 | 7.27 | 8.63 ± 0.05 | 6.81 | 4.14 | bound |
-| [H₇⁻](app:s/7/-1/1) = [H⁻(H₂)₃](app:s/7/-1/1) | −39 | 7.83 | 10.92 ± 0.11 | 8.61 | 4.73 | bound |
-| [H₉⁻](app:s/9/-1/1) = [H⁻(H₂)₄](app:s/9/-1/1) | −46 | 7.85 | 12.65 ± 0.23 | 9.75 | 5.25 | bound |
+| [H₅⁻](app:s/5/-1/1) = [H⁻(H₂)₂](app:s/5/-1/1) | −28 | 7.28 | 8.56 ± 0.05 | 6.92 | 4.11 | bound |
+| [H₇⁻](app:s/7/-1/1) = [H⁻(H₂)₃](app:s/7/-1/1) | −39 | 7.61 | 11.17 ± 0.11 | 8.23 | 4.79 | bound |
+| [H₉⁻](app:s/9/-1/1) = [H⁻(H₂)₄](app:s/9/-1/1) | −46 | 8.06 | 12.46 ± 0.23 | 10.02 | 5.22 | bound |
 
 - All four anions are bound, in every variant, by 7–13 meV (80–150 K): ten to
   a hundred times more than the neutral clusters.
 - Orientation doubles the binding: [H₂](app:s/2/0/1) lines up with the ion's field, which a
   sphere cannot do.
-- With pairs alone, each further [H₂](app:s/2/0/1) is bound by about the same 7.8 meV; the
+- With pairs alone, each further [H₂](app:s/2/0/1) is bound by about the same 7.3–8.1 meV; the
   growth with size comes from the three-body term, whose exact size is the
   main uncertainty.
 - The study also exposed a gap in the campaign. For [H₅⁻](app:s/5/-1/1) and [H₇⁻](app:s/7/-1/1) the MP2

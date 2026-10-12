@@ -1115,7 +1115,7 @@ the same structures):**
     exponential decay beyond the grid. Off-grid checks agree within 0.1 meV.
     The four-body and higher terms are repulsive, so pairs plus three-body
     overbinds at the minima: model / CCSD(T) total binding 125.9/121.5,
-    230.2/210.8, 341.2/299.4 meV (4–14 %). Pairs alone underbind. The two
+    230.0/210.9, 341.2/299.4 meV (4–14 %). Pairs alone underbind. The two
     models bracket the true potential.
   - Results, D₀ (meV) for losing one H₂ (DMC: 2,000 walkers, dt = 10 a.u.,
     100,000 steps). "10 % shallower" scales pairs + three-body by 0.9;
@@ -1124,15 +1124,15 @@ the same structures):**
     | | harmonic | pairs only | pairs + three-body | 10 % shallower | H₂ as spheres |
     |---|---|---|---|---|---|
     | H₃⁻ | −13.9 | 6.83 (exact) | 6.83 (exact) | 5.52 | 3.44 |
-    | H₅⁻ | −28 | 7.27 | 8.63 ± 0.05 | 6.81 | 4.14 |
-    | H₇⁻ | −39 | 7.83 | 10.92 ± 0.11 | 8.61 | 4.73 |
-    | H₉⁻ | −46 | 7.85 | 12.65 ± 0.23 | 9.75 | 5.25 |
+    | H₅⁻ | −28 | 7.28 | 8.56 ± 0.05 | 6.92 | 4.11 |
+    | H₇⁻ | −39 | 7.61 | 11.17 ± 0.11 | 8.23 | 4.79 |
+    | H₉⁻ | −46 | 8.06 | 12.46 ± 0.23 | 10.02 | 5.22 |
 
   - Reading: all four anions are **bound** with quantum ZPE in every variant,
     by 7–13 meV (80–150 K), 10–100 times the neutral clusters. H₂
     orientation doubles D₀ (H₂ aligns with the field of the ion). Binding per
     H₂ grows with k, but only through the three-body term: pairs alone give
-    ~7.8 meV from k = 3. Harmonic ZPE is wrong by 20–60 meV.
+    7.3–8.1 meV from k = 2. Harmonic ZPE is wrong by 20–60 meV.
   - Found on the way, and fixed: the campaign's MP2 branch had ended H₅⁻ and
     H₇⁻ in shallow saddles (one mode at −34 cm⁻¹; three at −30 to −57 cm⁻¹,
     after three displacements), so `mp2_ref` (`when: minimum`) never ran.
