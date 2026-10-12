@@ -90,5 +90,5 @@ data directory.
 ## References
 
 - `doc/Plan.md` §3.1 (containers, parallelism, scratch) and Phase 4 (pilot and decisions).
-- The ORCA 6 manual: `%maxcore`, `%pal`, and memory and disk use of the
+- The [ORCA 6.1 manual](https://www.faccts.de/docs/orca/6.1/manual/): `%maxcore`, `%pal`, and memory and disk use of the
   correlation modules.

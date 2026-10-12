@@ -34,7 +34,7 @@ flowchart LR
 - A. Szabo, N. S. Ostlund, *Modern Quantum Chemistry* (Dover, 1996) (邦訳: 『新しい量子化学』東京大学出版会)
 - F. Jensen, *Introduction to Computational Chemistry*, 3rd ed. (Wiley, 2017)
 - C. J. Cramer, *Essentials of Computational Chemistry*, 2nd ed. (Wiley, 2004)
-- ORCA 6 マニュアル
+- [ORCA 6.1 マニュアル](https://www.faccts.de/docs/orca/6.1/manual/) (このプロジェクトが使っているバージョン)
 
 !!! note "翻訳について"
     このウィキの原文は英語である。図の中の文字やプログラムの出力は英語のままにしてある。用語の訳が分かりにくいときは、右上の言語切り替えで同じページの英語版を開ける。

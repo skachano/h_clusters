@@ -40,4 +40,4 @@ Pages cite these standard texts:
 - A. Szabo, N. S. Ostlund, *Modern Quantum Chemistry* (Dover, 1996)
 - F. Jensen, *Introduction to Computational Chemistry*, 3rd ed. (Wiley, 2017)
 - C. J. Cramer, *Essentials of Computational Chemistry*, 2nd ed. (Wiley, 2004)
-- The ORCA 6 manual
+- The [ORCA 6.1 manual](https://www.faccts.de/docs/orca/6.1/manual/), for the version this project runs

@@ -57,4 +57,4 @@ ORCA は `scratch/<hash>` で実行され、終わったあとで小さな出力
 ## 参考文献
 
 - `doc/Plan.md` §3.1 (コンテナ、並列化、スクラッチ) とフェーズ 4 (試験計算と決定)。
-- ORCA 6 マニュアル: `%maxcore`、`%pal`、および相関モジュールのメモリとディスクの使用。
+- [ORCA 6.1 マニュアル](https://www.faccts.de/docs/orca/6.1/manual/): `%maxcore`、`%pal`、および相関モジュールのメモリとディスクの使用。
