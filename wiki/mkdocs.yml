@@ -60,6 +60,7 @@ plugins:
             Spin and multiplicity: スピンと多重度
             Units: 単位
             Chemical and van der Waals bonds: 化学結合とファンデルワールス結合
+            Electrons, charge, spin and bond lengths: 電子、電荷、スピン、結合長
             Hartree–Fock: ハートリー–フォック法
             Density functional theory: 密度汎関数理論
             MP2: MP2
@@ -137,6 +138,7 @@ nav:
       - Born–Oppenheimer approximation: foundations/born-oppenheimer.md
       - Potential energy surface: foundations/potential-energy-surface.md
       - Chemical and van der Waals bonds: foundations/chemical-and-van-der-waals-bonds.md
+      - Electrons, charge, spin and bond lengths: foundations/electrons-charges-and-bond-lengths.md
       - Spin and multiplicity: foundations/spin-and-multiplicity.md
       - Units: foundations/units.md
   - Methods:

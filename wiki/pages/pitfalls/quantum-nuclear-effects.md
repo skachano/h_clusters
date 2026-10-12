@@ -46,6 +46,35 @@ its ground state, the central proton's wavefunction spreads over both sides,
 shared between the two H₂ units, although the shared-proton D₂d structure
 isn't a minimum. The question "which structure is H₅⁺?" has no classical answer.
 
+### H₅⁺ in units: two textbook descriptions
+
+Split into familiar units, H₅⁺ has two standard descriptions, and the
+literature uses both:
+
+- **H₃⁺·H₂: the structure at the minimum.** The C₂ᵥ minimum is an H₂
+  attached side-on to one corner of an H₃⁺ triangle. This is how H₅⁺ appears
+  as the first member of the H₃⁺(H₂)ₙ series in cluster chemistry,
+  astrochemistry and the classic infrared spectra of H₅⁺, H₇⁺ and H₉⁺: H₂
+  ligands added around an H₃⁺ core, with the first shell complete at H₉⁺,
+  one H₂ on each corner. The project's cheapest dissociation channel agrees:
+  H₅⁺ → H₃⁺ + H₂ costs 0.37 eV.
+- **H₂·H⁺·H₂: the shared proton.** A proton held between two H₂,
+  [H₂–H–H₂]⁺, like the Zundel ion H₅O₂⁺ in water. Its symmetric D₂d form is
+  the saddle point the proton crosses on its way from one H₂ to the other.
+  That barrier is about 48 cm⁻¹ here, against a zero-point energy of about
+  7800 cm⁻¹, so in the ground state the central proton is shared: its
+  wavefunction spreads over both sides, and the vibrationally averaged ion is
+  effectively symmetric. Spectroscopy and quantum dynamics therefore often
+  call H₅⁺ a shared-proton (proton-bound) complex; its low-frequency
+  spectrum is dominated by the proton's motion between the two H₂, and
+  isotopic substitution (H₄D⁺) partly localizes it.
+
+Neither is wrong: H₃⁺·H₂ describes the classical minimum and the cluster
+series built on it, H₂·H⁺·H₂ where the nuclei actually are in the ground
+state. For labels computed from minimum structures, as in this project,
+H₃⁺ + H₂ is the natural primary one, with the shared proton noted as what the
+real ion does.
+
 ### Methods that go beyond
 
 | Method | Idea | Cost |
@@ -94,6 +123,9 @@ whose $j = 0$ ground state is spherical.
   the harmonic ZPE's influence visible rather than hidden in one number.
 
 ## References
+
+- M. Okumura, L. I. Yeh, Y. T. Lee, *J. Chem. Phys.* **88**, 79 (1988):
+  infrared spectra of H₃⁺(H₂)ₙ, n = 1–6.
 
 - M. E. Tuckerman, *Statistical Mechanics: Theory and Molecular Simulation*
   (Oxford, 2010): path integrals.
