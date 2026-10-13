@@ -24,7 +24,7 @@ $$
 
 となる ([結合エネルギー](../foundations/potential-energy-surface.md#binding-energy-d_e-and-d_0))。
 
-## 例: H₅⁺ → H₃⁺ + H₂ { #example-h5-h3-h2 }
+## 例: [H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1) { #example-h5-h3-h2 }
 
 ベースラインキャンペーンより。電子エネルギーは CCSD(T)/aug-cc-pVTZ、ZPE は RI-MP2/aug-cc-pVTZ の調和振動数から求め、どちらも MP2 構造で計算した。
 

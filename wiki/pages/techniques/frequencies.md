@@ -56,7 +56,7 @@ is built **numerically** from gradients: displace each of the $3N$
 coordinates forwards and backwards and difference the gradients, which costs
 $6N$ gradient calculations.
 
-## Example: H₂ and the cost of approximations
+## Example: [H₂](app:s/2/0/1) and the cost of approximations
 
 The toy [`h2_mp2_opt_freq.py`](geometry-optimization.md#the-code) gets the
 force constant from the curvature of the energy curve at the minimum:
@@ -77,7 +77,7 @@ better:
 | RI-MP2/aug-cc-pVTZ (L1M) | 4517 |
 | Experiment | 4401 |
 
-## Example: H₃⁺ and H₅⁺
+## Example: [H₃⁺](app:s/3/1/1) and [H₅⁺](app:s/5/1/1)
 
 [H₃⁺](app:s/3/1/1) (L1) has 3 × 3 − 6 = 3 modes: **2743, 2743 and 3368 cm⁻¹**. The pair
 with identical frequencies is a *degenerate* mode, forced by the triangle's

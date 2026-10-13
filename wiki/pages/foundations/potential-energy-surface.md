@@ -184,7 +184,7 @@ singlet) attract and form [H₂](app:s/2/0/1). With parallel spins (the triplet)
 essentially no well, only a tiny van der Waals dip: the atoms repel. A "species" in this project, such as [H₄⁺](app:s/4/1/2) in
 the doublet state, is one surface.
 
-## Example: the H₂ curve, computed two ways
+## Example: the [H₂](app:s/2/0/1) curve, computed two ways
 
 [`h2_minimal_basis.py`](#the-code) computes the [H₂](app:s/2/0/1) energy at many bond
 lengths with two methods (explained in [Hartree–Fock](../methods/hartree-fock.md)),

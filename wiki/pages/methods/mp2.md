@@ -45,7 +45,7 @@ and how much energy it costs (the orbital-energy gap in the denominator).
 The denominator is negative, so $E^{(2)}$ is always negative: correlation
 lowers the energy.
 
-## Example: H₂ in STO-3G
+## Example: [H₂](app:s/2/0/1) in STO-3G
 
 With one occupied orbital ($\sigma_g$) and one virtual ($\sigma_u$), the sum
 has a single term:

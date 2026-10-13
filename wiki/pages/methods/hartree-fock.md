@@ -132,7 +132,7 @@ eigenvalue problem after a change of basis: with $\mathbf{X} =
 \mathbf{S}^{-1/2}$, diagonalize $\mathbf{X}^\mathsf{T}\mathbf{F}\mathbf{X}$ and
 transform the eigenvectors back with $\mathbf{C} = \mathbf{X}\mathbf{C}'$.
 
-## Example: H₂ from scratch
+## Example: [H₂](app:s/2/0/1) from scratch
 
 `wiki/examples/h2_minimal_basis.py` implements all of the above with numpy,
 for [H₂](app:s/2/0/1) in the STO-3G basis: one 1s-like function per atom, each a sum of three

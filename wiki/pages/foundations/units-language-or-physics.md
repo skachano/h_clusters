@@ -58,7 +58,7 @@ The [H₂](app:s/2/0/1) units in (H₂)ₖ pass every test by large margins:
   than the intermolecular motions (tens of cm⁻¹).
 - **Transferability:** in the cluster [H₂](app:s/2/0/1) keeps its free bond length
   (0.74 Å), a bond order near 1, and nearly free rotation.
-- **Quantum numbers:** ortho- and para-H₂ (nuclear spin coupled to rotation)
+- **Quantum numbers:** ortho- and [para-H₂](app:s/2/0/1) (nuclear spin coupled to rotation)
   remain labels of *each [H₂](app:s/2/0/1)* in the cluster. They interconvert only over
   hours to days, so in a real sample each [H₂](app:s/2/0/1) of a cluster really is para or
   ortho: a measurable property that belongs to one unit.

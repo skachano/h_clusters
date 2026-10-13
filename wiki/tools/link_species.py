@@ -9,9 +9,10 @@ multiplicity for every H_m^n of the baseline (1 for an even electron count, 2 fo
 spin word stands right next to it ("triplet H₃⁺", "H₄⁻ quartet", "三重項の H⁻"). A formula made
 of several units links as a whole to the species they add up to: (H₂)₂, H₂·H, H₃⁺·H₂, H⁻(H₂)₄,
 (H₂H₂H₂)⁺. So does a sum written with +, the products or the reactants of a channel: H₃⁺ + H₂
-and H₄⁺ + H open H₅⁺, also when its terms were linked one by one before. Left alone: the bare atom H and the proton H⁺ (not in the app), families with a
-variable count such as H⁻(H₂)ₖ, sums outside the app's grid, and headings, code, math, links
-and HTML.
+and H₄⁺ + H open H₅⁺, also when its terms were linked one by one before. Section headings link
+too. Left alone: the bare atom H and the proton H⁺ (not in the app), families with a variable
+count such as H⁻(H₂)ₖ, sums outside the app's grid, and the page title, code, math, links and
+HTML.
 """
 
 import re
@@ -32,7 +33,7 @@ PROTECTED = re.compile(r"`[^`]*`|\$[^$]*\$|!?\[[^\]]*\]\([^)]*\)|<[^>]+>")
 # A species link already on the page, which can be a term of a sum.
 APP_LINK = re.compile(r"\[([^\]]+)\]\(app:s/[-\d/]+\)")
 PLUS = " + "
-SKIP_LINE = re.compile(r"^\s*(#|!!!|\?\?\?|--8<--|\*\[)")
+SKIP_LINE = re.compile(r"^\s*(# |!!!|\?\?\?|--8<--|\*\[)")
 SPIN = {"singlet": 1, "doublet": 2, "triplet": 3, "quartet": 4, "一重項": 1, "二重項": 2, "三重項": 3, "四重項": 4}
 WORDS = "|".join(SPIN)
 SPIN_BEFORE = re.compile(rf"({WORDS})の?\s*$")

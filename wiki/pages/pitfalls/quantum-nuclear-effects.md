@@ -36,7 +36,7 @@ Consequences that grow as the mass drops:
 - **Isotope effects**: H and D clusters can differ in structure and stability
   although their PES is identical.
 
-### H₅⁺: a molecule without a structure
+### [H₅⁺](app:s/5/1/1): a molecule without a structure
 
 At CCSD(T), [H₅⁺](app:s/5/1/1)'s C₂ᵥ structure ([H₃⁺·H₂](app:s/5/1/1)) is 0.13 kcal/mol below the D₂d one (a
 proton shared by two [H₂](app:s/2/0/1)), which is the barrier for the proton to move from
@@ -46,7 +46,7 @@ its ground state, the central proton's wavefunction spreads over both sides,
 shared between the two [H₂](app:s/2/0/1) units, although the shared-proton D₂d structure
 isn't a minimum. The question "which structure is [H₅⁺](app:s/5/1/1)?" has no classical answer.
 
-### H₅⁺ in units: two textbook descriptions
+### [H₅⁺](app:s/5/1/1) in units: two textbook descriptions
 
 Split into familiar units, [H₅⁺](app:s/5/1/1) has two standard descriptions, and the
 literature uses both:
@@ -59,7 +59,7 @@ literature uses both:
   one [H₂](app:s/2/0/1) on each corner. The project's cheapest dissociation channel agrees:
   [H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1) costs 0.37 eV.
 - **[H₂·H⁺·H₂](app:s/5/1/1): the shared proton.** A proton held between two [H₂](app:s/2/0/1),
-  [H₂–H–H₂]⁺, like the Zundel ion H₅O₂⁺ in water. Its symmetric D₂d form is
+  [[H₂–H–H₂]⁺](app:s/5/1/1), like the Zundel ion H₅O₂⁺ in water. Its symmetric D₂d form is
   the saddle point the proton crosses on its way from one [H₂](app:s/2/0/1) to the other.
   That barrier is about 48 cm⁻¹ here, against a zero-point energy of about
   7800 cm⁻¹, so in the ground state the central proton is shared: its
@@ -106,7 +106,7 @@ Protons have spin ½ too. Exchanging two protons must change the sign of the tot
 wavefunction, which couples nuclear spin to rotation: [H₂](app:s/2/0/1) comes as *para*
 (nuclear spins paired, even rotational levels) and *ortho* (parallel, odd
 levels). At low temperatures this changes rotational energies and entropies.
-The project's thermochemistry ignores it; the DMC study assumes para-H₂,
+The project's thermochemistry ignores it; the DMC study assumes [para-H₂](app:s/2/0/1),
 whose $j = 0$ ground state is spherical.
 
 ## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)

@@ -66,7 +66,7 @@ keeps growing.
 rotational energy $B\,j(j+1)$ is diffusion on a sphere with diffusion
 constant $B$ (59.3 cm⁻¹ for [H₂](app:s/2/0/1)). Each walker then carries positions and axes,
 and the potential may depend on orientation. When the potential is
-spherical on average, as for para-H₂ in its $j = 0$ state, [H₂](app:s/2/0/1) can instead be
+spherical on average, as for [para-H₂](app:s/2/0/1) in its $j = 0$ state, [H₂](app:s/2/0/1) can instead be
 a point particle on an orientation-averaged potential.
 
 ## How this project uses it

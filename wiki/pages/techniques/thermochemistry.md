@@ -52,7 +52,7 @@ without limit as its frequency goes to zero, so soft cluster modes
 (tens to a few hundred cm⁻¹) get unphysically large entropies. Grimme's
 **quasi-RRHO** treats modes below about 100 cm⁻¹ as partly free rotors instead.
 
-## Example: is H₅⁺ stable at room temperature?
+## Example: is [H₅⁺](app:s/5/1/1) stable at room temperature?
 
 [H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1), with CCSD(T) electronic energies plus RI-MP2 thermal
 corrections from ORCA at 298.15 K and 1 atm (baseline campaign data):

@@ -14,7 +14,7 @@
 
 この手法は基底の範囲で[変分的](../foundations/schrodinger-equation.md#the-variational-principle) なので、窮屈な電子は単にエネルギーが高くなる。より小さな指数の関数 (基底名の **aug-** や **-D**) を加えると、電子に居場所ができる。
 
-## 例: 分散関数のある H⁻ とない H⁻
+## 例: 分散関数のある [H⁻](app:s/1/-1/1) とない [H⁻](app:s/1/-1/1)
 
 [`h_minus_diffuse.py`](#the-code) は、s 型ガウス関数で H と [H⁻](app:s/1/-1/1) を厳密に (完全 CI で) 計算する。出発点は、[基底関数系](../methods/basis-sets.md#example-the-hydrogen-atom)のページで中性の水素原子に対して最適化した 4 関数の基底である。そこに、指数が次々に小さくなる分散関数を加えていく:
 

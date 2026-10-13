@@ -37,7 +37,7 @@ that artificial state.
 - With some methods and bases, the energy can even fall *below* the neutral:
   false binding.
 
-## Example: H₂⁻ in the campaign
+## Example: [H₂⁻](app:s/2/-1/2) in the campaign
 
 | Level | E([H₂⁻](app:s/2/-1/2)) − E([H₂](app:s/2/0/1)) | [H₂⁻](app:s/2/-1/2) "bond length" | "Frequency" |
 |---|---|---|---|

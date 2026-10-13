@@ -25,7 +25,7 @@ in the basis, a cramped electron simply has a higher energy. Adding
 functions with smaller exponents (the **aug-** or **-D** in a basis name)
 gives it room.
 
-## Example: H⁻ with and without diffuse functions
+## Example: [H⁻](app:s/1/-1/1) with and without diffuse functions
 
 [`h_minus_diffuse.py`](#the-code) computes H and [H⁻](app:s/1/-1/1) exactly (full CI) in
 s-type Gaussians. The start is the 4-function basis optimized for the

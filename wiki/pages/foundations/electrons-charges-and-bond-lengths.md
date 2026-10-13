@@ -135,7 +135,7 @@ local properties resemble that molecule's: bond length, bond order, spin.
 It is a statement of resemblance, not a claim that the free molecule sits
 inside unchanged.
 
-## Example: H₆⁺, the H₂·H₂⁺·H₂ sandwich
+## Example: [H₆⁺](app:s/6/1/2), the [H₂·H₂⁺·H₂](app:s/6/1/2) sandwich
 
 The lowest [H₆⁺](app:s/6/1/2) (doublet) is a chain of three pairs: a central pair 1.05 Å
 long between two outer [H₂](app:s/2/0/1) of 0.79 Å, linked at 1.22 Å. The literature

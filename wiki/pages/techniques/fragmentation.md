@@ -118,7 +118,7 @@ leaving fragment's distance, or a nudged-elastic-band (NEB) search between
 the cluster and the separated products, with accurate single points along
 the way ([transition states and barriers](transition-states.md)).
 
-## Example: H₅⁺
+## Example: [H₅⁺](app:s/5/1/1)
 
 CCSD(T)/aug-cc-pVTZ energies from the baseline campaign (lowest structure of
 each species):

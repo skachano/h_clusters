@@ -48,7 +48,7 @@ parabola is a poor model.
   gradient components, and the largest and RMS steps are all below
   thresholds. `TightOpt` uses stricter thresholds than plain `Opt`.
 
-## Example: H₂ by Newton–Raphson
+## Example: [H₂](app:s/2/0/1) by Newton–Raphson
 
 [`h2_mp2_opt_freq.py`](#the-code) optimizes the toy [H₂](app:s/2/0/1) from a stretched start,
 R = 2.0 bohr, with numerical derivatives. Plain Newton fails:

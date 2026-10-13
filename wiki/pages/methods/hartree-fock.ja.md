@@ -96,7 +96,7 @@ flowchart TD
 
 $\mathbf{FC} = \mathbf{SC}\boldsymbol{\varepsilon}$ は、基底を変換すれば普通の固有値問題になる。$\mathbf{X} = \mathbf{S}^{-1/2}$ として $\mathbf{X}^\mathsf{T}\mathbf{F}\mathbf{X}$ を対角化し、固有ベクトルを $\mathbf{C} = \mathbf{X}\mathbf{C}'$ で元に戻せばよい。
 
-## 例: H₂ を一から計算する { #example-h2-from-scratch }
+## 例: [H₂](app:s/2/0/1) を一から計算する { #example-h2-from-scratch }
 
 `wiki/examples/h2_minimal_basis.py` は、以上のすべてを numpy で実装している。対象は STO-3G 基底の [H₂](app:s/2/0/1) で、各原子に 1s 型の関数が 1 つずつあり、それぞれが 3 つのガウス関数の和である。中心は SCF ループである:
 
