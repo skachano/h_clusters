@@ -1,3 +1,9 @@
+/* Links in dark mode: a step lighter than Material's indigo (#5488e8), easier
+   to read on the slate background. */
+[data-md-color-scheme="slate"][data-md-color-primary] {
+  --md-typeset-a-color: #7aa3ef;
+}
+
 /* Charts (.viz): page colors come from the Material theme; series colors are
    the validated categorical slots 1-2, stepped separately for dark mode. */
 .viz {
