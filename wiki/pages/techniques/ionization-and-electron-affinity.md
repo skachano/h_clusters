@@ -82,7 +82,7 @@ both weaken the binding.
 number, because a finite basis set can't let the electron escape
 ([unbound anions](../pitfalls/unbound-anions.md)).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - IE, EA and VDE for anions are derived quantities of Phase 5
   (`doc/Plan.md` §2.2); an anion with a negative EA or VDE gets the verdict
@@ -91,7 +91,7 @@ number, because a finite basis set can't let the electron escape
   whole species grid is computed.
 - E(H⁺) = 0 by definition (`doc/Plan.md` §1.1).
 - EA(H) is one of the Phase 1 anchor regression tests (`worker/tests/test_anchors.py`).
-- Web app: the [Extensions](app:studies) page compares vertical and
+- [Web app](app:): the [Extensions](app:studies) page compares vertical and
   adiabatic electron removal.
 
 ## References

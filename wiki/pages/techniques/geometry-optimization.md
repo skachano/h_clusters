@@ -105,7 +105,7 @@ convergence is the hallmark of Newton's method.
   apart and the optimization never converges. That is a result about the
   cluster, not a failure ([structure search](structure-search.md#how-this-project-does-it)).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Tasks `opt` and `optfreq` (`worker/src/hclust/engines/orca.py`) add the
   level's optimization keyword: `TightOpt` for L1/L1M, `Opt` for the screening

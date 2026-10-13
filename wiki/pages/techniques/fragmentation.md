@@ -138,7 +138,7 @@ apart, as expected for an [H₃⁺](app:s/3/1/1) core solvated by [H₂](app:s/2
 The missing row shows the "closure" property: a verdict for [H₅⁺](app:s/5/1/1) needs [H₄](app:s/4/0/1) to be
 finished too.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Channel enumeration and verdicts are Phase 5 (`analysis/fragments.py`); the
   `Verdict` table stores `d_min`, `d0_min`, the verdict and the weakest
@@ -152,7 +152,7 @@ finished too.
 - The *structural* check that a single optimized structure hasn't fallen
   apart is separate: the 3.5 Å contact cutoff in
   [structure search](structure-search.md#how-this-project-does-it).
-- Web app: each species page lists its channels and draws its fragmentation
+- [Web app](app:): each species page lists its channels and draws its fragmentation
   tree, e.g. [H₅⁺](app:s/5/1/1).
 
 ## References

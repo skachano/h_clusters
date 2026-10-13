@@ -92,11 +92,11 @@ $$
 - 中性クラスターでは三体力を除いている。そこでは小さい。アニオンでは大きく、上下からはさむことしかできない: 対だけでは束縛が足りず、対 + 三体では束縛しすぎる。
 - 10 a.u. の時間刻みはクラスターのエネルギーに数パーセントのバイアスを与える。20 a.u. から半分にしても判定は変わらなかった。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - ソルバー: `worker/src/hclust/analysis/dmc.py` (DMC、厳密な動径ソルバー、対ポテンシャル)。テストは `worker/tests/test_dmc.py`
 - 研究: `worker/src/hclust/studies/dmc.py` (中性) と `worker/src/hclust/studies/dmc_anions.py` (アニオン。結合チャネル、回転子 DMC、三体項の表は `analysis/dmc.py`)。`python -m hclust study dmc` または `dmc_anions` で実行し、報告は `data/studies/dmc@baseline.json` と `dmc_anions@baseline.json`
-- ウェブアプリ: [「追加計算」](app:studies)ページの「原子核の量子的な運動: 拡散モンテカルロ法」と「アニオン H⁻(H₂)ₖ の原子核の量子的な運動」
+- [ウェブアプリ](app:): [「追加計算」](app:studies)ページの「原子核の量子的な運動: 拡散モンテカルロ法」と「アニオン H⁻(H₂)ₖ の原子核の量子的な運動」
 - 計画: `doc/Plan.md`、フェーズ 8、DMC の研究とアニオンの DMC
 
 ## 参考文献

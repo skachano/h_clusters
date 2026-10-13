@@ -45,10 +45,11 @@ The concept in plain language, then the equations.
 
 A worked example, preferably with numbers from this project.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Code: `worker/src/hclust/levels.py`
 - Plan: `doc/Plan.md` §2.1
+- [Web app](app:): the view that shows the topic, e.g. [H₃⁺](app:s/3/1/1)
 
 ## References
 
@@ -105,8 +106,9 @@ written with +, such as the products of a channel: in H₆⁺ → H₅⁺ + H,
 "H₅⁺ + H" opens H₆⁺, also when its terms were linked one by one before. It
 leaves alone headings, code, math, families with a variable count like
 H⁻(H₂)ₖ, and the atom H and proton H⁺ outside a sum, which are not in the
-app. A "Web app:" bullet under "Where this appears in h_clusters" points to
-the view that shows the page's topic.
+app. The heading "Where this appears in h_clusters" links h_clusters to the
+repository, and its "Web app" bullet, linked to the app, points to the view
+that shows the page's topic.
 
 ## Preview and check
 

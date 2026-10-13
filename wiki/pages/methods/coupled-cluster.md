@@ -79,7 +79,7 @@ gradients (`analytic_gradient=False` for L2 in `levels.py`), so a CCSD(T)
 geometry optimization would need numerical gradients: the optional level L3
 in the plan.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - **L2**, `CCSD(T) aug-cc-pVTZ` in `worker/src/hclust/levels.py`: single
   points on the minima from both geometry branches (stages `dft_ref` and

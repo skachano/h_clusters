@@ -109,7 +109,7 @@ gaps exist, every method converges and the units are as real as molecules in
 a gas. Where they do not, the choice is a convention, and what is physical is
 that no unique answer exists.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Units from fragmentation energies, at two thresholds placed in the energy
   gaps (1 eV: covalent cores and ligands; 0.013 eV: ion clusters whole), and

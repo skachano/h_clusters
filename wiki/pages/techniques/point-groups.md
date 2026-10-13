@@ -65,7 +65,7 @@ this project:
 - In the baseline campaign, three RI-MP2 [H₅⁺](app:s/5/1/1) results with the same energy to
   10⁻⁶ hartree and the same bond lengths to 10⁻⁴ Å are labelled C₂ᵥ, C₁ and C₁.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - ORCA's point group and symmetry number are parsed into the `result` table
   (`point_group`, `symmetry_number`), but are not trusted for analysis.
@@ -75,7 +75,7 @@ this project:
 - Duplicate detection doesn't use symmetry at all: the
   [distance fingerprint](structure-search.md#how-this-project-does-it) compares
   structures directly.
-- Web app: the [grid](app:) and each species page show the point group and
+- [Web app](app:): the [grid](app:) and each species page show the point group and
   shape class of every structure.
 
 ## References

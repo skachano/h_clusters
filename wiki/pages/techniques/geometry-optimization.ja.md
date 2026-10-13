@@ -75,7 +75,7 @@ RHF, Newton with a 0.3 bohr trust radius from R = 2.0 bohr:
 - **平らな曲面。**弱く束縛されたクラスターには非常にやわらかい方向がある (コアのまわりを滑る [H₂](app:s/2/0/1) ユニットなど)。勾配はどこでも小さく、最適化には多くのステップが必要になる。
 - **ばらばらになる。**ランダムな構造から出発すると、断片が離れていって最適化が収束しないことがある。それは失敗ではなく、クラスターについての結果である ([構造探索](structure-search.md#how-this-project-does-it))。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - タスク `opt` と `optfreq` (`worker/src/hclust/engines/orca.py`) は、レベルの最適化キーワードを加える。L1/L1M には `TightOpt`、選別レベル L0 には `Opt`。
 - 最適化サイクルの既定の上限 50 回は、やわらかいクラスターには短すぎた (フェーズ 4: 3 × 50 サイクルのあとも [H₂](app:s/2/0/1) ユニットが滑り続けていた)。そこで L0、L1、L1M は `%geom MaxIter 150` を設定している。

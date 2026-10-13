@@ -239,7 +239,7 @@ electrons have different spatial orbitals, so at long distance one can sit on
 each atom. The energy becomes right, but the wavefunction is no longer a
 pure singlet (**spin contamination**, measured by ⟨S²⟩).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - **Restricted vs unrestricted.** `worker/src/hclust/engines/orca.py` adds `UHF`
   (or `UKS` for DFT) to every input with multiplicity > 1. Closed-shell

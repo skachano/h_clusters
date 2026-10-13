@@ -56,13 +56,13 @@ DFT の[自己相互作用誤差](../pitfalls/self-interaction-error.md)と、L0
 
 **[H₂⁻](app:s/2/-1/2): 負の電子親和力。** CCSD(T) では、[H₂⁻](app:s/2/-1/2) は [H₂](app:s/2/0/1) + 自由電子より 0.057 ハートリー (1.6 eV) *上*にある。余分な電子は束縛されておらず、実際の [H₂⁻](app:s/2/-1/2) は短寿命の共鳴としてしか存在しない。それでも計算は数値を返す。有限の基底関数系では電子が逃げ出せないからである ([非束縛アニオン](../pitfalls/unbound-anions.md))。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - IE、EA、アニオンの VDE は、フェーズ 5 で求める派生量である (`doc/Plan.md` §2.2)。EA や VDE が負のアニオンは、最も低いカテゴリーである `unbound_electron` と判定される。
 - これらには同じ m の隣の電荷状態が必要であり、化学種のグリッド全体を計算するもうひとつの理由になっている。
 - E(H⁺) = 0 と定義する (`doc/Plan.md` §1.1)。
 - EA(H) はフェーズ 1 のアンカー回帰テストのひとつである (`worker/tests/test_anchors.py`)。
-- ウェブアプリ: [「追加計算」](app:studies)ページで垂直と断熱の電子の除去を比べている。
+- [ウェブアプリ](app:): [「追加計算」](app:studies)ページで垂直と断熱の電子の除去を比べている。
 
 ## 参考文献
 

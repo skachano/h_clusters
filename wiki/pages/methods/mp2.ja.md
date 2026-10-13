@@ -73,7 +73,7 @@ MP2 の値は Szabo & Ostlund と一致する。この小さな基底では、MP
 | 調和振動数 | 4517 cm⁻¹ | — | 4401 cm⁻¹ |
 | エネルギー | −1.16502 ハートリー | −1.17263 | −1.17447 |
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `worker/src/hclust/levels.py` の **L1M**: RI-JK と aug-cc-pVTZ 基底を用いる RI-MP2。昇格したすべての構造を最適化し (ステージ `mp2`)、各状態の上位 3 つに数値的な振動数計算を行う (`mp2_freq`)。ORCA 6.1 には解析的な RI-MP2 ヘッセ行列がないためである。
 - 一電子の化学種 (H、[H₂⁺](app:s/2/1/2)) には相関させるものがないので、L1M はそれらに対して普通の HF に切り替わる (`levels.py` の `correlated=True`)。

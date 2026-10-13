@@ -64,7 +64,7 @@ $$
 
 水素原子で、ガウス関数ひとつ $e^{-\alpha r^2}$ を試行波動関数にする。最適な指数 $\alpha = 0.283$ で −0.4244 ハートリーが得られる。変分原理のとおり厳密値−0.5 より上で、2.06 eV 高すぎる。関数を足せばエネルギーは下がる一方で、6 個で誤差は 0.004 eV 以内になる ([`h_atom_basis.py`](../methods/basis-sets.md#example-the-hydrogen-atom))。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - 各化学種 H_m^n は $N = m - n$ 個の電子をもつ (`worker/src/hclust/species.py`)。0 個 (H⁺) から 11 個 ([H₁₀⁻](app:s/10/-1/2)) まで。
 - H⁺ には電子がないので解くべきものがない。そのエネルギーは 0 と定義され (`doc/Plan.md` §1.1)、`engines/orca.py` はその計算を拒否する。

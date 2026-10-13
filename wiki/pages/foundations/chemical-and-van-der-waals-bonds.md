@@ -97,7 +97,7 @@ lie in between, which is why they are 10–100 times more strongly bound.
 Numbers from CCSD(T)/aug-cc-pVTZ in this project, counterpoise-corrected for
 the weak pairs.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Units and the 1.15 Å cutoff: `worker/src/hclust/structures.py`
 - Bond orders: `worker/src/hclust/studies/bonds.py`; the per-structure bond

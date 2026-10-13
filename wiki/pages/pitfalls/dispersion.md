@@ -58,7 +58,7 @@ Charged clusters are different. [H₃⁺·H₂](app:s/5/1/1) ([H₅⁺](app:s/5/
 ion polarizing the [H₂](app:s/2/0/1) (induction, falling off as $R^{-4}$), which even methods
 without dispersion describe. Dispersion is a smaller correction there.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Both DFT levels include D4: r²SCAN-3c (L0) and ωB97X-D4 (L1). ωB97M-V
   (L1V) has VV10 instead.

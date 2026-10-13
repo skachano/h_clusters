@@ -52,13 +52,13 @@ $$
 
 1 eV 未満のほかのチャネル、[H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1)、[H₆⁺](app:s/6/1/2) → [H₄⁺ + H₂](app:s/6/1/2) と → [H₃⁺ + H₃](app:s/6/1/2) は、極大なしに生成物まで上がる。確認用の [H₅⁺](app:s/5/1/1) の D₂d の鞍点を通るプロトン移動は 0.0057 eV (0.13 kcal/mol)、虚振動数は 545i cm⁻¹ が 1 つで、零点エネルギー込みでは −0.037 eV である。零点の準位は障壁より上にある。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - 障壁の研究: `worker/src/hclust/studies/barriers.py`。[H₅⁺](app:s/5/1/1) と [H₆⁺](app:s/6/1/2) (二重項) の 1 eV 未満の各チャネルについて、原子の割り当て方の最も良い 2 通りをたどる。RI-MP2 (レベル L1M、イメージ 10 個) の CI-NEB が、クラスターの極小から 4 Å 引き離した断片まで走る。ORCA は NEB の端点を固定するので、端は生成物錯体に緩和しない。経路に極大があれば数値ヘッセ行列からの `OptTS` が続き、鞍点は虚振動数がちょうど 1 つで、出発したイメージの近くにとどまった (どの距離も 0.25 Å 以上変わらない) 場合だけ数える。エネルギーはすべてのイメージでの CCSD(T) 一点計算から求める。IRC はまだない。`python -m hclust study barriers` で実行し、報告は `data/studies/barriers@baseline.json`。
 - 解離の木とユニットは今も生成物のエネルギー ($D_e$) だけを使う: `worker/src/hclust/analysis/units.py`。
 - ORCA には手順に必要なものがそろっている: `NEB-TS` (CI-NEB に続けて TS 最適化)、`ZOOM-NEB`、`OptTS`、`IRC`、緩和スキャン (`%geom Scan`)、MECP 用の `SurfCrossOpt`。構造のレベル L1 (ωB97X-D4) と L1M (RI-MP2) には解析的な勾配があり、エネルギーはこのプロジェクトのほかのすべてのエネルギーと同じく CCSD(T) の一点計算で求める。
 - 計画: `doc/Plan.md`、フェーズ 8、障壁。
-- ウェブアプリ: [「追加計算」](app:studies)ページの「出ていく道の障壁」。
+- [ウェブアプリ](app:): [「追加計算」](app:studies)ページの「出ていく道の障壁」。
 
 ## 参考文献
 

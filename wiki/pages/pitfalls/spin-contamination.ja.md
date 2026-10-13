@@ -50,7 +50,7 @@
 
 ほとんどの状態ははるかにきれいである。最悪の 2 つは計画の 10 % のしきい値ちょうどにあるので、その MP2 構造は見直す価値がある。構造を決める CCSD(T) エネルギーのほうは影響が小さい。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - ⟨S²⟩ はすべての ORCA 出力から `result` テーブルの `s2` 列に読み込まれる。
 - 多重度が 1 より大きい状態は `UHF` か `UKS` で、閉殻の一重項は制限法で計算する (`engines/orca.py`)。

@@ -54,7 +54,7 @@ $\Delta H$ が $\Delta E_0$ より大きいのは、断片 2 個のほうがク�
 
 $\Delta G = +1.5$ kcal/mol から、$K = p_{\text{H}_3^+}\,p_{\text{H}_2}/p_{\text{H}_5^+}$ について $K = e^{-1.50/0.593} = 0.08$ atm が得られる。1 atm の [H₂](app:s/2/0/1) 中では [H₅⁺](app:s/5/1/1) が裸の [H₃⁺](app:s/3/1/1) より約 12 対 1 で多い。0.01 atm の [H₂](app:s/2/0/1) 中では裸の [H₃⁺](app:s/3/1/1) のほうが多い。おおよそ $T = \Delta H/\Delta S \approx 380$ K より上では、1 atm でも [H₅⁺](app:s/5/1/1) は解離する。クラスターは束縛されているが、それが*存在する*かどうかは条件しだいである。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - 振動数計算のたびに、298.15 K での ORCA の熱化学が `thermo` フィールドに保存される: `zpe`、`innerEnergyU`、`enthalpyH`、`entropyS` ($T\cdot S$ としてハートリー単位で保存)、`freeEnergyG`。
 - 計画 (フェーズ 5) では、保存された振動数から任意の $T$ と $p$ で RRHO/qRRHO を再計算し、298 K での ORCA の値と照合する。ウェブアプリの[一覧](app:?q=d_g)では、$T$ と $p$ を変えると安定性のグリッドが塗り直される (`doc/Plan.md` §4)。

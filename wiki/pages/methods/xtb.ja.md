@@ -34,7 +34,7 @@ GFN2-xTB は [H₃⁺](app:s/3/1/1) の形を定性的に間違える。水素�
 - 選別を行うのは xTB ではなく r²SCAN-3c (L0) である。
 - xTB を使った GOAT は、テンプレートとランダム探索が見つけなかったものを何も見つけなかったので、ベースラインキャンペーンでは既定で無効になっている (フェーズ 3 の知見)。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `worker/src/hclust/levels.py` の `Level("XTB", "XTB", kind="xtb")`。
 - ORCA の `! GOAT-EXPLORE XTB` を通じて使う ([構造探索](../techniques/structure-search.md))。ORCA は worker の `Dockerfile` で設定された環境変数 `XTBEXE` を通じて `xtb` の実行ファイルを見つける。

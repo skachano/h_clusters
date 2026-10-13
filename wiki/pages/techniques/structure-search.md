@@ -106,7 +106,7 @@ has no C₂ᵥ minimum. The MP2 branch recovered C₂ᵥ from those structures o
 because its optimizer, and the saddle-point displacement, moved them there.
 A search inherits the blind spots of its screening method.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `seeds:` and the `pre` / `promote` stages in `campaigns/baseline.yaml`.
 - `GENERATORS`, `fingerprint`, `same_structure`, `is_dissociated` and
@@ -117,7 +117,7 @@ A search inherits the blind spots of its screening method.
   --stage <name>` lists it.
 - ORCA's GOAT-EXPLORE with xTB is available as a seed source, but added no
   surviving structure in Phase 3 and is off in the baseline.
-- Web app: the isomers kept for each state are on its species page, e.g.
+- [Web app](app:): the isomers kept for each state are on its species page, e.g.
   [H₅⁺](app:s/5/1/1).
 
 ## References

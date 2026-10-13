@@ -175,7 +175,7 @@ like most functionals, spreads a hole too widely
 ([self-interaction error](../pitfalls/self-interaction-error.md)), so a
 correlated method would likely put somewhat more of it on the central pair.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Löwdin charges, spin populations and bond orders: the bonds study,
   `worker/src/hclust/studies/bonds.py`; the atom and bond tables and the

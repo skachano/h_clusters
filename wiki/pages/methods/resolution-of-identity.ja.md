@@ -46,7 +46,7 @@ $$
 
 構造最適化には数十回の勾配計算が必要で、数値的な振動数計算には 1 構造あたりさらに約 60 回必要になる。5〜20 倍の差が、MP2 による構造レベルをそもそも使えるかどうかを決めた。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - **L1M** は `worker/src/hclust/levels.py` で `RI-MP2 RIJK` とされ、基底の行は `aug-cc-pVTZ aug-cc-pVTZ/C aug-cc-pVTZ/JK` (軌道基底、次に 2 つの補助基底) である。
 - ORCA 6.1 には解析的な RI-MP2 ヘッセ行列がないので、L1M の振動数は数値的に求め (`analytic_hessian=False`)、各状態の上位 3 構造だけに行う。

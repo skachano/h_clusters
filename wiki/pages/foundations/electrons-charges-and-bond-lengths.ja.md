@@ -95,7 +95,7 @@ $\rho_\alpha$ と $\rho_\beta$ は互いに独立に変われるので、電荷�
 
 注意が 2 つある。部分電荷は分割の規則に依存する。また ωB97X-D4 は、ほとんどの汎関数と同様に正孔を広げすぎる ([自己相互作用誤差](../pitfalls/self-interaction-error.md)) ので、相関を取り入れた手法では中央の対にもう少し多く集まるだろう。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - レーヴディン電荷、スピンポピュレーション、結合次数: 結合の研究 `worker/src/hclust/studies/bonds.py`。ウェブアプリの各化学種ページ (たとえば [H₆⁺](app:s/6/1/2)) の原子と結合の表、「原子を強調」のハロー
 - クラスターのユニットとその原子 ([H₆⁺](app:s/6/1/2) が非局在化と表示されるところ): `worker/src/hclust/analysis/units.py`

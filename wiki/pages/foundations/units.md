@@ -69,7 +69,7 @@ Two consequences:
   kcal/mol falls apart easily at room temperature
   ([thermochemistry](../techniques/thermochemistry.md)).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `worker/src/hclust/units.py` holds the conversions (CODATA 2018):
   `BOHR_TO_ANGSTROM`, `HARTREE_TO_EV`, `HARTREE_TO_KCAL`.

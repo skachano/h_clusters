@@ -56,7 +56,7 @@ H      0.5434963710    -0.6212694821    -1.0029636119
 - **キャンペーンの途中で設定を変える。** L0 を `TightOpt` から `MaxIter 150` つきの `Opt` に切り替えたとき、新しいハッシュになったのは新しい L0 ジョブだけだった。完了したジョブは結果を保ち、各ジョブがどの設定を使ったかはハッシュが記録している。
 - **再試行は新しいハッシュ。** `SlowConv` をつけた再試行や新しい構造からの再開は入力を変えるので、各試行は固有のハッシュをもち、`attempt` テーブルに保存される。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `worker/src/hclust/engines/orca.py` の `OrcaJob.hash`、`job_hash()`、`orca_version()`。
 - `job` テーブルと `attempt` テーブルには各実行のハッシュが保存される。`attempt` の `cached` 列がキャッシュヒットを示す (ベースラインではこれまでに 15 回)。

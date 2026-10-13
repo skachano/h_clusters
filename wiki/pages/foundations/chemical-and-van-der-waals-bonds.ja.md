@@ -57,7 +57,7 @@ h_clusters では、化学結合でつながった原子の集まりを**単位*
 
 数値はこのプロジェクトの CCSD(T)/aug-cc-pVTZ によるもので、弱い対についてはカウンターポイズ補正済みである。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - 単位と 1.15 Å のしきい値: `worker/src/hclust/structures.py`
 - 結合次数: `worker/src/hclust/studies/bonds.py`。[ウェブアプリ](app:s/5/1/1)の構造ごとの結合表と 3D ビューアー

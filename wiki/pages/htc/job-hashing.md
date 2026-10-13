@@ -83,7 +83,7 @@ counts; a crashed run may leave partial files behind.
   new geometry, changes the input, so each attempt has its own hash, stored in
   the `attempt` table.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `OrcaJob.hash`, `job_hash()` and `orca_version()` in
   `worker/src/hclust/engines/orca.py`.

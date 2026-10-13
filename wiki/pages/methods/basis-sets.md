@@ -104,7 +104,7 @@ complex A·B, fragment A borrows B's basis functions to lower its own energy,
 which makes binding look stronger. The counterpoise correction removes it by
 computing each fragment in the full basis of the complex.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - L1 uses def2-TZVPPD; L1M and L2 use aug-cc-pVTZ (with the matching
   auxiliary sets for [RI](resolution-of-identity.md)). r²SCAN-3c (L0) comes
@@ -114,7 +114,7 @@ computing each fragment in the full basis of the complex.
 - Basis size changes answers: MP2 with aug-cc-pVDZ collapses [H₅⁺](app:s/5/1/1) to D₂d,
   aug-cc-pVTZ keeps C₂ᵥ.
 - A TZ → QZ → CBS convergence study is the optional level L4 (Plan, Phase 8).
-- Web app: the [Extensions](app:studies) page has the counterpoise
+- [Web app](app:): the [Extensions](app:studies) page has the counterpoise
   correction and the basis-set limit.
 
 ## References

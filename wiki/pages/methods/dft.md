@@ -95,7 +95,7 @@ Like HF, formally $N^3$–$N^4$ in the number of basis functions, with tricks
 ([RI](resolution-of-identity.md)) bringing it down. For [H₁₀](app:s/10/0/1) in the pilot run,
 an r²SCAN-3c gradient took 3 s and an ωB97X-D4 gradient 48 s on one core.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - **L0, r²SCAN-3c**: a "composite" method (Grimme, 2021): r²SCAN with a
   purpose-built triple-ζ basis, D4 dispersion and a basis-set correction,

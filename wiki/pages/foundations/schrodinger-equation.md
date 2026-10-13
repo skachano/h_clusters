@@ -98,7 +98,7 @@ above the exact −0.5, as the variational principle demands, and 2.06 eV too
 high. Adding functions can only lower the energy, and six of them bring it
 within 0.004 eV ([`h_atom_basis.py`](../methods/basis-sets.md#example-the-hydrogen-atom)).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Each species H_m^n has $N = m - n$ electrons
   (`worker/src/hclust/species.py`), from 0 (H⁺) to 11 ([H₁₀⁻](app:s/10/-1/2)).

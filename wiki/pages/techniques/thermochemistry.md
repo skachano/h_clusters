@@ -75,7 +75,7 @@ $K = p_{\text{H}_3^+}\,p_{\text{H}_2}/p_{\text{H}_5^+}$. In 1 atm of [H₂](app:
 above $T = \Delta H/\Delta S \approx 380$ K, [H₅⁺](app:s/5/1/1) dissociates even at 1 atm.
 The cluster is bound, but whether it *exists* depends on conditions.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Every frequency job stores ORCA's thermochemistry at 298.15 K in the
   `thermo` field: `zpe`, `innerEnergyU`, `enthalpyH`, `entropyS` (stored as

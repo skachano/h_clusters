@@ -56,14 +56,14 @@ flowchart TD
 
 ### 評価としてのはしご
 
-最終的な構造はどれもすべての段でのエネルギーをもつので、キャンペーンは同じ構造で各手法の CCSD(T) に対する誤差を測ることになる。計画中のウェブアプリの手法評価ビューがそれである (`doc/Plan.md` §4)。このウィキにすでにある例: [H の電子親和力](../techniques/ionization-and-electron-affinity.md#examples-from-the-campaign)の 4 つのレベルでの値、[DFT での H₂⁺](../pitfalls/self-interaction-error.md#examples-from-this-project)。
+最終的な構造はどれもすべての段でのエネルギーをもつので、キャンペーンは同じ構造で各手法の CCSD(T) に対する誤差を測ることになる。ウェブアプリの[ベンチマーク](app:benchmark)ページがそれである (`doc/Plan.md` §4)。このウィキにすでにある例: [H の電子親和力](../techniques/ionization-and-electron-affinity.md#examples-from-the-campaign)の 4 つのレベルでの値、[DFT での H₂⁺](../pitfalls/self-interaction-error.md#examples-from-this-project)。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `worker/src/hclust/levels.py` の `LEVELS`: 手法、基底、微分の対応、スクラッチの見積もりをもつ各段。
 - `campaigns/baseline.yaml` の `stages:`: このキャンペーンのはしご。
 - `doc/Plan.md` §2: 手法のはしごの表とその根拠。
-- ウェブアプリ: [「手法比較」](app:benchmark)ページで各段の $D_e$ が CCSD(T) からどれだけ離れているかを、[「ジョブ」](app:jobs)ページでステージを示す。
+- [ウェブアプリ](app:): [「手法比較」](app:benchmark)ページで各段の $D_e$ が CCSD(T) からどれだけ離れているかを、[「ジョブ」](app:jobs)ページでステージを示す。
 
 ## 参考文献
 

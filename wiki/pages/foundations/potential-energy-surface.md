@@ -246,7 +246,7 @@ appear or vanish.
     --8<-- "h2_minimal_basis.py"
     ```
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - **Structure search** (`doc/Plan.md` §2.1, `worker/src/hclust/structures.py`)
   looks for all the low minima on each species' PES. With 24 dimensions for
@@ -271,7 +271,7 @@ appear or vanish.
   [point groups](../techniques/point-groups.md), names for the two shapes'
   symmetry. This is exactly why the project has more than
   one geometry level.
-- Web app: the [grid](app:?q=d_e) shows each species' weakest channel by $D_e$;
+- [Web app](app:): the [grid](app:?q=d_e) shows each species' weakest channel by $D_e$;
   [switched to $D_0$](app:?q=d_0) it shows which clusters stay bound once ZPE is included.
 
 ## References

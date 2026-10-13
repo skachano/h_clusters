@@ -52,7 +52,7 @@ $\hat{T}$ を二電子励起までで打ち切っても (**CCSD**)、$\tfrac{1}{
 
 CCSD(T) は HF 行列式がよい出発点であることを前提とする (「単参照」法)。結合が大きく伸びた場合や、ほぼ縮退した状態で複数の行列式が同じくらい重要な場合には精度が落ち、多参照法が必要になる。また変分的でもない。このプロジェクトは CCSD(T) を解析的勾配なしで使っているので (`levels.py` の L2 で `analytic_gradient=False`)、CCSD(T) で構造最適化するには数値勾配が必要になる。計画の任意レベル L3 がそれにあたる。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `worker/src/hclust/levels.py` の **L2**、`CCSD(T) aug-cc-pVTZ`: 2 つの構造分岐の極小での一点計算 (ステージ `dft_ref` と `mp2_ref`)。エネルギーの低いほうが構造を決める。
 - [H₅⁺](app:s/5/1/1) の問題に決着をつけた: C₂ᵥ (MP2 構造) は D₂d (DFT 構造) より 0.13 kcal/mol 低く、文献と一致する。

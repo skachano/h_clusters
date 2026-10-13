@@ -106,7 +106,7 @@ maximum. The check, the [H₅⁺](app:s/5/1/1) proton hop through the D₂d sadd
 0.0057 eV (0.13 kcal/mol) with one imaginary mode at 545i cm⁻¹, and −0.037 eV
 with zero-point energy: the zero-point level lies above the barrier.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - The barriers study, `worker/src/hclust/studies/barriers.py`: for each
   channel of [H₅⁺](app:s/5/1/1) and [H₆⁺](app:s/6/1/2) (doublet) below 1 eV, the two best ways of
@@ -127,7 +127,7 @@ with zero-point energy: the zero-point level lies above the barrier.
   (RI-MP2) have analytic gradients; CCSD(T) single points give the
   energies, as for every other energy in the project.
 - Plan: `doc/Plan.md`, Phase 8, barriers.
-- Web app: the [Extensions](app:studies) page, "Barriers on the way out".
+- [Web app](app:): the [Extensions](app:studies) page, "Barriers on the way out".
 
 ## References
 

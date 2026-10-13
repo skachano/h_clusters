@@ -82,7 +82,7 @@ A stage added to a campaign after its barrier has passed still gets its jobs:
 on the next `run`, `Runner._expand` spawns children for finished jobs and
 re-spawns from existing selections (campaigns are extensible, Phase 3).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `select:` stages and `from:` links in `campaigns/baseline.yaml`; the schema
   (`energy_window_kcal`, `max_per_state`, `minima_only`, dedup tolerances) in

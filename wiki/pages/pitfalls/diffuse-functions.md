@@ -81,7 +81,7 @@ functions, and their EAs are positive (0.20, 0.48 and 0.73 eV).
 - **False binding.** Very diffuse functions can hold an electron that
   shouldn't be bound at all ([unbound anions](unbound-anions.md)).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - The plan makes diffuse functions mandatory and uses them for **all**
   species, not just anions, so that every charge state is treated alike

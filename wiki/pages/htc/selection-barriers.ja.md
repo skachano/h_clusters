@@ -53,7 +53,7 @@ select H3+ (1)    promote: 22 structures, 0 dissociated, 2 unique, 1 promoted
 
 バリアを通過したあとでキャンペーンに加えたステージも、ジョブを受け取れる。次の `run` で、`Runner._expand` が完了したジョブの子を生成し、既存の選抜からも生成し直す (キャンペーンは拡張可能である。フェーズ 3)。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `campaigns/baseline.yaml` の `select:` ステージと `from:` のつながり。スキーマ (`energy_window_kcal`、`max_per_state`、`minima_only`、重複の許容差) は `worker/src/hclust/campaign.py` にある。
 - `worker/src/hclust/runner.py` の `Runner._maybe_select`、`_select`、`_spawn_from_selection`、`reselect`。

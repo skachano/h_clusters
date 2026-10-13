@@ -71,7 +71,7 @@ Most states are much cleaner. The two worst sit right at the plan's 10 %
 threshold, so their MP2 geometries deserve a second look. Their CCSD(T)
 energies, which decide the structures, are less affected.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - ⟨S²⟩ is parsed from every ORCA output into the `s2` column of the `result` table.
 - States with multiplicity > 1 run `UHF` or `UKS`; closed-shell singlets run

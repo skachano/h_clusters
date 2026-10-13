@@ -67,7 +67,7 @@ far above [H₂](app:s/2/0/1)'s own 4401 cm⁻¹). Nothing in the individual out
   are added.
 - **Odd geometries or frequencies** unlike those of the neutral.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `H₂⁻` is a Phase 1 sanity anchor: "not bound (a resonance); a calculation in
   a finite basis may falsely bind it" (`doc/Plan.md` §1.2).
@@ -76,7 +76,7 @@ far above [H₂](app:s/2/0/1)'s own 4401 cm⁻¹). Nothing in the individual out
   once its electron is unbound (`doc/Plan.md` §2.2).
 - HOMO and LUMO energies are stored for every result (`homo`, `lumo` in the
   `result` table, in hartree).
-- Web app: the species page of an unbound anion explains why it has no
+- [Web app](app:): the species page of an unbound anion explains why it has no
   structure, e.g. [H₂⁻](app:s/2/-1/2).
 
 ## References

@@ -54,7 +54,7 @@ r²SCAN-3c (L0) には分散関数のない独自の基底がついている。�
 - **コスト。**関数が増える。aug-cc-pVTZ は H 1 個あたり 23 関数で、cc-pVTZ の 14 関数より多い。
 - **見かけの束縛。**非常に広がった関数は、本来束縛されるべきでない電子を保持してしまうことがある ([非束縛アニオン](unbound-anions.md))。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - 計画は分散関数を必須とし、アニオンだけでなく**すべての**化学種に使って、どの電荷状態も同じように扱われるようにしている (`doc/Plan.md` §2): def2-TZVPP**D** (L1)、**aug**-cc-pVTZ (L1M、L2)。
 - L0 に分散関数がないことが許されるのは、L0 が選別用のレベルだからにすぎない。アニオンのエネルギーが L0 からとられることはない。

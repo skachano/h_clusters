@@ -61,7 +61,7 @@ DFT はまた、厳密なエネルギーに対して[変分的](../foundations/s
 
 HF と同じく、形式的には基底関数の数の $N^3$〜$N^4$ で増え、工夫 ([RI](resolution-of-identity.md)) によって下げられる。試験計算での [H₁₀](app:s/10/0/1) では、1 コアで r²SCAN-3c の勾配が 3 秒、ωB97X-D4 の勾配が 48 秒かかった。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - **L0、r²SCAN-3c**: 「複合」手法 (Grimme、2021)。r²SCAN に専用の三重ζ基底関数系、D4 分散補正、基底関数の補正を組み合わせ、低コストに調整してある。すべての候補構造の予備最適化に使う。
 - **L1、ωB97X-D4/def2-TZVPPD**: DFT の主な構造レベル。解析的な二次微分があるのでωB97M-V の代わりに選ばれた。[H₁₀](app:s/10/0/1) の最適化と振動数計算が 2 時間から 16 分になる (`doc/Plan.md`、フェーズ 4)。

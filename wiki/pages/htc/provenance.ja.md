@@ -59,11 +59,11 @@ stateDiagram-v2
 
 フェーズ 4 では、最初の一巡のあとで解離カットオフが誤っていたことが分かった。修復は `reselect` (選抜記録 1,232 件の消去) と `retry-failed --reopen` (267 ジョブの再投入) のあと再起動するだけで、完了した計算はすべて残った。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `worker/src/hclust/runner.py` の `Runner.run`、`_recover`、`_requeue`、`requeue_failed`。コマンドは `worker/src/hclust/cli.py` にある。
 - `attempt` テーブル: ベースラインではこれまでに 2,274 回の試行が記録され、操作は `restart` (372)、`displace` (71)、`scf` (1) である。
-- ウェブアプリ: [「ジョブ」](app:jobs)ページに、失敗したジョブとその試行回数が並ぶ。
+- [ウェブアプリ](app:): [「ジョブ」](app:jobs)ページに、失敗したジョブとその試行回数が並ぶ。
 
 ## 参考文献
 

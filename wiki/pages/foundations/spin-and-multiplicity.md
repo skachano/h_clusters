@@ -78,7 +78,7 @@ An exact wavefunction with spin $S$ has $\langle \hat{S}^2\rangle = S(S+1)$:
 Unrestricted methods can produce wavefunctions with the wrong value, which
 signals a contaminated state ([spin contamination](../pitfalls/spin-contamination.md)).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `allowed_multiplicities()` in `worker/src/hclust/species.py` implements the
   parity rule. The baseline campaign keeps the two lowest multiplicities of
@@ -89,7 +89,7 @@ signals a contaminated state ([spin contamination](../pitfalls/spin-contaminatio
 - ⟨S²⟩ is parsed from every output and stored in the `result` table (`s2`).
 - Fragments of a cluster may be in any spin state, so the fragmentation
   analysis needs both multiplicities of every species (`doc/Plan.md` §2.2).
-- Web app: each species page compares its two spin states, e.g.
+- [Web app](app:): each species page compares its two spin states, e.g.
   [H₃⁺](app:s/3/1/1).
 
 ## References

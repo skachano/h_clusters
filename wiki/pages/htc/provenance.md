@@ -93,13 +93,13 @@ pass. The repair was `reselect` (clearing 1,232 selection records) and
 `retry-failed --reopen` (requeueing 267 jobs), then a relaunch, with every
 completed calculation kept.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `Runner.run`, `_recover`, `_requeue` and `requeue_failed` in
   `worker/src/hclust/runner.py`; the commands in `worker/src/hclust/cli.py`.
 - The `attempt` table: 2,274 attempts recorded in the baseline so far, with
   actions `restart` (372), `displace` (71) and `scf` (1).
-- Web app: the [Jobs](app:jobs) page lists the failed jobs with their
+- [Web app](app:): the [Jobs](app:jobs) page lists the failed jobs with their
   attempts.
 
 ## References

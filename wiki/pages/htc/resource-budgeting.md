@@ -77,7 +77,7 @@ data directory.
   through its process group, so a timed-out job leaves nothing running
   (`_kill_group` in `engines/orca.py`).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `resources:` in `campaigns/baseline.yaml`; `Level.scratch_gb_m10` in
   `worker/src/hclust/levels.py`; `Runner.scratch_gb` and `_next_pending` in
@@ -85,7 +85,7 @@ data directory.
 - `SCRATCH_DIR` in `.env.example` and the `/scratch` mount in `compose.yaml`.
 - Wall time per attempt is recorded (`wall_s` in the `attempt` table): 51
   CPU-hours in the baseline so far.
-- Web app: the [Jobs](app:jobs) page shows the run times per stage and level.
+- [Web app](app:): the [Jobs](app:jobs) page shows the run times per stage and level.
 
 ## References
 

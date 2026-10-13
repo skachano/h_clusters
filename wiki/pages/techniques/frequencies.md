@@ -95,7 +95,7 @@ At the DFT levels the D₂d structure is a minimum instead. The imaginary
 mode of D₂d at MP2 moves the central proton towards one [H₂](app:s/2/0/1), the motion that
 turns it into C₂ᵥ.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Tasks `freq` and `optfreq` add `Freq` (analytic) or `NumFreq` (numerical,
   for levels with `analytic_hessian=False`) in `engines/orca.py`. L1 was
@@ -112,7 +112,7 @@ turns it into C₂ᵥ.
 - Stages with `minima_only` or `when: minimum` (`campaigns/baseline.yaml`)
   only pass on structures with no imaginary frequencies.
 - Frequencies and normal modes are stored per result (`frequencies`, `modes`).
-- Web app: the 3D viewer on each species page animates the normal modes, e.g.
+- [Web app](app:): the 3D viewer on each species page animates the normal modes, e.g.
   [H₃⁺](app:s/3/1/1).
 
 ## References

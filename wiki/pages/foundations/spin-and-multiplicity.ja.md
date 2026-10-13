@@ -55,13 +55,13 @@ $N$ 個の電子が対をつくれる数には限りがある。$N$ が偶数な
 
 スピン $S$ の厳密な波動関数では $\langle \hat{S}^2\rangle = S(S+1)$ である。一重項で 0、二重項で 0.75、三重項で 2、四重項で 3.75 となる。非制限法ではこれと違う値の波動関数ができることがあり、それは汚染された状態のしるしである ([スピン汚染](../pitfalls/spin-contamination.md))。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `worker/src/hclust/species.py` の `allowed_multiplicities()` が偶奇の規則を実装している。ベースラインキャンペーンは各化学種について最も低い 2 つの多重度を残し (`campaigns/baseline.yaml` の `n_mult: 2`)、全部で 56 状態になる。
 - ORCA の入力にはどれも座標行に電荷と多重度が書かれる。たとえば三重項 [H₃⁺](app:s/3/1/3) なら `* xyz 1 3` である。多重度が 1 より大きい状態は非制限法 (`UHF`/`UKS`) で計算される (`engines/orca.py`)。
 - ⟨S²⟩ はすべての ORCA 出力から読み取られ、`result` テーブル (`s2`) に保存される。
 - クラスターの断片はどのスピン状態でもあり得るので、解離の解析にはすべての化学種の両方の多重度が必要である (`doc/Plan.md` §2.2)。
-- ウェブアプリ: 各化学種ページで 2 つのスピン状態を比べられる。例: [H₃⁺](app:s/3/1/1)。
+- [ウェブアプリ](app:): 各化学種ページで 2 つのスピン状態を比べられる。例: [H₃⁺](app:s/3/1/1)。
 
 ## 参考文献
 

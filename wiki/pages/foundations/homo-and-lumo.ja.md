@@ -88,12 +88,12 @@ CCSD(T)/aug-cc-pVTZ 参照計算 (L2) の HF 軌道。基底状態について e
 
 余分な電子が束縛されていないアニオンでも、最も広がった関数の擬連続状態から HOMO が返ってくる。aug-cc-pVTZ と def2-TZVPPD ではその状態は +1 eV 付近にあり、束縛されたアニオンは +0.2 eV (ωB97X-D4) または −0.7 eV (HF) より下にある。キャンペーンはその間の隔たりを安価な判定に使う: HOMO が +0.5 eV より上のアニオンには `unbound` のフラグが立ち、その構造は信用されない。決定的な判定はやはりエネルギーである: アニオンが中性分子と自由電子の和より下にあるかどうか ([イオン化エネルギーと電子親和力](../techniques/ionization-and-electron-affinity.md))。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - **解析。**`worker/src/hclust/parse.py` の `_frontier_orbitals` は ORCA の出力の最後の `ORBITAL ENERGIES` ブロックを読み、両方のスピンを通じて最も高い被占軌道と最も低い空軌道をとる。MP2 と CCSD(T) のジョブでは、これらは HF 参照の軌道である。ハートリー単位で保存される (`result` テーブルの `homo`、`lumo`)。
 - **非束縛アニオン。**`worker/src/hclust/levels.py` の `Level.unbound_homo_ev` が、ωB97X-D4、ωB97M-V、RI-MP2、CCSD(T) の HF 参照について +0.5 eV のしきい値を定める。r²SCAN-3c にはない: 自己相互作用誤差と分散関数の欠如のため、束縛された [H⁻](app:s/1/-1/1) でさえ +4 eV より上に来る (`doc/Plan.md`、フェーズ 4)。
 - **判定。**状態の参照構造は、自身の HOMO によっても、その構造を求めたジョブの HOMO によっても、非束縛アニオンであってはならない (`worker/src/hclust/analysis/verdicts.py`)。
-- ウェブアプリ: 各化学種ページの性質の中の「HOMO / LUMO (HF)」(例: [H₃⁺](app:s/3/1/1))、そしてトレンドページでグリッド全体にわたる [HOMO–LUMO ギャップ](app:trends)。
+- [ウェブアプリ](app:): 各化学種ページの性質の中の「HOMO / LUMO (HF)」(例: [H₃⁺](app:s/3/1/1))、そして[トレンド](app:trends)ページでグリッド全体にわたる HOMO–LUMO ギャップ。
 
 ## 参考文献
 

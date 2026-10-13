@@ -54,7 +54,7 @@ kcal/mol と kJ/mol は分子 *1 モルあたり*のエネルギーであり、e
 - **全エネルギーは巨大で、化学はごく小さな差の中にある。** 0.1 kcal/mol の相対エネルギーは、ハートリー単位の全エネルギーの小数第 5 位の差である。計算は、気にしている差よりはるかに厳しく収束させなければならない (すべての入力に `TightSCF` がついているのはそのため)。
 - **弱い結合は熱エネルギーと競合する。**数 kcal/mol で結合したクラスターは室温で簡単にばらばらになる ([熱化学](../techniques/thermochemistry.md))。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `worker/src/hclust/units.py` に換算係数がある (CODATA 2018): `BOHR_TO_ANGSTROM`、`HARTREE_TO_EV`、`HARTREE_TO_KCAL`。
 - `result` テーブルのエネルギーはハートリー、構造は Å で保存される。

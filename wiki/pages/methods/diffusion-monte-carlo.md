@@ -170,7 +170,7 @@ Results, $D_0$ in meV for losing one [H₂](app:s/2/0/1):
 - A time step of 10 a.u. biases cluster energies by a few percent; halving
   it from 20 a.u. changed no verdict.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Solver: `worker/src/hclust/analysis/dmc.py` (DMC, exact radial solver,
   pair potentials); tests in `worker/tests/test_dmc.py`
@@ -179,7 +179,7 @@ Results, $D_0$ in meV for losing one [H₂](app:s/2/0/1):
   DMC and the three-body table in `analysis/dmc.py`), run with
   `python -m hclust study dmc` or `dmc_anions`; reports in
   `data/studies/dmc@baseline.json` and `dmc_anions@baseline.json`
-- Web app: the [Extensions](app:studies) page, "Quantum nuclear motion: diffusion Monte
+- [Web app](app:): the [Extensions](app:studies) page, "Quantum nuclear motion: diffusion Monte
   Carlo" and "Quantum nuclear motion of the anions H⁻(H₂)ₖ"
 - Plan: `doc/Plan.md`, Phase 8, DMC study and anion DMC
 

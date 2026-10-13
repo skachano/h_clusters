@@ -174,7 +174,7 @@ geometry is not trusted. The decisive test is still the energy: whether the
 anion is below the neutral plus a free electron
 ([Ionization energy and electron affinity](../techniques/ionization-and-electron-affinity.md)).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - **Parsing.** `_frontier_orbitals` in `worker/src/hclust/parse.py` reads the
   last `ORBITAL ENERGIES` block of an ORCA output and takes the highest
@@ -188,9 +188,9 @@ anion is below the neutral plus a free electron
   Phase 4).
 - **Verdicts.** A state's reference structure must not be an unbound anion by
   its own HOMO or its geometry job's (`worker/src/hclust/analysis/verdicts.py`).
-- Web app: "HOMO / LUMO (HF)" among the properties on each species page, e.g.
-  [H₃⁺](app:s/3/1/1), and the [HOMO–LUMO gap](app:trends) across the grid
-  on the Trends page.
+- [Web app](app:): "HOMO / LUMO (HF)" among the properties on each species page, e.g.
+  [H₃⁺](app:s/3/1/1), and the HOMO–LUMO gap across the grid on the
+  [Trends](app:trends) page.
 
 ## References
 

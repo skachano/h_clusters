@@ -66,7 +66,7 @@ real molecule doesn't sit in either well. Its central proton moves freely
 between the two [H₂](app:s/2/0/1) units (it is "fluxional").
 See [quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - ORCA reports the ZPE with every frequency job; it is stored in the
   `thermo` field of each result (`"zpe"`, in hartree).
@@ -76,7 +76,7 @@ See [quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md).
 - Phase 8 goes beyond the harmonic ZPE: VPT2 for [H₂](app:s/2/0/1), [H₃⁺](app:s/3/1/1) and [H₅⁺](app:s/5/1/1), and
   [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md) for the
   neutral clusters, where the harmonic $D_0 < 0$ turns out to be wrong.
-- Web app: compare the [grid by $D_e$](app:?q=d_e) with the
+- [Web app](app:): compare the [grid by $D_e$](app:?q=d_e) with the
   [grid by $D_0$](app:?q=d_0) to see which clusters ZPE unbinds; the
   [Extensions](app:studies) page has the VPT2 and DMC studies.
 

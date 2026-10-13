@@ -102,7 +102,7 @@ How MP2 compares on the project's [H₂](app:s/2/0/1) (aug-cc-pVTZ basis):
 | Harmonic frequency | 4517 cm⁻¹ | — | 4401 cm⁻¹ |
 | Energy | −1.16502 hartree | −1.17263 | −1.17447 |
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - **L1M** in `worker/src/hclust/levels.py`: RI-MP2 with RI-JK and the
   aug-cc-pVTZ basis. It optimizes every promoted structure (stage `mp2`);

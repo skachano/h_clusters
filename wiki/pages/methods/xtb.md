@@ -53,7 +53,7 @@ As a result:
 - GOAT with xTB found nothing that the template and random search didn't, so
   it is off by default in the baseline campaign (Phase 3 findings).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `Level("XTB", "XTB", kind="xtb")` in `worker/src/hclust/levels.py`.
 - Used through ORCA's `! GOAT-EXPLORE XTB`

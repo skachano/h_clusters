@@ -50,12 +50,12 @@ $$
 - アニオン、奇数電子の陽イオン、電荷が共有され得る構造には特に疑ってかかる。
 - 一電子系には HF を使う。HF は厳密である。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - **L1M** (RI-MP2) 構造レベルがあるのは [H₅⁺](app:s/5/1/1) の結果のためである (`worker/src/hclust/levels.py` のコメント)。
 - アンカーテスト (`worker/tests/test_anchors.py`) は、DFT の [H₂⁺](app:s/2/1/2) 結合長を「必ず失敗すべきテスト」(strict xfail) として保持している。それを「直してしまう」変更があれば気づける。
 - DFT と MP2 の両方の構造での CCSD(T) 一点計算が、各構造を決める (`campaigns/baseline.yaml` の `dft_ref`、`mp2_ref`)。
-- ウェブアプリ: [「手法比較」](app:benchmark)ページで各構造レベルの $D_e$ を CCSD(T) と比べている。DFT が失敗するのはアニオンである。
+- [ウェブアプリ](app:): [「手法比較」](app:benchmark)ページで各構造レベルの $D_e$ を CCSD(T) と比べている。DFT が失敗するのはアニオンである。
 
 ## 参考文献
 

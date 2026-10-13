@@ -47,12 +47,12 @@ ORCA は `scratch/<hash>` で実行され、終わったあとで小さな出力
 - `%maxcore` はコアあたりの値で、ORCA はそれを緩い上限として扱うので、ワーカー数はコア数ではなく空きメモリで決めた。
 - タイムアウトは、プロセスグループを通じて ORCA のプロセス木全体 (`orca_scf`、`orca_mdci`、…) を停止するので、タイムアウトしたジョブは何も残さない (`engines/orca.py` の `_kill_group`)。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `campaigns/baseline.yaml` の `resources:`、`worker/src/hclust/levels.py` の `Level.scratch_gb_m10`、`worker/src/hclust/runner.py` の `Runner.scratch_gb` と `_next_pending`。
 - `.env.example` の `SCRATCH_DIR` と `compose.yaml` の `/scratch` マウント。
 - 試行ごとの経過時間が記録される (`attempt` テーブルの `wall_s`): ベースラインではこれまでに 51 CPU 時間。
-- ウェブアプリ: [「ジョブ」](app:jobs)ページにステージとレベルごとの実行時間がある。
+- [ウェブアプリ](app:): [「ジョブ」](app:jobs)ページにステージとレベルごとの実行時間がある。
 
 ## 参考文献
 

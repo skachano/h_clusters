@@ -45,12 +45,12 @@
 - ORCA は、3 本の結合の差が 3·10⁻⁴ Å 未満だった ωB97M-V の [H₃⁺](app:s/3/1/1) を C₂ᵥ と判定した (フェーズ 1 の知見)。
 - ベースラインキャンペーンでは、エネルギーが 10⁻⁶ ハートリーまで、結合長が 10⁻⁴ Å まで等しい RI-MP2 の [H₅⁺](app:s/5/1/1) の結果 3 つが、C₂ᵥ、C₁、C₁ と判定されている。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - ORCA の点群と対称数は `result` テーブル (`point_group`、`symmetry_number`) に読み込まれるが、解析には信用しない。
 - フェーズ 5 では、許容誤差をもつ判定 (pymatgen の `PointGroupAnalyzer`) を使った独自の `analysis/symmetry.py` と、構造ごとの形の分類 (直線、平面、3 次元) を加える (`doc/Plan.md` §2.2)。
 - 重複の判定には対称性をまったく使わない。[距離の指紋](structure-search.md#how-this-project-does-it)が構造を直接比べる。
-- ウェブアプリ: [一覧](app:)と各化学種ページに、各構造の点群と形の分類が表示される。
+- [ウェブアプリ](app:): [一覧](app:)と各化学種ページに、各構造の点群と形の分類が表示される。
 
 ## 参考文献
 

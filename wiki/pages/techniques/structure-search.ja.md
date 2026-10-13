@@ -69,13 +69,13 @@ def fingerprint(geometry: Geometry) -> np.ndarray:
 
 [H₃⁺](app:s/3/1/1) では、20 個のランダムな出発点すべてが三角形を見つけた (フェーズ 3)。[H₅⁺](app:s/5/1/1) では L0 ですべての出発点が D₂d 構造に行き着いた。選別レベルの DFT に C₂ᵥ 極小がないからである。MP2 の分岐が C₂ᵥ を取り戻せたのは、その最適化と鞍点からのずらしがそれらの構造をそこへ動かしたからにすぎない。探索は選別手法の死角を受け継ぐ。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - `campaigns/baseline.yaml` の `seeds:` と、`pre` / `promote` ステージ。
 - `worker/src/hclust/structures.py` の `GENERATORS`、`fingerprint`、`same_structure`、`is_dissociated`、`composition`。選抜の処理は `worker/src/hclust/runner.py` の `Runner._select` である。
 - すべての判断 (順位、重複先、解離、組成、出どころ) は `candidate` テーブルに保存され、`python -m hclust structures <campaign> --stage <name>` で一覧できる。
 - xTB を使った ORCA の GOAT-EXPLORE は初期構造の出どころとして使えるが、フェーズ 3 では生き残る構造を何も加えず、ベースラインでは無効にしている。
-- ウェブアプリ: 各状態で残った異性体は、その化学種ページにある。例: [H₅⁺](app:s/5/1/1)。
+- [ウェブアプリ](app:): 各状態で残った異性体は、その化学種ページにある。例: [H₅⁺](app:s/5/1/1)。
 
 ## 参考文献
 

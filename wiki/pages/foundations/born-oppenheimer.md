@@ -75,7 +75,7 @@ dissociation energy are below 0.01 eV.
     *further* approximation, and for hydrogen a poor one
     ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Every ORCA job is a step-one calculation: fixed nuclei, electrons only. An
   optimization repeats it at many geometries.

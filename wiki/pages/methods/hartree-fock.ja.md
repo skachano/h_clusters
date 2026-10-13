@@ -171,7 +171,7 @@ RHF は常に両者を同じ割合で混ぜる。平衡付近ではそれで差�
 
 より安価な修正が**非制限 HF** (UHF) である。上向きスピンと下向きスピンの電子に別々の空間軌道を許すので、遠く離れたところでは各原子に 1 個ずつ電子が乗れる。エネルギーは正しくなるが、波動関数はもはや純粋な一重項ではない (**スピン汚染**。⟨S²⟩ で測る)。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - **制限と非制限。** `worker/src/hclust/engines/orca.py` は多重度が 1 より大きいすべての入力に `UHF` (DFT なら `UKS`) を加える。閉殻の一重項には ORCA の既定である RHF が使われる。`TightSCF` は上のループの収束しきい値を厳しくする。
 - **一電子の化学種。** H と [H₂⁺](app:s/2/1/2) には相関させる電子対がない。`worker/src/hclust/levels.py` で `correlated` とされたレベル (MP2、CCSD(T)) は、これらに対しては普通の HF に切り替わる。HF は基底の範囲で厳密である。

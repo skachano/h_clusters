@@ -62,7 +62,7 @@ A geometry optimization needs tens of gradients, and numerical frequencies
 need about 60 more per structure. The factor of 5–20 decided whether an MP2
 geometry level was affordable at all.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - **L1M** is `RI-MP2 RIJK` with the basis line
   `aug-cc-pVTZ aug-cc-pVTZ/C aug-cc-pVTZ/JK` (orbital basis, then the two

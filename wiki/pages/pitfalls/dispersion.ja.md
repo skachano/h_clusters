@@ -38,7 +38,7 @@ $$
 
 電荷をもつクラスターは事情が違う。[H₃⁺·H₂](app:s/5/1/1) ([H₅⁺](app:s/5/1/1)) や [H⁻·H₂](app:s/3/-1/1) は主にイオンが [H₂](app:s/2/0/1) を分極させることで (誘起相互作用。$R^{-4}$ で減衰する) まとまっており、分散力のない手法でもこれは記述できる。そこでは分散力はより小さな補正である。
 
-## h_clusters での登場箇所
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - どちらの DFT レベルも D4 を含む: r²SCAN-3c (L0) と ωB97X-D4 (L1)。ωB97M-V (L1V) は代わりに VV10 をもつ。
 - 分散補正*なし*の B3LYP/def2-TZVPPD、**L1b** が教育用に `worker/src/hclust/levels.py` に定義されている。中性の複合体に対して実行すれば、それらがばらばらになる様子を観察できる。

@@ -75,17 +75,17 @@ The ladder was redesigned twice by evidence:
 
 Because every final structure has energies at every rung, the campaign
 measures each method's error against CCSD(T) on the same structures: the
-method benchmark view of the planned web app (`doc/Plan.md` §4). Examples
+[Benchmark](app:benchmark) page of the web app (`doc/Plan.md` §4). Examples
 already in this wiki: the [electron affinity of H](../techniques/ionization-and-electron-affinity.md#examples-from-the-campaign)
 at four levels and [H₂⁺ under DFT](../pitfalls/self-interaction-error.md#examples-from-this-project).
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - `LEVELS` in `worker/src/hclust/levels.py`: every rung with its method, basis,
   derivative support and scratch estimate.
 - `stages:` in `campaigns/baseline.yaml`: the ladder for this campaign.
 - `doc/Plan.md` §2: the method ladder table and its rationale.
-- Web app: the [Benchmark](app:benchmark) page shows how far each rung's
+- [Web app](app:): the [Benchmark](app:benchmark) page shows how far each rung's
   $D_e$ is from CCSD(T); the [Jobs](app:jobs) page shows the stages.
 
 ## References

@@ -79,7 +79,7 @@ the D₂d structure is a saddle point (546i cm⁻¹), and CCSD(T) puts C₂ᵥ
   charge could be shared.
 - One-electron systems: use HF, which is exact.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - The **L1M** (RI-MP2) geometry level exists because of the [H₅⁺](app:s/5/1/1) result (comment
   in `worker/src/hclust/levels.py`).
@@ -87,7 +87,7 @@ the D₂d structure is a saddle point (546i cm⁻¹), and CCSD(T) puts C₂ᵥ
   length as a strict expected failure, so a change that "fixes" it would be noticed.
 - CCSD(T) single points on both the DFT and MP2 geometries decide each
   structure (`dft_ref`, `mp2_ref` in `campaigns/baseline.yaml`).
-- Web app: the [Benchmark](app:benchmark) page compares each geometry
+- [Web app](app:): the [Benchmark](app:benchmark) page compares each geometry
   level's $D_e$ with CCSD(T); the anions are where DFT fails.
 
 ## References

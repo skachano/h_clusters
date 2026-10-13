@@ -109,7 +109,7 @@ levels). At low temperatures this changes rotational energies and entropies.
 The project's thermochemistry ignores it; the DMC study assumes para-H₂,
 whose $j = 0$ ground state is spherical.
 
-## Where this appears in h_clusters
+## Where this appears in [h_clusters](https://github.com/skachano/h_clusters)
 
 - Every vibrational quantity in the project is harmonic: frequencies, ZPE
   and thermochemistry (`Freq`/`NumFreq` in `engines/orca.py`).
@@ -121,7 +121,7 @@ whose $j = 0$ ground state is spherical.
   [diffusion Monte Carlo](../methods/diffusion-monte-carlo.md)).
 - Reporting both ΔE and ΔE₀, and the separate `bound_with_zpe` verdict, keep
   the harmonic ZPE's influence visible rather than hidden in one number.
-- Web app: the VPT2 and DMC studies are on the [Extensions](app:studies) page.
+- [Web app](app:): the VPT2 and DMC studies are on the [Extensions](app:studies) page.
 
 ## References
 

@@ -63,14 +63,14 @@ FCI: minimum R_e = 0.7349 Å, force constant k = 0.4771 hartree/bohr², harmonic
 
 DFT のレベルでは逆に D₂d 構造が極小になる。MP2 での D₂d の虚振動モードは、中央の陽子を一方の [H₂](app:s/2/0/1) に近づける運動であり、構造を C₂ᵥ に変える。
 
-## h_clusters での登場箇所 { #where-this-appears-in-h_clusters }
+## [h_clusters](https://github.com/skachano/h_clusters) での登場箇所 { #where-this-appears-in-h_clusters }
 
 - タスク `freq` と `optfreq` は `engines/orca.py` で `Freq` (解析的) か `NumFreq` (数値的、`analytic_hessian=False` のレベル用) を加える。L1 が ωB97X-D4 に切り替えられたのは解析的ヘッセ行列があるからである。[H₁₀](app:s/10/0/1) で 231 秒、ωB97M-V の数値計算ではおよそ 2 時間かかる。
 - 解析的ヘッセ行列の方程式 (CP-SCF) が収束しないとき、ランナーは最適化された構造から `NumFreq` で再試行する (エラー種別 `cpscf`)。
 - **鞍点は下り坂へ押し出される**: 結果に虚振動数があると、`worker/src/hclust/runner.py` の `displace_along_imaginary_mode()` が原子を最も大きな虚振動数のモードに沿って 0.1 Å 動かし (試行ごとに向きを交互に変える)、再最適化する。これで直線状の [H₃⁺](app:s/3/1/1) の鎖が三角形になり (フェーズ 2)、MP2 の D₂d [H₅⁺](app:s/5/1/1) 構造は 2 つとも C₂ᵥ になった (フェーズ 3)。3 回試行しても残る構造は鞍点 (`n_imag > 0`) として保存される。
 - `minima_only` や `when: minimum` のついたステージ (`campaigns/baseline.yaml`) は、虚振動数のない構造だけを次へ渡す。
 - 振動数と基準振動は結果ごとに保存される (`frequencies`、`modes`)。
-- ウェブアプリ: 各化学種ページの 3D ビューアーで基準振動をアニメーション表示できる。例: [H₃⁺](app:s/3/1/1)。
+- [ウェブアプリ](app:): 各化学種ページの 3D ビューアーで基準振動をアニメーション表示できる。例: [H₃⁺](app:s/3/1/1)。
 
 ## 参考文献
 
