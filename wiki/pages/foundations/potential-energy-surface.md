@@ -54,7 +54,7 @@ The slope of the surface is the **gradient** $\mathbf{g} = \partial E /
 |---|---|---|---|
 | **Minimum** | zero | all positive | A stable structure. A PES can have several: the **isomers**. The lowest is the **global minimum** |
 | **Saddle point** (first order) | zero | exactly one negative | A transition state: the highest point on the lowest path between two minima |
-| **Asymptote** | goes to zero | | Fragments far apart, e.g. [H₂](app:s/2/0/1) → H + H |
+| **Asymptote** | goes to zero | | Fragments far apart, e.g. [H₂](app:s/2/0/1) → [H + H](app:s/2/0/1) |
 
 The gradient finds points where the surface is flat; only the Hessian tells
 a minimum from a saddle point. That is why the project computes
@@ -165,7 +165,7 @@ D_0 = D_e - \Delta\text{ZPE}, \qquad
 \Delta\text{ZPE} = \text{ZPE}(\text{cluster}) - \sum_\text{fragments} \text{ZPE}(\text{fragment})
 $$
 
-Take [H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1). The cluster has $3 \cdot 5 - 6 = 9$ normal modes; the
+Take [H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1). The cluster has $3 \cdot 5 - 6 = 9$ normal modes; the
 fragments have $3 + 1 = 4$ between them. The extra five are the soft motions
 of [H₂](app:s/2/0/1) against [H₃⁺](app:s/3/1/1) that hold the cluster together, and each brings its own
 zero-point energy. So $\Delta\text{ZPE}$ is typically positive and $D_0 < D_e$.

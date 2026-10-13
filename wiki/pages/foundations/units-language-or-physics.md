@@ -75,7 +75,7 @@ imposes: spectroscopically it *is* four [H₂](app:s/2/0/1), with small shifts.
 
 ### Covalent units: nothing below them
 
-Inside [H₃⁺](app:s/3/1/1) there are no units. Splitting it into [H₂](app:s/2/0/1) + H⁺ fails every test:
+Inside [H₃⁺](app:s/3/1/1) there are no units. Splitting it into [H₂ + H⁺](app:s/3/1/1) fails every test:
 the bonding is shared over three centres, nothing is transferable, and the
 pieces cost 4.6 eV to separate. [H₃⁺](app:s/3/1/1) is simply the unit.
 
@@ -92,7 +92,7 @@ The ion clusters lie in between, and the answer degrades gradually:
   barrier between them
   ([quantum nuclear effects](../pitfalls/quantum-nuclear-effects.md)).
   The decomposition depends on which question you ask.
-- **[H₆⁺](app:s/6/1/2) (doublet):** "[H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) + H" (what it falls apart into) and
+- **[H₆⁺](app:s/6/1/2) (doublet):** "[H₃⁺ + H₂ + H](app:s/6/1/2)" (what it falls apart into) and
   "[H₂·H₂⁺·H₂](app:s/6/1/2)" (what its pieces resemble) are both defensible and neither is
   complete: the hole is delocalised
   ([electrons, charge, spin and bond lengths](electrons-charges-and-bond-lengths.md)).

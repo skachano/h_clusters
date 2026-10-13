@@ -57,7 +57,7 @@ literature uses both:
   astrochemistry and the classic infrared spectra of [H₅⁺](app:s/5/1/1), [H₇⁺](app:s/7/1/1) and [H₉⁺](app:s/9/1/1): [H₂](app:s/2/0/1)
   ligands added around an [H₃⁺](app:s/3/1/1) core, with the first shell complete at [H₉⁺](app:s/9/1/1),
   one [H₂](app:s/2/0/1) on each corner. The project's cheapest dissociation channel agrees:
-  [H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) costs 0.37 eV.
+  [H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1) costs 0.37 eV.
 - **[H₂·H⁺·H₂](app:s/5/1/1): the shared proton.** A proton held between two [H₂](app:s/2/0/1),
   [H₂–H–H₂]⁺, like the Zundel ion H₅O₂⁺ in water. Its symmetric D₂d form is
   the saddle point the proton crosses on its way from one [H₂](app:s/2/0/1) to the other.
@@ -72,7 +72,7 @@ literature uses both:
 Neither is wrong: [H₃⁺·H₂](app:s/5/1/1) describes the classical minimum and the cluster
 series built on it, [H₂·H⁺·H₂](app:s/5/1/1) where the nuclei actually are in the ground
 state. For labels computed from minimum structures, as in this project,
-[H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) is the natural primary one, with the shared proton noted as what the
+[H₃⁺ + H₂](app:s/5/1/1) is the natural primary one, with the shared proton noted as what the
 real ion does.
 
 ### Methods that go beyond
@@ -98,7 +98,7 @@ or more [H₂](app:s/2/0/1) by about 0.1 meV; only [H₂·H](app:s/3/0/2) is at 
 harmonic approximation treats the soft intermolecular motions as stiff
 parabolas and overestimates their zero-point energy several-fold. For the
 cations, where the binding is much larger, VPT2 changes $D_0$ of
-[H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) only from 0.244 to 0.280 eV.
+[H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1) only from 0.244 to 0.280 eV.
 
 ### Nuclear spin
 

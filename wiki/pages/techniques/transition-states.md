@@ -82,13 +82,13 @@ because the bottleneck moves with energy.
 
 | Channel type | Example | Rearrangement? | Tool |
 |---|---|---|---|
-| Loss of a ligand | [H₇⁺](app:s/7/1/1) → [H₅⁺](app:s/5/1/1) + [H₂](app:s/2/0/1), H⁻(H₂)ₖ → H⁻(H₂)ₖ₋₁ + [H₂](app:s/2/0/1) | no | relaxed scan; expected to confirm $D_e$ |
-| Van der Waals split | [(H₂)₄](app:s/8/0/1) → [(H₂)₃](app:s/6/0/1) + [H₂](app:s/2/0/1) | no | relaxed scan |
-| Rearranging core | [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H (an [H₃⁺](app:s/3/1/1) triangle must form) | yes | NEB → TS → IRC |
+| Loss of a ligand | [H₇⁺](app:s/7/1/1) → [H₅⁺ + H₂](app:s/7/1/1), H⁻(H₂)ₖ → H⁻(H₂)ₖ₋₁ + [H₂](app:s/2/0/1) | no | relaxed scan; expected to confirm $D_e$ |
+| Van der Waals split | [(H₂)₄](app:s/8/0/1) → [(H₂)₃ + H₂](app:s/8/0/1) | no | relaxed scan |
+| Rearranging core | [H₆⁺](app:s/6/1/2) → [H₅⁺ + H](app:s/6/1/2) (an [H₃⁺](app:s/3/1/1) triangle must form) | yes | NEB → TS → IRC |
 | Spin change | high-spin cations to low-spin products | — | MECP |
 
-For [H₆⁺](app:s/6/1/2) → [H₅⁺](app:s/5/1/1) + H no barrier was expected, because the reverse reaction
-resembles [H₂⁺](app:s/2/1/2) + [H₂](app:s/2/0/1) → [H₃⁺](app:s/3/1/1) + H, which has none
+For [H₆⁺](app:s/6/1/2) → [H₅⁺ + H](app:s/6/1/2) no barrier was expected, because the reverse reaction
+resembles [H₂⁺ + H₂](app:s/4/1/2) → [H₃⁺ + H](app:s/4/1/2), which has none
 ([fragmentation](fragmentation.md#products-versus-process-rearrangement-and-barriers)).
 The NEB calculation finds a small one instead:
 
@@ -100,8 +100,8 @@ The NEB calculation finds a small one instead:
   MP2's, and along the path MP2 and CCSD(T) differ by up to 0.1 eV (0.19
   against 0.29 eV at the end).
 
-The other channels below 1 eV, [H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1),
-[H₆⁺](app:s/6/1/2) → H₄⁺ + [H₂](app:s/2/0/1) and → [H₃⁺](app:s/3/1/1) + H₃, rise to the products without a
+The other channels below 1 eV, [H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1),
+[H₆⁺](app:s/6/1/2) → [H₄⁺ + H₂](app:s/6/1/2) and → [H₃⁺ + H₃](app:s/6/1/2), rise to the products without a
 maximum. The check, the [H₅⁺](app:s/5/1/1) proton hop through the D₂d saddle, gives
 0.0057 eV (0.13 kcal/mol) with one imaginary mode at 545i cm⁻¹, and −0.037 eV
 with zero-point energy: the zero-point level lies above the barrier.

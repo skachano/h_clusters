@@ -8,7 +8,8 @@ H₃⁺ becomes [H₃⁺](app:s/3/1/1): size, charge and the ground spin state, 
 multiplicity for every H_m^n of the baseline (1 for an even electron count, 2 for odd), unless a
 spin word stands right next to it ("triplet H₃⁺", "H₄⁻ quartet", "三重項の H⁻"). A formula made
 of several units links as a whole to the species they add up to: (H₂)₂, H₂·H, H₃⁺·H₂, H⁻(H₂)₄,
-(H₂H₂H₂)⁺. Left alone: the bare atom H and the proton H⁺ (not in the app), families with a
+(H₂H₂H₂)⁺. So does a sum written with +, the products or the reactants of a channel: H₃⁺ + H₂
+and H₄⁺ + H open H₅⁺, also when its terms were linked one by one before. Left alone: the bare atom H and the proton H⁺ (not in the app), families with a
 variable count such as H⁻(H₂)ₖ, sums outside the app's grid, and headings, code, math, links
 and HTML.
 """
@@ -28,6 +29,9 @@ NOT_BEFORE = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 NOT_AFTER = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]·(⁺⁻" + DIGITS + VARIABLE)
 # Spans to leave alone: inline code, inline math, Markdown links and images, HTML tags.
 PROTECTED = re.compile(r"`[^`]*`|\$[^$]*\$|!?\[[^\]]*\]\([^)]*\)|<[^>]+>")
+# A species link already on the page, which can be a term of a sum.
+APP_LINK = re.compile(r"\[([^\]]+)\]\(app:s/[-\d/]+\)")
+PLUS = " + "
 SKIP_LINE = re.compile(r"^\s*(#|!!!|\?\?\?|--8<--|\*\[)")
 SPIN = {"singlet": 1, "doublet": 2, "triplet": 3, "quartet": 4, "一重項": 1, "二重項": 2, "三重項": 3, "四重項": 4}
 WORDS = "|".join(SPIN)
@@ -122,7 +126,50 @@ def link_species(text: str) -> str:
     return "".join(out)
 
 
+def term(text: str, i: int) -> tuple[str, Formula] | None:
+    """The term of a sum at i, a formula or a species link, as its label and formula (its end in
+    text)."""
+    if (a := APP_LINK.match(text, i)) is not None:
+        f = parse(a[1], 0)
+        if f is None or f.end != len(a[1]):
+            return None
+        f.end = a.end()
+        return a[1], f
+    if text[i] not in "H(" or (i > 0 and text[i - 1] in NOT_BEFORE):
+        return None
+    f = parse(text, i)
+    if f is None or (f.end < len(text) and text[f.end] in NOT_AFTER):
+        return None
+    return text[i:f.end], f
+
+
+def link_sums(text: str) -> str:
+    """Link every sum of formulas, H₃⁺ + H₂, whole to the species it adds up to."""
+    out, i = [], 0
+    while i < len(text):
+        first = term(text, i)
+        if first is None:
+            span = PROTECTED.match(text, i)
+            j = span.end() if span else i + 1
+            out.append(text[i:j])
+            i = j
+            continue
+        labels, total = [first[0]], Formula(first[1].end, first[1].m, first[1].charge, 1, first[1].family)
+        while text.startswith(PLUS, total.end) and (t := term(text, total.end + len(PLUS))) is not None:
+            labels.append(t[0])
+            total.m += t[1].m
+            total.charge += t[1].charge
+            total.family |= t[1].family
+            total.end = t[1].end
+        target = route(text, i, total) if len(labels) > 1 else None
+        # A single term, or a sum that is no species of the app, is left to link_species.
+        out.append(text[i:total.end] if target is None else f"[{PLUS.join(labels)}](app:{target})")
+        i = total.end
+    return "".join(out)
+
+
 def link_text(text: str) -> str:
+    text = link_sums(text)
     out, last = [], 0
     for span in PROTECTED.finditer(text):
         out += [link_species(text[last:span.start()]), span[0]]

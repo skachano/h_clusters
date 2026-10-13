@@ -229,7 +229,7 @@ $$
 
 RHF always mixes the two in equal amounts. Near equilibrium that is
 acceptable. At long distance, two neutral atoms should be 100 % covalent, but
-RHF stays 50 % H⁺ + [H⁻](app:s/1/-1/1), which costs a lot of energy. Full CI fixes this by
+RHF stays 50 % [H⁺ + H⁻](app:s/2/0/1), which costs a lot of energy. Full CI fixes this by
 mixing in the doubly excited configuration $\sigma_u^2$. Since $\sigma_u
 \propto \phi_A - \phi_B$, it contains the same ionic terms but the covalent
 terms with the opposite sign, so subtracting it cancels the ionic part.

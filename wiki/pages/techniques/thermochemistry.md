@@ -54,7 +54,7 @@ without limit as its frequency goes to zero, so soft cluster modes
 
 ## Example: is H₅⁺ stable at room temperature?
 
-[H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1), with CCSD(T) electronic energies plus RI-MP2 thermal
+[H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1), with CCSD(T) electronic energies plus RI-MP2 thermal
 corrections from ORCA at 298.15 K and 1 atm (baseline campaign data):
 
 | Quantity | hartree | kcal/mol |

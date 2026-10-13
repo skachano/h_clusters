@@ -51,9 +51,9 @@ The numbers that matter in this project span six orders of magnitude:
 |---|---|---|
 | Total energy of [H₁₀](app:s/10/0/1) (its size) | ≈ 160 | ≈ 3700 |
 | [H₂](app:s/2/0/1) bond ($D_e$) | 4.75 | 110 |
-| [H₃⁺](app:s/3/1/1) → [H₂](app:s/2/0/1) + H⁺ | 4.6 | 106 |
+| [H₃⁺](app:s/3/1/1) → [H₂ + H⁺](app:s/3/1/1) | 4.6 | 106 |
 | [H⁻](app:s/1/-1/1) → H + e⁻ (electron affinity) | 0.75 | 17 |
-| [H₅⁺](app:s/5/1/1) → [H₃⁺](app:s/3/1/1) + [H₂](app:s/2/0/1) ($D_e$, this project's CCSD(T)) | 0.37 | 8.5 |
+| [H₅⁺](app:s/5/1/1) → [H₃⁺ + H₂](app:s/5/1/1) ($D_e$, this project's CCSD(T)) | 0.37 | 8.5 |
 | [H₂](app:s/2/0/1) zero-point energy | 0.27 | 6.2 |
 | "Chemical accuracy" | 0.043 | 1 |
 | Thermal energy $k_BT$ at 298 K | 0.026 | 0.59 |

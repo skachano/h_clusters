@@ -100,12 +100,13 @@ python3 wiki/tools/link_species.py wiki/pages/**/*.md
 
 It adds the missing links (ground state, or the spin state named next to the
 formula: "triplet H₃⁺"). A formula of several units links as a whole to the
-species they add up to: H₃⁺·H₂ and (H₂)₂ open H₅⁺ and H₄. It leaves alone
-headings, code, math, families with a variable count like H⁻(H₂)ₖ, and the
-atom H and proton H⁺, which are not in the app. A pair or reaction written
-with + is linked by hand, whole, to the species it makes:
-`[H₃⁺ + H₂ → H₅⁺](app:s/5/1/1)`. A "Web app:" bullet under "Where this
-appears in h_clusters" points to the view that shows the page's topic.
+species they add up to: H₃⁺·H₂ and (H₂)₂ open H₅⁺ and H₄. So does a sum
+written with +, such as the products of a channel: in H₆⁺ → H₅⁺ + H,
+"H₅⁺ + H" opens H₆⁺, also when its terms were linked one by one before. It
+leaves alone headings, code, math, families with a variable count like
+H⁻(H₂)ₖ, and the atom H and proton H⁺ outside a sum, which are not in the
+app. A "Web app:" bullet under "Where this appears in h_clusters" points to
+the view that shows the page's topic.
 
 ## Preview and check
 

@@ -54,7 +54,7 @@ is self-interaction:
 |---|---|---|---|---|
 | Bond length | 1.083 Å | 1.105 Å | 1.058 Å | 1.057 Å |
 | Harmonic frequency | — | 2074 cm⁻¹ | 2322 cm⁻¹ | 2322 cm⁻¹ |
-| $D_e$ (→ H + H⁺) | 2.91 eV | 2.91 eV | 2.79 eV | 2.79 eV |
+| $D_e$ (→ [H + H⁺](app:s/2/1/2)) | 2.91 eV | 2.91 eV | 2.79 eV | 2.79 eV |
 
 The bond is too long and too soft but too strong: the electron is happier
 spread over both protons than it should be.
